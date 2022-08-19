@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AD6E2CBA-063B-4972-B67F-6CA2A84BEB2D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Console_Platformer</RootNamespace>
+    <AssemblyName>Console_Platformer</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Engine\Collider.cs" />
+    <Compile Include="Engine\Sprites\Bitmap.cs" />
+    <Compile Include="Engine\Sprites\Animator.cs" />
+    <Compile Include="Engine\Button.cs" />
+    <Compile Include="Engine\Camera.cs" />
+    <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Engine\ImputManager.cs" />
+    <Compile Include="Engine\Math\Util.cs" />
+    <Compile Include="Engine\ResourceManager.cs" />
+    <Compile Include="Engine\Sprites\Sprite.cs" />
+    <Compile Include="Engine\Math\Vec2f.cs" />
+    <Compile Include="SpaceGame\BaseObjects\Asteroid.cs" />
+    <Compile Include="SpaceGame\BaseObjects\BaseObject.cs" />
+    <Compile Include="SpaceGame\BaseObjects\Enemy.cs" />
+    <Compile Include="SpaceGame\BaseObjects\Ship.cs" />
+    <Compile Include="SpaceGame\Game.cs" />
+    <Compile Include="Engine\GameObject.cs" />
+    <Compile Include="Engine\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Engine\Renderer.cs" />
+    <Compile Include="SpaceGame\BaseObjects\PlayerShip.cs" />
+    <Compile Include="Engine\Math\Vec2i.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
