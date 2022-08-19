@@ -10,16 +10,18 @@ namespace Console_Platformer.Engine
     {
         // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
+        // In which chunk the GameObject resides
+        public Chunk Chunk { get; private set; }
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
         public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
-        public List<Collider> Colliders { get; set; } 
+        public List<Collider> Colliders { get; set; }
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
 
         private int _spriteLevel;
         public int SpriteLevel //u
         {
             get { return _spriteLevel; }
-            set 
+            set
             {
                 // Checks whether the SpriteLevel value is valid and sets it to minimum priority if it's invalid
                 if (value >= 0 && value < Engine.spriteLevelCount) _spriteLevel = value;
@@ -34,6 +36,7 @@ namespace Console_Platformer.Engine
             SpriteLevel = 5;
             Sprites = new Sprite[Engine.spriteMaxCount];
             Colliders = new List<Collider>();
+            Chunk = Engine.chunks[Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize];
         }
 
         // Moves the gameObject and return a boolean to indicate whether the object was moved successfully
@@ -61,6 +64,17 @@ namespace Console_Platformer.Engine
                     }
                 }
 
+                // Chunk traverse detection
+                var chunkX = Position.X / Engine.chunkSize;
+                var chunkY = Position.Y / Engine.chunkSize;
+                if (Chunk != Engine.chunks[chunkX, chunkY])
+                {
+                    Chunk.gameObjects.Remove(this);
+                    Chunk = Engine.chunks[chunkX, chunkY];
+                    Chunk.gameObjects.Add(this);
+                    OnChunkTraverse(chunkX, chunkY);
+                }
+
                 return true;
             }
             else return false;
@@ -70,17 +84,26 @@ namespace Console_Platformer.Engine
         private bool CollisionDetection()
         {
             var isColliding = false;
-            foreach (var gameObject in Engine.gameObjects)
+            for (int x = 0; x < Engine.chunks.GetLength(0); x++)
             {
-                if (this != gameObject && gameObject.Collidable)
+                for (int y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    if (IsCollidingWith(gameObject))
+                    if (Engine.chunks[x, y].IsLoaded)
                     {
-                        isColliding = true;
+                        foreach (var gameObject in Engine.chunks[x, y].gameObjects)
+                        {
+                            if (this != gameObject && gameObject.Collidable)
+                            {
+                                if (IsCollidingWith(gameObject))
+                                {
+                                    isColliding = true;
 
-                        // Collsion detected
-                        OnCollision(gameObject);
-                        gameObject.OnCollision(this);
+                                    // Collsion detected
+                                    OnCollision(gameObject);
+                                    gameObject.OnCollision(this);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -99,12 +122,14 @@ namespace Console_Platformer.Engine
                         Position.Y + col1.AttachmentPos.Y + col1.Size.Y > gameObject.Position.Y)
                     {
                         return true;
-                    }  
+                    }
                 }
             }
 
             return false;
         }
+
+        protected virtual void OnChunkTraverse(int chunkX, int chunkY) { }
 
         // Updates the animators of GameObject if it has any (if it doesn't, Animation property is set to null and is ignored)
         public virtual void Update()

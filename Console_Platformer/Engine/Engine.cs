@@ -12,15 +12,15 @@ namespace Console_Platformer.Engine
         public bool gameShouldClose = false;
         public int deltaTime = 0; // Miliseconds since last frame
         public string title = "default title";
-        public readonly Vec2i worldSize = new Vec2i(500, 500);
+        public readonly Vec2i worldSize = new Vec2i(100 * chunkSize, 100 * chunkSize); //TODO: make it so chunk count and world size must match
         public readonly string pixelSpacingCharacters = " ";
         public readonly char backgroudPixel = ' ';
         public readonly int spriteLevelCount = 10;
         public readonly int spriteMaxCount = 10;
 
-        public readonly int chunkSize = 100;
-        public readonly int neighbouringChunks = 2;
-        public List<GameObject> gameObjects = new List<GameObject>();
+        public const int chunkSize = 100;
+        public readonly int chunkLoadRadius = 3;
+        public readonly Chunk[,] chunks = new Chunk[100, 100];
         public static Random gRandom = new Random();
 
         //"  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -63,7 +63,6 @@ namespace Console_Platformer.Engine
 
                     // Rendering
                     Renderer.Render();
-
                 }
 
                 deltaTime = (int)(DateTime.Now - lastFrame).TotalMilliseconds;
@@ -77,15 +76,21 @@ namespace Console_Platformer.Engine
             ImputManager.UpdateImput(this);
 
             // Updates all GameObject
-            foreach(var gameObject in gameObjects)
+            foreach(var chunk in chunks)
             {
-                gameObject.Update();
+                if (chunk.IsLoaded)
+                {
+                    foreach (var gameObject in chunk.gameObjects)
+                    {
+                        gameObject.Update();
+                    } 
+                }
             }
 
             // Lazy removing game objects. 
             foreach (var gameObject in gameObjectsToRemove)
             {
-                gameObjects.Remove(gameObject);
+                gameObject.Chunk.gameObjects.Remove(gameObject);
             }
             gameObjectsToRemove.Clear();
         }
@@ -97,6 +102,15 @@ namespace Console_Platformer.Engine
             Console.CursorVisible = false;
             Console.Title = title;
             Console.OutputEncoding = Encoding.Unicode;
+
+            // Initialise chunks
+            for (var x = 0; x < chunks.GetLength(0); x++)
+            {
+                for (var y = 0; y < chunks.GetLength(1); y++)
+                {
+                    chunks[x, y] = new Chunk();
+                }
+            }
 
             // Debug
             debugLines = new string[debugLinesCount];
@@ -127,7 +141,7 @@ namespace Console_Platformer.Engine
         // Adds and deletes gameobjects
         public void AddGameObject(GameObject gameObject)
         {
-            gameObjects.Add(gameObject);
+            chunks[gameObject.Position.X / chunkSize, gameObject.Position.Y / chunkSize].gameObjects.Add(gameObject);
             gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)

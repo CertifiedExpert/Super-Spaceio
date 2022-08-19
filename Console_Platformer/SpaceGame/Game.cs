@@ -31,7 +31,7 @@ namespace SpaceGame.Platformer
             MovePlayer();
             UpdateCamera();
 
-            UpdateAllBaseObjects();
+            //UpdateAllBaseObjects();
         }
 
         private void UpdateCamera()
@@ -50,6 +50,8 @@ namespace SpaceGame.Platformer
             RemoveGameObject(baseObject);
         }
 
+        //TODO: figure this out
+        /* I HAVE NO IDEA IF THIS IS NECESSARY 
         private void UpdateAllBaseObjects()
         {
             if (playerMovedInThisFrame)
@@ -64,7 +66,7 @@ namespace SpaceGame.Platformer
                 } 
             }
         }
-
+        */
         private void MovePlayer()
         {
             
@@ -72,7 +74,7 @@ namespace SpaceGame.Platformer
 
         private void LoadLevel()
         {
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 var astSize = gRandom.Next(1, 30);
                 var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),

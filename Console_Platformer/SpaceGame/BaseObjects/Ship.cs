@@ -62,5 +62,13 @@ namespace SpaceGame.Platformer
 
             MoveGameObject(finalX, finalY);
         }
+
+        public override void OnCollision(GameObject collidingObject)
+        {
+            base.OnCollision(collidingObject);
+
+            Velocity = new Vec2f(0, 0);
+            restOfVelocity = new Vec2f(0, 0);
+        }
     }
 }

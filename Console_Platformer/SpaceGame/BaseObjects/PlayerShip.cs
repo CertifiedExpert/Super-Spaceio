@@ -24,6 +24,8 @@ namespace SpaceGame.Platformer
             movementSprites[6] = new Sprite(ResourceManager.fighter1Down);
             movementSprites[7] = new Sprite(ResourceManager.fighter1DownRight);
             ThrustStrength = 4;
+
+            OnChunkTraverse(Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize); // Call this with the curren position in order to load in chunks for the first time
         }
 
         public override void Update()
@@ -66,6 +68,37 @@ namespace SpaceGame.Platformer
             {
                 Game.playerMovedInThisFrame = false;
                 Game.milisecondsSinceLastPlayerMove += Game.deltaTime;
+            }
+        }
+
+        protected override void OnChunkTraverse(int chunkX, int chunkY)
+        {
+            base.OnChunkTraverse(chunkX, chunkY);
+            ///*
+            //TODO: optimise this so maybe we do not need to iterate over all chunks
+            for (var i = 0; i < Engine.chunks.GetLength(0); i++)
+            {
+                for (var j = 0; j < Engine.chunks.GetLength(1); j++)
+                {
+                    Engine.chunks[i, j].IsLoaded = false;
+                }
+            }//*/
+    
+            var begginX = chunkX - Engine.chunkLoadRadius + 1;
+            var begginY = chunkY - Engine.chunkLoadRadius + 1;
+            if (begginX < 0) begginX = 0;
+            if (begginY < 0) begginY = 0;
+            var endX = chunkX + Engine.chunkLoadRadius - 1;
+            var endY = chunkY + Engine.chunkLoadRadius - 1;
+            if (endX >= Engine.chunks.GetLength(0)) endX = 0;
+            if (endY >= Engine.chunks.GetLength(1)) endY = 0;
+
+            for (var y = begginY; y <= endY; y++)
+            {
+                for (var x = begginX; x <= endX; x++)
+                {
+                    Engine.chunks[x, y].IsLoaded = true;
+                }
             }
         }
     }
