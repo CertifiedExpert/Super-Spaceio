@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpaceGame.Engine
+namespace Console_Platformer.Engine
 {
     class Util
     {

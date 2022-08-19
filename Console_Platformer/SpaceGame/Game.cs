@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SpaceGame.Engine;
+using Console_Platformer.Engine;
 
 namespace SpaceGame.Platformer
 {
-    class Game : Engine.Engine
+    class Game : Engine
     {
         // Settings
         public int milisecondsPerPlayerMove = 50;
