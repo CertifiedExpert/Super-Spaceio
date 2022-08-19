@@ -18,6 +18,8 @@ namespace SpaceGame.Engine
         public readonly int spriteLevelCount = 10;
         public readonly int spriteMaxCount = 10;
 
+        public readonly int chunkSize = 100;
+        public readonly int neighbouringChunks = 2;
         public List<GameObject> gameObjects = new List<GameObject>();
         public static Random gRandom = new Random();
 
