@@ -30,7 +30,6 @@ namespace Console_Platformer.Engine
         public ImputManager ImputManager { get; private set; }
 
         private List<GameObject>[] gameObjectRenderLists;
-        //private List<GameObject> gameObjectsToRemove = new List<GameObject>();
         private DateTime lastFrame;
         private readonly int milisecondsForNextFrame = 40;
 
@@ -53,7 +52,8 @@ namespace Console_Platformer.Engine
                 if (deltaTime > milisecondsForNextFrame)
                 {
 
-                    debugLines[5] = deltaTime.ToString();
+                    debugLines[1] = $"DeltaTime:  {deltaTime}";
+                    debugLines[2] = $"FPS: {1000 / deltaTime}";
 
                     lastFrame = DateTime.Now;
 

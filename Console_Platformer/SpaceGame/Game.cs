@@ -32,6 +32,18 @@ namespace SpaceGame.Platformer
             UpdateCamera();
 
             //UpdateAllBaseObjects();
+            var loadedGameObjectCount = 0;
+            foreach (var c in chunks)
+            {
+                if (c.IsLoaded)
+                {
+                    foreach (var go in c.gameObjects)
+                    {
+                        loadedGameObjectCount++;
+                    } 
+                }
+            }
+            debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
         }
 
         private void UpdateCamera()
