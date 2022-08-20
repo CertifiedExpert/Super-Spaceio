@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SpaceGame.Engine;
+using Console_Platformer.Engine;
 
 namespace SpaceGame.Platformer
 {
@@ -61,6 +61,14 @@ namespace SpaceGame.Platformer
             restOfVelocity.Y = totalY - finalY;
 
             MoveGameObject(finalX, finalY);
+        }
+
+        public override void OnCollision(GameObject collidingObject)
+        {
+            base.OnCollision(collidingObject);
+
+            Velocity = new Vec2f(0, 0);
+            restOfVelocity = new Vec2f(0, 0);
         }
     }
 }

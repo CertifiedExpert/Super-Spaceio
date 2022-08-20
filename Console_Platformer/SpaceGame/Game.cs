@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SpaceGame.Engine;
+using Console_Platformer.Engine;
 
 namespace SpaceGame.Platformer
 {
-    class Game : Engine.Engine
+    class Game : Engine
     {
         // Settings
         public int milisecondsPerPlayerMove = 50;
@@ -31,7 +31,19 @@ namespace SpaceGame.Platformer
             MovePlayer();
             UpdateCamera();
 
-            UpdateAllBaseObjects();
+            //UpdateAllBaseObjects();
+            var loadedGameObjectCount = 0;
+            foreach (var c in chunks)
+            {
+                if (c.IsLoaded)
+                {
+                    foreach (var go in c.gameObjects)
+                    {
+                        loadedGameObjectCount++;
+                    } 
+                }
+            }
+            debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
         }
 
         private void UpdateCamera()
@@ -50,6 +62,8 @@ namespace SpaceGame.Platformer
             RemoveGameObject(baseObject);
         }
 
+        //TODO: figure this out
+        /* I HAVE NO IDEA IF THIS IS NECESSARY 
         private void UpdateAllBaseObjects()
         {
             if (playerMovedInThisFrame)
@@ -64,7 +78,7 @@ namespace SpaceGame.Platformer
                 } 
             }
         }
-
+        */
         private void MovePlayer()
         {
             
@@ -72,7 +86,7 @@ namespace SpaceGame.Platformer
 
         private void LoadLevel()
         {
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 var astSize = gRandom.Next(1, 30);
                 var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),

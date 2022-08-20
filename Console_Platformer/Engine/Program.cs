@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SpaceGame.Platformer;
 
-namespace SpaceGame.Engine
+namespace Console_Platformer.Engine
 {
     class Program
     {

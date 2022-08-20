@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpaceGame.Engine
+namespace Console_Platformer.Engine
 {
     class Renderer
     {
@@ -55,7 +55,7 @@ namespace SpaceGame.Engine
                 var gameObjectList = gameObjectRenderLists[level];
                 foreach (var gameObject in gameObjectList)
                 {
-                    WriteSpritesToScreenBuffer(gameObject);
+                    if (gameObject.Chunk.IsLoaded) WriteSpritesToScreenBuffer(gameObject);
                 }
             }
         }

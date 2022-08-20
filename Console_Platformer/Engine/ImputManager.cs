@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace SpaceGame.Engine
+namespace Console_Platformer.Engine
 {
     class ImputManager
     {
