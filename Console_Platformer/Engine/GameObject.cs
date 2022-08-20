@@ -110,16 +110,16 @@ namespace Console_Platformer.Engine
 
             return isColliding;
         }
-        public bool IsCollidingWith(GameObject gameObject)
+        public bool IsCollidingWith(GameObject other)
         {
-            foreach (var col1 in Colliders)
+            foreach (var col in Colliders)
             {
-                foreach (var col2 in gameObject.Colliders)
+                foreach (var otherCol in other.Colliders)
                 {
-                    if (Position.X < gameObject.Position.X + col2.AttachmentPos.X + col2.Size.X &&
-                        Position.X + col1.AttachmentPos.X + col1.Size.X > gameObject.Position.X &&
-                        Position.Y < gameObject.Position.Y + col2.AttachmentPos.Y + col2.Size.Y &&
-                        Position.Y + col1.AttachmentPos.Y + col1.Size.Y > gameObject.Position.Y)
+                    if (Position.X + col.AttachmentPos.X < other.Position.X + otherCol.AttachmentPos.X + otherCol.Size.X &&
+                        Position.X + col.AttachmentPos.X + col.Size.X > other.Position.X + otherCol.AttachmentPos.X &&
+                        Position.Y + col.AttachmentPos.Y < other.Position.Y + otherCol.AttachmentPos.Y + otherCol.Size.Y &&
+                        Position.Y + col.AttachmentPos.Y + col.Size.Y > other.Position.Y + otherCol.AttachmentPos.Y)
                     {
                         return true;
                     }
