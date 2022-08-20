@@ -30,7 +30,7 @@ namespace Console_Platformer.Engine
         public ImputManager ImputManager { get; private set; }
 
         private List<GameObject>[] gameObjectRenderLists;
-        private List<GameObject> gameObjectsToRemove = new List<GameObject>();
+        //private List<GameObject> gameObjectsToRemove = new List<GameObject>();
         private DateTime lastFrame;
         private readonly int milisecondsForNextFrame = 40;
 
@@ -88,11 +88,24 @@ namespace Console_Platformer.Engine
             }
 
             // Lazy removing game objects. 
-            foreach (var gameObject in gameObjectsToRemove)
+            foreach (var chunk in chunks)
             {
-                gameObject.Chunk.gameObjects.Remove(gameObject);
+                foreach (var gameObject in chunk.gameObjectsToRemove)
+                {
+                    chunk.gameObjects.Remove(gameObject);
+                }
+                chunk.gameObjectsToRemove.Clear();
             }
-            gameObjectsToRemove.Clear();
+
+            // Lazy adding GameObjects
+            foreach (var chunk in chunks)
+            {
+                foreach (var gameObject in chunk.gameObjectsToAdd)
+                {
+                    chunk.gameObjects.Add(gameObject);
+                }
+                chunk.gameObjectsToAdd.Clear();
+            }
         }
 
 
@@ -141,12 +154,12 @@ namespace Console_Platformer.Engine
         // Adds and deletes gameobjects
         public void AddGameObject(GameObject gameObject)
         {
-            chunks[gameObject.Position.X / chunkSize, gameObject.Position.Y / chunkSize].gameObjects.Add(gameObject);
+            chunks[gameObject.Position.X / chunkSize, gameObject.Position.Y / chunkSize].gameObjectsToAdd.Add(gameObject);
             gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
-            gameObjectsToRemove.Add(gameObject);
+            gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
             gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
         }
 

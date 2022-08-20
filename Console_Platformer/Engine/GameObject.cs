@@ -69,9 +69,9 @@ namespace Console_Platformer.Engine
                 var chunkY = Position.Y / Engine.chunkSize;
                 if (Chunk != Engine.chunks[chunkX, chunkY])
                 {
-                    Chunk.gameObjects.Remove(this);
+                    Chunk.gameObjectsToRemove.Add(this);
                     Chunk = Engine.chunks[chunkX, chunkY];
-                    Chunk.gameObjects.Add(this);
+                    Chunk.gameObjectsToAdd.Add(this);
                     OnChunkTraverse(chunkX, chunkY);
                 }
 

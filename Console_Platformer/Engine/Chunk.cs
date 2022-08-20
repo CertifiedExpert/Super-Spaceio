@@ -9,6 +9,8 @@ namespace Console_Platformer.Engine
     class Chunk
     {
         public List<GameObject> gameObjects = new List<GameObject>();
+        public List<GameObject> gameObjectsToRemove = new List<GameObject>();
+        public List<GameObject> gameObjectsToAdd = new List<GameObject>();
         public DateTime lastUnloaded = DateTime.MinValue;
 
         private bool _isLoaded;
