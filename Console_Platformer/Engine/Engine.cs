@@ -13,15 +13,15 @@ namespace Console_Platformer.Engine
         public int deltaTime = 0; // Miliseconds since last frame
         public string title = "default title";
         public readonly Vec2i worldSize = new Vec2i(chunkCountX * chunkSize, chunkCountY * chunkSize); 
-        public readonly string pixelSpacingCharacters = " ";
-        public readonly char backgroudPixel = ' ';
+        public const string pixelSpacingCharacters = " ";
+        public const char backgroudPixel = ' ';
         public const int spriteLevelCount = 10;
-        public readonly int spriteMaxCount = 10;
+        public const int spriteMaxCount = 10;
 
         public const int chunkCountX = 100;
         public const int chunkCountY = 100;
         public const int chunkSize = 100;
-        public readonly int chunkLoadRadius = 3;
+        public const int chunkLoadRadius = 3;
         public readonly Chunk[,] chunks = new Chunk[chunkCountX, chunkCountY];
         public static Random gRandom = new Random();
 
