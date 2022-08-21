@@ -12,15 +12,17 @@ namespace Console_Platformer.Engine
         public bool gameShouldClose = false;
         public int deltaTime = 0; // Miliseconds since last frame
         public string title = "default title";
-        public readonly Vec2i worldSize = new Vec2i(100 * chunkSize, 100 * chunkSize); //TODO: make it so chunk count and world size must match
+        public readonly Vec2i worldSize = new Vec2i(chunkCountX * chunkSize, chunkCountY * chunkSize); 
         public readonly string pixelSpacingCharacters = " ";
         public readonly char backgroudPixel = ' ';
         public readonly int spriteLevelCount = 10;
         public readonly int spriteMaxCount = 10;
 
+        public const int chunkCountX = 100;
+        public const int chunkCountY = 100;
         public const int chunkSize = 100;
         public readonly int chunkLoadRadius = 3;
-        public readonly Chunk[,] chunks = new Chunk[100, 100];
+        public readonly Chunk[,] chunks = new Chunk[chunkCountX, chunkCountY];
         public static Random gRandom = new Random();
 
         //"  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -31,7 +33,7 @@ namespace Console_Platformer.Engine
 
         private List<GameObject>[] gameObjectRenderLists;
         private DateTime lastFrame;
-        private readonly int milisecondsForNextFrame = 40;
+        private readonly int milisecondsForNextFrame = 20;
 
         //debug 
         public readonly bool allowDebug = true;

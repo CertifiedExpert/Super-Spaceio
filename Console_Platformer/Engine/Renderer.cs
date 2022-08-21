@@ -25,7 +25,7 @@ namespace Console_Platformer.Engine
         }
 
         // Writtes all gameobjects to the framebuffer and then draws the framebuffer
-        public void Render()
+        public void Render() //TODO: optimise called functions. Rendering takes 80% of total cpu usage
         {
             ClearBuffer(screenBuffer);
 
@@ -48,12 +48,11 @@ namespace Console_Platformer.Engine
         }
 
         // Draws all gameobjects to the screenBuffer 
-        private void DrawGameObjectsToFrameBuffer()
+        private void DrawGameObjectsToFrameBuffer() //TODO: optimise this. This takes up 50% total cpu usage. (28% self cpu!)
         {
             for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
             {
-                var gameObjectList = gameObjectRenderLists[level];
-                foreach (var gameObject in gameObjectList)
+                foreach (var gameObject in gameObjectRenderLists[level])
                 {
                     if (gameObject.Chunk.IsLoaded) WriteSpritesToScreenBuffer(gameObject);
                 }
@@ -97,7 +96,7 @@ namespace Console_Platformer.Engine
         
 
         // Writes the gameobject's sprite into the specified framebuffer
-        public void WriteSpritesToScreenBuffer(GameObject gameObject)
+        public void WriteSpritesToScreenBuffer(GameObject gameObject) //TODO: optimise this. 15% of total cpu usage, 10.5% self cpu
         {
             foreach (var sprite in gameObject.Sprites)
             {
