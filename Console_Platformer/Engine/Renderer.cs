@@ -10,12 +10,10 @@ namespace Console_Platformer.Engine
     {
         private Engine engine;
         private char[,] screenBuffer;
-        private List<GameObject>[] gameObjectRenderLists;
 
-        public Renderer(Engine engine, List<GameObject>[] gameObjectRenderLists)
+        public Renderer(Engine engine)
         {
             this.engine = engine;
-            this.gameObjectRenderLists = gameObjectRenderLists;
 
             // Initialize the screenBuffer
             screenBuffer = new char[engine.Camera.Size.X, engine.Camera.Size.Y];
@@ -24,7 +22,7 @@ namespace Console_Platformer.Engine
             ClearBuffer(screenBuffer);
         }
 
-        // Writtes all gameobjects to the framebuffer and then draws the framebuffer
+        // Writes all gameobjects to the framebuffer and then draws the framebuffer
         public void Render()
         {
             ClearBuffer(screenBuffer);
@@ -42,20 +40,28 @@ namespace Console_Platformer.Engine
             {
                 for (var y = 0; y < buffer.GetLength(1); y++)
                 {
-                    buffer[x, y] = engine.backgroudPixel;
+                    buffer[x, y] = Engine.backgroudPixel;
                 }
             }
         }
 
         // Draws all gameobjects to the screenBuffer 
-        private void DrawGameObjectsToFrameBuffer()
+        private void DrawGameObjectsToFrameBuffer() 
         {
-            for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
+            for (var x = 0; x < Engine.chunkCountX; x++)
             {
-                var gameObjectList = gameObjectRenderLists[level];
-                foreach (var gameObject in gameObjectList)
+                for (var y = 0; y < Engine.chunkCountY; y++)
                 {
-                    if (gameObject.Chunk.IsLoaded) WriteSpritesToScreenBuffer(gameObject);
+                    if (engine.chunks[x, y].IsLoaded)
+                    {
+                        for (var level = Engine.spriteLevelCount - 1; level >= 0; level--)
+                        {
+                            foreach (var gameObject in engine.chunks[x, y].gameObjectRenderLists[level])
+                            {
+                                WriteSpritesToScreenBuffer(gameObject);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -85,7 +91,7 @@ namespace Console_Platformer.Engine
                 for (int x = 0; x < engine.Camera.Size.X; x++)
                 {
                     line += screenBuffer[x, y].ToString();
-                    line += engine.pixelSpacingCharacters;
+                    line += Engine.pixelSpacingCharacters;
                 }
 
                 finalString += line + "\n";
@@ -97,31 +103,30 @@ namespace Console_Platformer.Engine
         
 
         // Writes the gameobject's sprite into the specified framebuffer
-        public void WriteSpritesToScreenBuffer(GameObject gameObject)
+        public void WriteSpritesToScreenBuffer(GameObject gameObject) 
         {
             foreach (var sprite in gameObject.Sprites)
             {
                 if (sprite != null)
                 {
-                    for (var x = 0; x < sprite.Bitmap.Size.X; x++)
-                    {
-                        for (var y = 0; y < sprite.Bitmap.Size.Y; y++)
-                        {
-                            // if pixel is not outside of screenBuffer then add it to the screenbuffer
-                            var finalX = gameObject.Position.X + sprite.AttachmentPos.X + x;
-                            var finalY = gameObject.Position.Y + sprite.AttachmentPos.Y + y;
+                    var realPosX = gameObject.Position.X + sprite.AttachmentPos.X - engine.Camera.Position.X; 
+                    var realPosY = gameObject.Position.Y + sprite.AttachmentPos.Y - engine.Camera.Position.Y;
 
-                            if (finalX < screenBuffer.GetLength(0) + engine.Camera.Position.X
-                                && finalX >= 0 + engine.Camera.Position.X
-                                && finalY < screenBuffer.GetLength(1) + engine.Camera.Position.Y
-                                && finalY >= 0 + engine.Camera.Position.Y)
-                            {
-                                if (sprite.Bitmap.Data[x, y] != ' ')
-                                    screenBuffer[finalX - engine.Camera.Position.X,
-                                    finalY - engine.Camera.Position.Y] = sprite.Bitmap.Data[x, y];
-                            }
+                    var beginX = (realPosX >= 0) ? 0 : -realPosX; 
+                    var endX = (realPosX + sprite.Bitmap.Size.X <= engine.Camera.Size.X) 
+                        ? sprite.Bitmap.Size.X - beginX : engine.Camera.Size.X - realPosX;
+
+                    var beginY = (realPosY >= 0) ? 0 : -realPosY;
+                    var endY = (realPosY + sprite.Bitmap.Size.Y <= engine.Camera.Size.Y)
+                        ? sprite.Bitmap.Size.Y - beginY : engine.Camera.Size.Y - realPosY;
+
+                    for (var x = 0; x < endX; x++)
+                    {
+                        for (var y = 0; y < endY; y++)
+                        {
+                            screenBuffer[realPosX + beginX + x, realPosY + beginY + y] = sprite.Bitmap.Data[beginX + x, beginY + y];  
                         }
-                    } 
+                    }
                 } 
             }
         }

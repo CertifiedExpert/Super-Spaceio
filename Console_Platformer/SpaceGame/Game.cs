@@ -86,7 +86,7 @@ namespace SpaceGame.Platformer
 
         private void LoadLevel()
         {
-            for (var i = 0; i < 10000; i++)
+            for (var i = 0; i < 100000; i++)
             {
                 var astSize = gRandom.Next(1, 30);
                 var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),

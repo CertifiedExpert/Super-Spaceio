@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Console_Platformer.Engine
 {
     class Sprite
-    {//TODO: maybe derive a NormalSprite and a StaticFillSprite from this to save memory
+    {//TODO: derive a NormalSprite and a StaticFillSprite from this to save memory (can constitute to over 50% total memory usage)
         public Bitmap Bitmap { get; set; }
         public Vec2i AttachmentPos { get; set; }
         public Animator Animator { get; set; }
