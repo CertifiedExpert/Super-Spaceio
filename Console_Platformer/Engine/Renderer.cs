@@ -40,7 +40,7 @@ namespace Console_Platformer.Engine
             {
                 for (var y = 0; y < buffer.GetLength(1); y++)
                 {
-                    buffer[x, y] = engine.backgroudPixel;
+                    buffer[x, y] = Engine.backgroudPixel;
                 }
             }
         }
@@ -91,7 +91,7 @@ namespace Console_Platformer.Engine
                 for (int x = 0; x < engine.Camera.Size.X; x++)
                 {
                     line += screenBuffer[x, y].ToString();
-                    line += engine.pixelSpacingCharacters;
+                    line += Engine.pixelSpacingCharacters;
                 }
 
                 finalString += line + "\n";
