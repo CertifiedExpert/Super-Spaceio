@@ -70,8 +70,10 @@ namespace Console_Platformer.Engine
                 if (Chunk != Engine.chunks[chunkX, chunkY])
                 {
                     Chunk.gameObjectsToRemove.Add(this);
+                    Chunk.gameObjectRenderLists[SpriteLevel].Remove(this);
                     Chunk = Engine.chunks[chunkX, chunkY];
                     Chunk.gameObjectsToAdd.Add(this);
+                    Chunk.gameObjectRenderLists[SpriteLevel].Add(this);
                     OnChunkTraverse(chunkX, chunkY);
                 }
 

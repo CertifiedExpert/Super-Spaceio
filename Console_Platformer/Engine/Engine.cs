@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace Console_Platformer.Engine
 {
     abstract class Engine
-    {
-        // Public variables
+    {//TODO: clean up readonlys and consts
+        // Public variables 
         public bool gameShouldClose = false;
         public int deltaTime = 0; // Miliseconds since last frame
         public string title = "default title";
         public readonly Vec2i worldSize = new Vec2i(chunkCountX * chunkSize, chunkCountY * chunkSize); 
         public readonly string pixelSpacingCharacters = " ";
         public readonly char backgroudPixel = ' ';
-        public readonly int spriteLevelCount = 10;
+        public const int spriteLevelCount = 10;
         public readonly int spriteMaxCount = 10;
 
         public const int chunkCountX = 100;
@@ -31,7 +31,6 @@ namespace Console_Platformer.Engine
         protected Renderer Renderer { get; private set; }
         public ImputManager ImputManager { get; private set; }
 
-        private List<GameObject>[] gameObjectRenderLists;
         private DateTime lastFrame;
         private readonly int milisecondsForNextFrame = 20;
 
@@ -134,20 +133,13 @@ namespace Console_Platformer.Engine
                 debugLines[i] = "";
             }
 
-            // Set up render lists
-            gameObjectRenderLists = new List<GameObject>[spriteLevelCount];
-            for (var i = 0; i < gameObjectRenderLists.Length; i++)
-            {
-                gameObjectRenderLists[i] = new List<GameObject>();
-            }
-
             // Set up frame timers
             lastFrame = DateTime.Now;
             //deltaTime = TimeSpan.Zero;
 
             // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
             Camera = new Camera(new Vec2i(0, 0), new Vec2i(189, 99));
-            Renderer = new Renderer(this, gameObjectRenderLists);
+            Renderer = new Renderer(this);
             ImputManager = new ImputManager();
             ResourceManager.Init();
         }
@@ -156,13 +148,15 @@ namespace Console_Platformer.Engine
         // Adds and deletes gameobjects
         public void AddGameObject(GameObject gameObject)
         {
-            chunks[gameObject.Position.X / chunkSize, gameObject.Position.Y / chunkSize].gameObjectsToAdd.Add(gameObject);
-            gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
+            var chunkX = gameObject.Position.X / chunkSize;
+            var chunkY = gameObject.Position.Y / chunkSize;
+            chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
+            chunks[chunkX, chunkY].gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
             gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
-            gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
+            gameObject.Chunk.gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
         }
 
         protected abstract void OnLoad();

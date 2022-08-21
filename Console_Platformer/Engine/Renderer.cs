@@ -10,12 +10,12 @@ namespace Console_Platformer.Engine
     {
         private Engine engine;
         private char[,] screenBuffer;
-        private List<GameObject>[] gameObjectRenderLists;
+        private Chunk[,] chunks;
 
-        public Renderer(Engine engine, List<GameObject>[] gameObjectRenderLists)
+        public Renderer(Engine engine)
         {
             this.engine = engine;
-            this.gameObjectRenderLists = gameObjectRenderLists;
+            chunks = engine.chunks;
 
             // Initialize the screenBuffer
             screenBuffer = new char[engine.Camera.Size.X, engine.Camera.Size.Y];
@@ -24,7 +24,7 @@ namespace Console_Platformer.Engine
             ClearBuffer(screenBuffer);
         }
 
-        // Writtes all gameobjects to the framebuffer and then draws the framebuffer
+        // Writes all gameobjects to the framebuffer and then draws the framebuffer
         public void Render() //TODO: optimise called functions. Rendering takes 80% of total cpu usage
         {
             ClearBuffer(screenBuffer);
@@ -48,13 +48,22 @@ namespace Console_Platformer.Engine
         }
 
         // Draws all gameobjects to the screenBuffer 
-        private void DrawGameObjectsToFrameBuffer() //TODO: optimise this. This takes up 50% total cpu usage. (28% self cpu!)
+        private void DrawGameObjectsToFrameBuffer() 
         {
-            for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
+            for (var x = 0; x < Engine.chunkCountX; x++)
             {
-                foreach (var gameObject in gameObjectRenderLists[level])
+                for (var y = 0; y < Engine.chunkCountY; y++)
                 {
-                    if (gameObject.Chunk.IsLoaded) WriteSpritesToScreenBuffer(gameObject);
+                    if (engine.chunks[x, y].IsLoaded)
+                    {
+                        for (var level = Engine.spriteLevelCount - 1; level >= 0; level--)
+                        {
+                            foreach (var gameObject in engine.chunks[x, y].gameObjectRenderLists[level])
+                            {
+                                WriteSpritesToScreenBuffer(gameObject);
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -11,6 +11,7 @@ namespace Console_Platformer.Engine
         public List<GameObject> gameObjects = new List<GameObject>();
         public List<GameObject> gameObjectsToRemove = new List<GameObject>();
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
+        public List<GameObject>[] gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
         public DateTime lastUnloaded = DateTime.MinValue;
 
         private bool _isLoaded;
@@ -27,6 +28,10 @@ namespace Console_Platformer.Engine
 
         public Chunk()
         {
+            for (var i = 0; i < gameObjectRenderLists.Length; i++)
+            {
+                gameObjectRenderLists[i] = new List<GameObject>();
+            }
             IsLoaded = false;
         }
         private void OnChunkLoaded()
