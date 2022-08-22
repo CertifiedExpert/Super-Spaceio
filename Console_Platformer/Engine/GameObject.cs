@@ -90,7 +90,7 @@ namespace Console_Platformer.Engine
             {
                 for (int y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    if (Engine.chunks[x, y].IsLoaded)
+                    if (Engine.IsChunkLoaded(new Vec2i(x, y)))
                     {
                         foreach (var gameObject in Engine.chunks[x, y].gameObjects)
                         {

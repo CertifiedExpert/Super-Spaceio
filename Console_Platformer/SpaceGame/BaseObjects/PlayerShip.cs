@@ -75,12 +75,12 @@ namespace SpaceGame.Platformer
         {
             base.OnChunkTraverse(chunkX, chunkY);
             ///*
-            //TODO: optimise this so maybe we do not need to iterate over all chunks
+            //TODO: optimise this so we iterate ONLY OVER THE ONES WHICH NEED TO BE DESERIALIZED (perhaps by keeping a list of previously loaded chunks and comparing it to chunks loaded now?)
             for (var i = 0; i < Engine.chunks.GetLength(0); i++)
             {
                 for (var j = 0; j < Engine.chunks.GetLength(1); j++)
                 {
-                    Engine.chunks[i, j].IsLoaded = false;
+                    if (Game.IsChunkLoaded(new Vec2i(i, j))) Game.ScheduleUnloadChunk(new Vec2i(i, j));
                 }
             }//*/
     
@@ -97,7 +97,7 @@ namespace SpaceGame.Platformer
             {
                 for (var x = begginX; x <= endX; x++)
                 {
-                    Engine.chunks[x, y].IsLoaded = true;
+                    if (!Game.IsChunkLoaded(new Vec2i(x, y))) Game.LoadChunk(new Vec2i(x, y));
                 }
             }
         }

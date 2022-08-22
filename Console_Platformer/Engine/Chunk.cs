@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract]
     class Chunk
     {
         public List<GameObject> gameObjects = new List<GameObject>();
@@ -13,30 +15,17 @@ namespace Console_Platformer.Engine
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
         public List<GameObject>[] gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
         public DateTime lastUnloaded = DateTime.MinValue;
-
-        private bool _isLoaded;
-        public bool IsLoaded
+        public Vec2i Index { get; set; }
+        public Engine Engine { get; set; }
+        public Chunk(Vec2i index, Engine engine)
         {
-            get { return _isLoaded; }
-            set 
-            {
-                if (_isLoaded == true && value == false) lastUnloaded = DateTime.Now;
-                else if (_isLoaded == false && value == true) OnChunkLoaded();
-                _isLoaded = value;
-            }
-        }
-
-        public Chunk()
-        {
+            Engine = engine;
             for (var i = 0; i < gameObjectRenderLists.Length; i++)
             {
                 gameObjectRenderLists[i] = new List<GameObject>();
             }
-            IsLoaded = false;
-        }
-        private void OnChunkLoaded()
-        {
-            //TODO: write some logic here
+
+            Index = index;
         }
     }
 }
