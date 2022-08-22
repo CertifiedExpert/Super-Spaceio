@@ -4,16 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+//TODO: temp
+using SpaceGame;
 
 namespace Console_Platformer.Engine
 {
     [DataContract]
+    [KnownType(typeof(GameObject))]
+    [KnownType(typeof(BaseObject))]
+    [KnownType(typeof(Asteroid))]
+    [KnownType(typeof(Enemy))]
+    [KnownType(typeof(Ship))]
+    [KnownType(typeof(PlayerShip))]
+
     class Chunk
     {
+        [DataMember]
+        public List<GameObject>[] gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
+        [DataMember]
         public List<GameObject> gameObjects = new List<GameObject>();
+
         public List<GameObject> gameObjectsToRemove = new List<GameObject>();
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
-        public List<GameObject>[] gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
         public DateTime lastUnloaded = DateTime.MinValue;
         public Vec2i Index { get; set; }
         public Engine Engine { get; set; }

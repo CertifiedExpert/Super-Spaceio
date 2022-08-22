@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Console_Platformer.Engine;
 
-namespace SpaceGame.Platformer
+namespace SpaceGame
 {
     class Game : Engine
     {
@@ -35,7 +35,7 @@ namespace SpaceGame.Platformer
             var loadedGameObjectCount = 0;
             foreach (var c in chunks)
             {
-                if (c.IsLoaded)
+                if (IsChunkLoaded(c))
                 {
                     foreach (var go in c.gameObjects)
                     {

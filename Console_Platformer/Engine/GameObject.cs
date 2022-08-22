@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract]
     abstract class GameObject
     {
         // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
         // In which chunk the GameObject resides
         public Chunk Chunk { get; private set; }
+        [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
+        [DataMember]
         public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
+        [DataMember]
         public List<Collider> Colliders { get; set; }
+        [DataMember]
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
 
+        [DataMember]
         private int _spriteLevel;
         public int SpriteLevel //u
         {
@@ -28,6 +35,10 @@ namespace Console_Platformer.Engine
                 else _spriteLevel = Engine.spriteLevelCount;
             }
         }
+
+        // Lord save my code...
+        [DataMember]
+        private char[][][] arrayOfJaggadizedBitmapData_serialize = new char[Engine.spriteMaxCount][][];
         public GameObject(Vec2i position, Engine engine)
         {
             Position = position.Copy();
@@ -139,6 +150,22 @@ namespace Console_Platformer.Engine
             foreach (var sprite in Sprites)
             {
                 sprite?.Animator?.Update();
+            }
+        }
+
+        public virtual void CompleteDataAfterSerialization()
+        {
+            //TODO: implement this method
+        }
+
+        public virtual void PrepareForSerialization()
+        {
+            for (var x = 0; x < Engine.spriteMaxCount; x++)
+            {
+                if (Sprites[x] != null)
+                {
+                    arrayOfJaggadizedBitmapData_serialize[x] = Util.Jaggedize2dArray(Sprites[x].Bitmap.Data);
+                }
             }
         }
         public abstract void OnCollision(GameObject collidingObject);

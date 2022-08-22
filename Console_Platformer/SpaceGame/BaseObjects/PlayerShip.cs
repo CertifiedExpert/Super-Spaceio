@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Console_Platformer.Engine;
 
-namespace SpaceGame.Platformer
+namespace SpaceGame
 {
+    [DataContract]
     class PlayerShip : Ship
     {
         public PlayerShip(Vec2i position, int mass, Game game) : base(position, mass, game)

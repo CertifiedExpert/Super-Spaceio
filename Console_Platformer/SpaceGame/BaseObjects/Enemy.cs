@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpaceGame.Platformer
+namespace SpaceGame
 {
+    [DataContract]
     class Enemy : Ship
     {
         public Enemy(Vec2i position, int mass, Game game) : base(position, mass, game)

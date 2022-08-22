@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract]
     class Animator
     {
         private Sprite sprite;
+        [DataMember]
         private List<Bitmap> frames;
+        [DataMember]
         private int milisecondsForFrameStep;
+        [DataMember]
         private bool loopable;
 
+        [DataMember]
         private int currentFrame = 0;
+        [DataMember]
         private DateTime lastFrameUpdate = DateTime.Now;
         public Animator(List<Bitmap> frames, int milisecondsForFrameStep, bool loopable, Sprite sprite,
                         bool randomiseStartFrame = false)

@@ -10,6 +10,7 @@ namespace Console_Platformer.Engine
     {//TODO: figure out in which functions the Vec2i parameter is acutally helpful as opposed to passing just 2 int
         //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
         //TODO: many times the Engine is called from SpaceGame. Game shoud be called instead
+        //TODO: file system. Everything is hardcoded for now.
         // Public variables 
         public bool gameShouldClose = false;
         public int deltaTime = 0; // Miliseconds since last frame
@@ -43,6 +44,8 @@ namespace Console_Platformer.Engine
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
         public string[] debugLines;
+
+        private string chunkSaveFolderPath = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug\SaveData\Chunks";
 
 
         // Applicaton loop
@@ -183,9 +186,14 @@ namespace Console_Platformer.Engine
 
         private void UnloadChunk(Chunk chunk)
         {
-            throw new NotImplementedException();
-        }
+            foreach (var gameObject in chunk.gameObjects)
+            {
+                gameObject.PrepareForSerialization();
+            }
 
+            var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";
+            Serializer.ToFile(chunk, fullPath);
+        }
         public void ScheduleUnloadChunk(Vec2i index)
         {
             chunksToBeUnloaded.Add(chunks[index.X, index.Y]);

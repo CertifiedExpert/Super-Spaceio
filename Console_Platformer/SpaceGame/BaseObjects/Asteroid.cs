@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpaceGame.Platformer
+namespace SpaceGame
 {
+    [DataContract]
     class Asteroid : BaseObject
     {
         public Asteroid(Vec2i position, Vec2i maxSize, Game game) : base(position, game)
