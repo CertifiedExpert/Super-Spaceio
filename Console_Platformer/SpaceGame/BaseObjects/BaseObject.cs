@@ -9,6 +9,10 @@ using Console_Platformer.Engine;
 namespace SpaceGame
 {
     [DataContract]
+    [KnownType(typeof(Asteroid))]
+    [KnownType(typeof(Enemy))]
+    [KnownType(typeof(Ship))]
+    [KnownType(typeof(PlayerShip))]
     abstract class BaseObject : GameObject
     {
         public Game Game { get; private set; }

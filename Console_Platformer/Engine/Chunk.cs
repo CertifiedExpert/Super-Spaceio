@@ -10,12 +10,7 @@ using SpaceGame;
 namespace Console_Platformer.Engine
 {
     [DataContract]
-    [KnownType(typeof(GameObject))]
-    [KnownType(typeof(BaseObject))]
-    [KnownType(typeof(Asteroid))]
-    [KnownType(typeof(Enemy))]
-    [KnownType(typeof(Ship))]
-    [KnownType(typeof(PlayerShip))]
+    //[KnownType(typeof(GameObject))]
 
     class Chunk
     {
