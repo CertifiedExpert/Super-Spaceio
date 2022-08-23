@@ -8,7 +8,7 @@ using Console_Platformer.Engine;
 
 namespace SpaceGame
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     abstract class BaseObject : GameObject
     {
         public Game Game { get; private set; }

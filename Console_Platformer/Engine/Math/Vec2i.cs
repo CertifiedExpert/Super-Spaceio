@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Console_Platformer.Engine
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     class Vec2i
     {
         [DataMember]

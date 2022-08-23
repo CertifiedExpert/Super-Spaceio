@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SpaceGame
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     class Enemy : Ship
     {
         public Enemy(Vec2i position, int mass, Game game) : base(position, mass, game)

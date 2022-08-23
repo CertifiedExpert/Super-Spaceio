@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SpaceGame
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     class Asteroid : BaseObject
     {
         public Asteroid(Vec2i position, Vec2i maxSize, Game game) : base(position, game)

@@ -8,7 +8,7 @@ using Console_Platformer.Engine;
 
 namespace SpaceGame
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     class PlayerShip : Ship
     {
         public PlayerShip(Vec2i position, int mass, Game game) : base(position, mass, game)
