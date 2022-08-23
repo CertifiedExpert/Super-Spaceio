@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Console_Platformer.Engine;
 
 namespace SpaceGame
 {
+    //TODO: find a fix for setting the Game property of BaseObject after deserialization
+    [DataContract(IsReference = true)]
     class Game : Engine
     {
         // Settings
@@ -33,7 +36,6 @@ namespace SpaceGame
         {
             if (ImputManager.Escape.IsPressed) gameShouldClose = true;
 
-            MovePlayer();
             UpdateCamera();
 
             //UpdateAllBaseObjects();
@@ -84,11 +86,13 @@ namespace SpaceGame
             }
         }
         */
-        private void MovePlayer()
-        {
-            
-        }
 
+        public override void LoadChunk(Vec2i index)
+        {
+            base.LoadChunk(index);
+
+
+        }
         private void LoadLevel()
         {
             for (var i = 0; i < 100000; i++)

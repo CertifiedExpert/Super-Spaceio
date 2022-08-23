@@ -174,7 +174,8 @@ namespace Console_Platformer.Engine
                 if (Sprites[i] != null)
                 {
                     var data = Util.UnJaggedize2dArray(arrayOfJaggadizedBitmapData_serialize[i]);
-                    Sprites[i].Bitmap = new Bitmap(new Vec2i(data.GetLength(1), data.GetLength(0)), data); 
+                    Sprites[i].Bitmap = new Bitmap(new Vec2i(data.GetLength(1), data.GetLength(0)), data);
+                    arrayOfJaggadizedBitmapData_serialize[i] = null;
                 }
             }
         }

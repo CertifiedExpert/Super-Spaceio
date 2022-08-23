@@ -35,11 +35,11 @@ namespace Console_Platformer.Engine
 
         public static T[,] UnJaggedize2dArray<T>(T[][] instance)
         {
-            var output = new T[instance.GetLength(0), instance.GetLength(1)];
+            var output = new T[instance.Length, instance[0].Length];
 
-            for (var x = 0; x < instance.GetLength(0); x++)
+            for (var x = 0; x < instance.Length; x++)
             {
-                for (var y = 0; y < instance.GetLength(1); y++)
+                for (var y = 0; y < instance[x].Length; y++)
                 {
                     output[x, y] = instance[x][y];
                 }

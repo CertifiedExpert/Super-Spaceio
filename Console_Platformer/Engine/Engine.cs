@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract(IsReference = true)]
     abstract class Engine
     {//TODO: figure out in which functions the Vec2i parameter is acutally helpful as opposed to passing just 2 int
         //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
@@ -56,6 +58,11 @@ namespace Console_Platformer.Engine
             OnEngineLoad();
             OnLoad();
 
+            foreach (var go in chunks[0, 0].gameObjectsToAdd)
+            {
+                chunks[0, 0].gameObjects.Add(go);
+            }
+            chunks[0, 0].gameObjectsToAdd.Clear();
             UnloadChunk(chunks[0, 0]);
             LoadChunk(new Vec2i(0, 0));
 
@@ -141,12 +148,13 @@ namespace Console_Platformer.Engine
             Console.Title = title;
             Console.OutputEncoding = Encoding.Unicode;
 
-            // Initialise chunks
+            // Initialise chunks and transition lists
             for (var x = 0; x < chunks.GetLength(0); x++)
             {
                 for (var y = 0; y < chunks.GetLength(1); y++)
                 {
                     chunks[x, y] = new Chunk(new Vec2i(x, y),  this);
+                    unloadedChunkTransitionGameObjects[x, y] = new List<GameObject>();
                 }
             }
 
@@ -182,7 +190,7 @@ namespace Console_Platformer.Engine
             gameObject.Chunk.UnInsertGameObject(gameObject);
         }
 
-        public void LoadChunk(Vec2i index)
+        public virtual void LoadChunk(Vec2i index)
         {
             var path = $"{chunkSaveFolderPath}\\chunk{index.X}_{index.Y}";
             chunks[index.X, index.Y] = serializer.FromFile<Chunk>(path);
