@@ -35,6 +35,7 @@ namespace Console_Platformer.Engine
         public Camera Camera { get; private set; } 
         protected Renderer Renderer { get; private set; }
         public ImputManager ImputManager { get; private set; }
+        public Serializer serializer { get; private set; }
 
         private DateTime lastFrame;
         private readonly int milisecondsForNextFrame = 20;
@@ -158,6 +159,7 @@ namespace Console_Platformer.Engine
             //deltaTime = TimeSpan.Zero;
 
             // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
+            serializer = new Serializer();
             Camera = new Camera(new Vec2i(0, 0), new Vec2i(189, 99));
             Renderer = new Renderer(this);
             ImputManager = new ImputManager();
@@ -181,7 +183,11 @@ namespace Console_Platformer.Engine
 
         public void LoadChunk(Vec2i index)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            //TODO: write this method
+            var path = $"{chunkSaveFolderPath}\\chunk{index.X}_{index.Y}";
+            chunks[index.X, index.Y] = serializer.FromFile<Chunk>(path);
+            
         }
 
         private void UnloadChunk(Chunk chunk)
@@ -192,8 +198,9 @@ namespace Console_Platformer.Engine
             }
 
             var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";
-            Serializer.ToFile(chunk, fullPath);
+            serializer.ToFile(chunk, fullPath);
         }
+
         public void ScheduleUnloadChunk(Vec2i index)
         {
             chunksToBeUnloaded.Add(chunks[index.X, index.Y]);

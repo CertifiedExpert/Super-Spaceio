@@ -18,6 +18,11 @@ namespace SpaceGame
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
+            serializer.knownTypes.Add(typeof(BaseObject));
+            serializer.knownTypes.Add(typeof(Asteroid));
+            serializer.knownTypes.Add(typeof(Ship));
+            serializer.knownTypes.Add(typeof(PlayerShip));
+            serializer.knownTypes.Add(typeof(Enemy));
             playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
             AddBaseObject(playerShip);
 

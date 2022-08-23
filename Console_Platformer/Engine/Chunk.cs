@@ -10,8 +10,6 @@ using SpaceGame;
 namespace Console_Platformer.Engine
 {
     [DataContract]
-    //[KnownType(typeof(GameObject))]
-
     class Chunk
     {
         [DataMember]

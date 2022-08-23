@@ -70,7 +70,6 @@
     <Compile Include="Engine\Renderer.cs" />
     <Compile Include="SpaceGame\BaseObjects\PlayerShip.cs" />
     <Compile Include="Engine\Math\Vec2i.cs" />
-    <Compile Include="Engine\TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
