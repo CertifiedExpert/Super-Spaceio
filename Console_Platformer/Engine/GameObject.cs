@@ -36,9 +36,6 @@ namespace Console_Platformer.Engine
             }
         }
 
-        // Lord save my code...
-        [DataMember]
-        private char[][][] arrayOfJaggadizedBitmapData_serialize = new char[Engine.spriteMaxCount][][];
         public GameObject(Vec2i position, Engine engine)
         {
             Position = position.Copy();
@@ -169,25 +166,17 @@ namespace Console_Platformer.Engine
             Engine = engine;
             Chunk = engine.chunks[index.X, index.Y];
 
-            for (var i = 0; i < Engine.spriteMaxCount; i++)
+            foreach (var sprite in Sprites)
             {
-                if (Sprites[i] != null)
-                {
-                    var data = Util.UnJaggedize2dArray(arrayOfJaggadizedBitmapData_serialize[i]);
-                    Sprites[i].Bitmap = new Bitmap(new Vec2i(data.GetLength(1), data.GetLength(0)), data);
-                    arrayOfJaggadizedBitmapData_serialize[i] = null;
-                }
+                if (sprite != null) sprite.OnDeserialization();
             }
         }
 
         public virtual void PrepareForDeserialization()
         {
-            for (var x = 0; x < Engine.spriteMaxCount; x++)
+            foreach (var sprite in Sprites)
             {
-                if (Sprites[x] != null)
-                {
-                    arrayOfJaggadizedBitmapData_serialize[x] = Util.Jaggedize2dArray(Sprites[x].Bitmap.Data);
-                }
+                if (sprite != null) sprite.PrepareForDeserialization();
             }
         }
         public abstract void OnCollision(GameObject collidingObject);
