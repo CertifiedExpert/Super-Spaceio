@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     abstract class GameObject
     {
         // Which game engine the gameobject belongs to
@@ -76,16 +76,23 @@ namespace Console_Platformer.Engine
                 }
 
                 // Chunk traverse detection
-                var chunkX = Position.X / Engine.chunkSize;
-                var chunkY = Position.Y / Engine.chunkSize;
-                if (Chunk != Engine.chunks[chunkX, chunkY])
+                var newChunkX = Position.X / Engine.chunkSize;
+                var newChunkY = Position.Y / Engine.chunkSize;
+                if (Chunk != Engine.chunks[newChunkX, newChunkY])
                 {
-                    Chunk.gameObjectsToRemove.Add(this);
-                    Chunk.gameObjectRenderLists[SpriteLevel].Remove(this);
-                    Chunk = Engine.chunks[chunkX, chunkY];
-                    Chunk.gameObjectsToAdd.Add(this);
-                    Chunk.gameObjectRenderLists[SpriteLevel].Add(this);
-                    OnChunkTraverse(chunkX, chunkY);
+                    Chunk.UnInsertGameObject(this);
+                    Chunk = Engine.chunks[newChunkX, newChunkY];
+
+                    if (Engine.IsChunkLoaded(new Vec2i(newChunkX, newChunkY)))
+                    {
+                        Chunk.InsertGameObject(this);
+                        OnChunkTraverse(newChunkX, newChunkY); 
+                    }
+                    else
+                    {
+                        Engine.unloadedChunkTransitionGameObjects[newChunkX, newChunkY].Add(this);
+                    }
+                    
                 }
 
                 return true;
@@ -153,12 +160,26 @@ namespace Console_Platformer.Engine
             }
         }
 
-        public virtual void CompleteDataAfterSerialization()
+        public void OnUnloadedChunkAwake(int chunkX, int chunkY)
         {
-            //TODO: implement this method
+            OnChunkTraverse(chunkX, chunkY);
+        }
+        public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        {
+            Engine = engine;
+            Chunk = engine.chunks[index.X, index.Y];
+
+            for (var i = 0; i < Engine.spriteMaxCount; i++)
+            {
+                if (Sprites[i] != null)
+                {
+                    var data = Util.UnJaggedize2dArray(arrayOfJaggadizedBitmapData_serialize[i]);
+                    Sprites[i].Bitmap = new Bitmap(new Vec2i(data.GetLength(1), data.GetLength(0)), data); 
+                }
+            }
         }
 
-        public virtual void PrepareForSerialization()
+        public virtual void PrepareForDeserialization()
         {
             for (var x = 0; x < Engine.spriteMaxCount; x++)
             {

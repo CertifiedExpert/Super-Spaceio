@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
-//TODO: temp
-using SpaceGame;
 
 namespace Console_Platformer.Engine
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     class Chunk
     {
         [DataMember]
@@ -19,6 +17,7 @@ namespace Console_Platformer.Engine
 
         public List<GameObject> gameObjectsToRemove = new List<GameObject>();
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
+        [DataMember]
         public DateTime lastUnloaded = DateTime.MinValue;
         public Vec2i Index { get; set; }
         public Engine Engine { get; set; }
@@ -31,6 +30,30 @@ namespace Console_Platformer.Engine
             }
 
             Index = index;
+        }
+
+        public void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        {
+            Engine = engine;
+            Index = index;
+            gameObjectsToAdd = new List<GameObject>();
+            gameObjectsToRemove = new List<GameObject>();
+
+            foreach (var gameObject in gameObjects)
+            {
+                gameObject.CompleteDataAfterSerialization(engine, index);
+            }
+        }
+
+        public void InsertGameObject(GameObject gameObject)
+        {
+            gameObjectsToAdd.Add(gameObject);
+            gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
+        }
+        public void UnInsertGameObject(GameObject gameObject)
+        {
+            gameObjectsToRemove.Add(gameObject);
+            gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
         }
     }
 }

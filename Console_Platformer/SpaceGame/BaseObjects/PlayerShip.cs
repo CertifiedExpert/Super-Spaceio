@@ -77,7 +77,6 @@ namespace SpaceGame
         {
             base.OnChunkTraverse(chunkX, chunkY);
             /*
-            //TODO: put this back in after debugging
             //TODO: optimise this so we iterate ONLY OVER THE ONES WHICH NEED TO BE DESERIALIZED (perhaps by keeping a list of previously loaded chunks and comparing it to chunks loaded now?)
             for (var i = 0; i < Engine.chunks.GetLength(0); i++)
             {

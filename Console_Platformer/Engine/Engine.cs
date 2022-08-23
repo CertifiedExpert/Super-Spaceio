@@ -56,6 +56,9 @@ namespace Console_Platformer.Engine
             OnEngineLoad();
             OnLoad();
 
+            UnloadChunk(chunks[0, 0]);
+            LoadChunk(new Vec2i(0, 0));
+
             while (!gameShouldClose)
             {
                 if (deltaTime > milisecondsForNextFrame)
@@ -172,29 +175,38 @@ namespace Console_Platformer.Engine
         {
             var chunkX = gameObject.Position.X / chunkSize;
             var chunkY = gameObject.Position.Y / chunkSize;
-            chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
-            chunks[chunkX, chunkY].gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
+            chunks[chunkX, chunkY].InsertGameObject(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
-            gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
-            gameObject.Chunk.gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
+            gameObject.Chunk.UnInsertGameObject(gameObject);
         }
 
         public void LoadChunk(Vec2i index)
         {
-            //throw new NotImplementedException();
-            //TODO: write this method
             var path = $"{chunkSaveFolderPath}\\chunk{index.X}_{index.Y}";
             chunks[index.X, index.Y] = serializer.FromFile<Chunk>(path);
-            
+
+            // Fill misssing data
+            chunks[index.X, index.Y].CompleteDataAfterSerialization(this, index);
+
+            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state
+            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            {
+                chunks[index.X, index.Y].InsertGameObject(gameObject);
+            }
+            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            {
+                gameObject.OnUnloadedChunkAwake(index.X, index.Y);
+            }
+            unloadedChunkTransitionGameObjects[index.X, index.Y].Clear();
         }
 
         private void UnloadChunk(Chunk chunk)
         {
             foreach (var gameObject in chunk.gameObjects)
             {
-                gameObject.PrepareForSerialization();
+                gameObject.PrepareForDeserialization();
             }
 
             var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";

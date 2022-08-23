@@ -10,7 +10,7 @@ namespace Console_Platformer.Engine
     {
         public Vec2i Size { get; set; }
         public char[,] Data { get; set; }
-
+        //TODO: delete size from constructor. It can be deduced inside from data
         public Bitmap(Vec2i size, char[,] data)
         {
             Size = size;
