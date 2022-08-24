@@ -11,8 +11,7 @@ namespace SpaceGame
     [DataContract(IsReference = true)]
     abstract class BaseObject : GameObject
     {
-        [DataMember]
-        public Game Game { get; private set; }
+        public Game Game { get; set; }
         public BaseObject(Vec2i position, Game game) : base(position, game)
         {
             Game = game;

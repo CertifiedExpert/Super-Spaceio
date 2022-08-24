@@ -76,16 +76,16 @@ namespace SpaceGame
         protected override void OnChunkTraverse(int chunkX, int chunkY)
         {
             base.OnChunkTraverse(chunkX, chunkY);
-            /*
-            //TODO: optimise this so we iterate ONLY OVER THE ONES WHICH NEED TO BE DESERIALIZED (perhaps by keeping a list of previously loaded chunks and comparing it to chunks loaded now?)
-            for (var i = 0; i < Engine.chunks.GetLength(0); i++)
-            {
-                for (var j = 0; j < Engine.chunks.GetLength(1); j++)
-                {
-                    if (Game.IsChunkLoaded(new Vec2i(i, j))) Game.ScheduleUnloadChunk(new Vec2i(i, j));
-                }
-            }*/
 
+            var chunksToBeUnloaded = new List<Chunk>();
+            for (var x = 0; x < Engine.chunks.GetLength(0); x++)
+            {
+                for (var y = 0; y < Engine.chunks.GetLength(1); y++)
+                {
+                    if (Game.IsChunkLoaded(new Vec2i(x, y))) chunksToBeUnloaded.Add(Game.chunks[x, y]);
+                }
+            }
+            
             var begginX = chunkX - Engine.chunkLoadRadius + 1;
             var begginY = chunkY - Engine.chunkLoadRadius + 1;
             if (begginX < 0) begginX = 0;
@@ -99,9 +99,15 @@ namespace SpaceGame
             {
                 for (var x = begginX; x <= endX; x++)
                 {
-                    if (!Game.IsChunkLoaded(new Vec2i(x, y))) Game.LoadChunk(new Vec2i(x, y));
+                    if (Game.IsChunkLoaded(new Vec2i(x, y)))
+                    {
+                        chunksToBeUnloaded.Remove(Game.chunks[x, y]);
+                    }
+                    else Game.LoadChunk(new Vec2i(x, y));
                 }
             }
+
+            foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(new Vec2i(chunk.Index.X, chunk.Index.Y));
         }
 
         public override void PrepareForDeserialization()

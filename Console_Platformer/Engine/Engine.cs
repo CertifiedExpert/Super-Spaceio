@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using System.IO;
 
 namespace Console_Platformer.Engine
 {
-    [DataContract(IsReference = true)]
     abstract class Engine
     {//TODO: figure out in which functions the Vec2i parameter is acutally helpful as opposed to passing just 2 int
         //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
@@ -26,7 +26,7 @@ namespace Console_Platformer.Engine
         public const int chunkCountX = 100;
         public const int chunkCountY = 100;
         public const int chunkSize = 100;
-        public const int chunkLoadRadius = 3;
+        public const int chunkLoadRadius = 3; //TODO: move this const to Game.cs
         public readonly Chunk[,] chunks = new Chunk[chunkCountX, chunkCountY];
         public readonly List<GameObject>[,] unloadedChunkTransitionGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
         private readonly List<Chunk> chunksToBeUnloaded = new List<Chunk>();
@@ -57,14 +57,6 @@ namespace Console_Platformer.Engine
             // Loading 
             OnEngineLoad();
             OnLoad();
-
-            foreach (var go in chunks[0, 0].gameObjectsToAdd)
-            {
-                chunks[0, 0].gameObjects.Add(go);
-            }
-            chunks[0, 0].gameObjectsToAdd.Clear();
-            UnloadChunk(chunks[0, 0]);
-            LoadChunk(new Vec2i(0, 0));
 
             while (!gameShouldClose)
             {
@@ -183,7 +175,8 @@ namespace Console_Platformer.Engine
         {
             var chunkX = gameObject.Position.X / chunkSize;
             var chunkY = gameObject.Position.Y / chunkSize;
-            chunks[chunkX, chunkY].InsertGameObject(gameObject);
+            if (IsChunkLoaded(new Vec2i(chunkX, chunkY))) chunks[chunkX, chunkY].InsertGameObject(gameObject);
+            else unloadedChunkTransitionGameObjects[chunkX, chunkY].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
@@ -219,6 +212,8 @@ namespace Console_Platformer.Engine
 
             var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";
             serializer.ToFile(chunk, fullPath);
+
+            chunks[chunk.Index.X, chunk.Index.Y] = null;
         }
 
         public void ScheduleUnloadChunk(Vec2i index)
@@ -234,7 +229,7 @@ namespace Console_Platformer.Engine
         public bool IsChunkLoaded(Chunk chunk)
         {
             if (chunk != null) return true;
-            else return true;
+            else return false;
         }
 
         protected abstract void OnLoad();

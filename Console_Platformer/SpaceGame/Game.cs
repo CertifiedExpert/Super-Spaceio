@@ -9,7 +9,7 @@ using Console_Platformer.Engine;
 namespace SpaceGame
 {
     //TODO: find a fix for setting the Game property of BaseObject after deserialization
-    [DataContract(IsReference = true)]
+    //[DataContract(IsReference = true)]
     class Game : Engine
     {
         // Settings
@@ -40,6 +40,7 @@ namespace SpaceGame
 
             //UpdateAllBaseObjects();
             var loadedGameObjectCount = 0;
+            var loadedChunks = 0;
             foreach (var c in chunks)
             {
                 if (IsChunkLoaded(c))
@@ -47,10 +48,14 @@ namespace SpaceGame
                     foreach (var go in c.gameObjects)
                     {
                         loadedGameObjectCount++;
-                    } 
+                    }
+                    loadedChunks++;
                 }
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
+            debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
+            debugLines[4] = $"Current chunk X: {playerShip.Chunk.Index.X} | Y: {playerShip.Chunk.Index.Y}";
+            debugLines[5] = $"Loaded chunks: {loadedChunks}";
         }
 
         private void UpdateCamera()
@@ -91,7 +96,10 @@ namespace SpaceGame
         {
             base.LoadChunk(index);
 
-
+            foreach (var gameObject in chunks[index.X, index.Y].gameObjects)
+            {
+                ((BaseObject)gameObject).Game = this;
+            }
         }
         private void LoadLevel()
         {
@@ -102,16 +110,6 @@ namespace SpaceGame
                     new Vec2i(astSize, astSize), this);
                 AddBaseObject(ast);
             }
-            //var enm = new Enemy(new Vec2i(50, 20), 1, this);
-            //AddBaseObject(enm);
-
-            /*
-            for (var i = 0; i < 30; i++)
-            {
-                var e = new Enemy(new Vec2i(30 + 30 * i, 30), 1, this);
-                AddBaseObject(e);
-            }
-            */
         }
     }
 }
