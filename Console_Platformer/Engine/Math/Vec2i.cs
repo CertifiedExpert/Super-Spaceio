@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract(IsReference = true)]
     class Vec2i
     {
+        [DataMember]
         public int X { get; set; }
+        [DataMember]
         public int Y { get; set; }
         public Vec2i(int x, int y)
         {

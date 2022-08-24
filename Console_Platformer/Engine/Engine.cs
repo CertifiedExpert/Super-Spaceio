@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.IO;
 
 namespace Console_Platformer.Engine
 {
     abstract class Engine
-    {//TODO: clean up readonlys and consts
+    {//TODO: figure out in which functions the Vec2i parameter is acutally helpful as opposed to passing just 2 int
+        //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
+        //TODO: many times the Engine is called from SpaceGame. Game shoud be called instead
+        //TODO: file system. Everything is hardcoded for now.
         // Public variables 
         public bool gameShouldClose = false;
         public int deltaTime = 0; // Miliseconds since last frame
@@ -21,8 +26,10 @@ namespace Console_Platformer.Engine
         public const int chunkCountX = 100;
         public const int chunkCountY = 100;
         public const int chunkSize = 100;
-        public const int chunkLoadRadius = 3;
+        public const int chunkLoadRadius = 3; //TODO: move this const to Game.cs
         public readonly Chunk[,] chunks = new Chunk[chunkCountX, chunkCountY];
+        public readonly List<GameObject>[,] unloadedChunkTransitionGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
+        private readonly List<Chunk> chunksToBeUnloaded = new List<Chunk>();
         public static Random gRandom = new Random();
 
         //"  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -30,6 +37,7 @@ namespace Console_Platformer.Engine
         public Camera Camera { get; private set; } 
         protected Renderer Renderer { get; private set; }
         public ImputManager ImputManager { get; private set; }
+        public Serializer serializer { get; private set; }
 
         private DateTime lastFrame;
         private readonly int milisecondsForNextFrame = 20;
@@ -39,6 +47,8 @@ namespace Console_Platformer.Engine
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
         public string[] debugLines;
+
+        private string chunkSaveFolderPath = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug\SaveData\Chunks";
 
 
         // Applicaton loop
@@ -79,7 +89,7 @@ namespace Console_Platformer.Engine
             // Updates all GameObject
             foreach(var chunk in chunks)
             {
-                if (chunk.IsLoaded)
+                if (IsChunkLoaded(chunk))
                 {
                     foreach (var gameObject in chunk.gameObjects)
                     {
@@ -91,22 +101,35 @@ namespace Console_Platformer.Engine
             // Lazy removing game objects. 
             foreach (var chunk in chunks)
             {
-                foreach (var gameObject in chunk.gameObjectsToRemove)
+                if (IsChunkLoaded(chunk))
                 {
-                    chunk.gameObjects.Remove(gameObject);
+                    foreach (var gameObject in chunk.gameObjectsToRemove)
+                    {
+                        chunk.gameObjects.Remove(gameObject);
+                    }
+                    chunk.gameObjectsToRemove.Clear(); 
                 }
-                chunk.gameObjectsToRemove.Clear();
             }
 
             // Lazy adding GameObjects
             foreach (var chunk in chunks)
             {
-                foreach (var gameObject in chunk.gameObjectsToAdd)
+                if (IsChunkLoaded(chunk))
                 {
-                    chunk.gameObjects.Add(gameObject);
+                    foreach (var gameObject in chunk.gameObjectsToAdd)
+                    {
+                        chunk.gameObjects.Add(gameObject);
+                    }
+                    chunk.gameObjectsToAdd.Clear(); 
                 }
-                chunk.gameObjectsToAdd.Clear();
             }
+
+            // Lazy unloading Chunks
+            foreach (var chunk in chunksToBeUnloaded)
+            {
+                UnloadChunk(chunk);
+            }
+            chunksToBeUnloaded.Clear();
         }
 
 
@@ -117,12 +140,13 @@ namespace Console_Platformer.Engine
             Console.Title = title;
             Console.OutputEncoding = Encoding.Unicode;
 
-            // Initialise chunks
+            // Initialise chunks and transition lists
             for (var x = 0; x < chunks.GetLength(0); x++)
             {
                 for (var y = 0; y < chunks.GetLength(1); y++)
                 {
-                    chunks[x, y] = new Chunk();
+                    chunks[x, y] = new Chunk(new Vec2i(x, y),  this);
+                    unloadedChunkTransitionGameObjects[x, y] = new List<GameObject>();
                 }
             }
 
@@ -138,6 +162,7 @@ namespace Console_Platformer.Engine
             //deltaTime = TimeSpan.Zero;
 
             // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
+            serializer = new Serializer();
             Camera = new Camera(new Vec2i(0, 0), new Vec2i(189, 99));
             Renderer = new Renderer(this);
             ImputManager = new ImputManager();
@@ -150,13 +175,61 @@ namespace Console_Platformer.Engine
         {
             var chunkX = gameObject.Position.X / chunkSize;
             var chunkY = gameObject.Position.Y / chunkSize;
-            chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
-            chunks[chunkX, chunkY].gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
+            if (IsChunkLoaded(new Vec2i(chunkX, chunkY))) chunks[chunkX, chunkY].InsertGameObject(gameObject);
+            else unloadedChunkTransitionGameObjects[chunkX, chunkY].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
-            gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
-            gameObject.Chunk.gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
+            gameObject.Chunk.UnInsertGameObject(gameObject);
+        }
+
+        public virtual void LoadChunk(Vec2i index)
+        {
+            var path = $"{chunkSaveFolderPath}\\chunk{index.X}_{index.Y}";
+            chunks[index.X, index.Y] = serializer.FromFile<Chunk>(path);
+
+            // Fill misssing data
+            chunks[index.X, index.Y].CompleteDataAfterSerialization(this, index);
+
+            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state
+            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            {
+                chunks[index.X, index.Y].InsertGameObject(gameObject);
+            }
+            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            {
+                gameObject.OnUnloadedChunkAwake(index.X, index.Y);
+            }
+            unloadedChunkTransitionGameObjects[index.X, index.Y].Clear();
+        }
+
+        private void UnloadChunk(Chunk chunk)
+        {
+            foreach (var gameObject in chunk.gameObjects)
+            {
+                gameObject.PrepareForDeserialization();
+            }
+
+            var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";
+            serializer.ToFile(chunk, fullPath);
+
+            chunks[chunk.Index.X, chunk.Index.Y] = null;
+        }
+
+        public void ScheduleUnloadChunk(Vec2i index)
+        {
+            chunksToBeUnloaded.Add(chunks[index.X, index.Y]);
+        }
+
+        public bool IsChunkLoaded(Vec2i index)
+        {
+            if (chunks[index.X, index.Y] != null) return true;
+            else return false;
+        }
+        public bool IsChunkLoaded(Chunk chunk)
+        {
+            if (chunk != null) return true;
+            else return false;
         }
 
         protected abstract void OnLoad();

@@ -52,7 +52,7 @@ namespace Console_Platformer.Engine
             {
                 for (var y = 0; y < Engine.chunkCountY; y++)
                 {
-                    if (engine.chunks[x, y].IsLoaded)
+                    if (engine.IsChunkLoaded(new Vec2i(x, y)))
                     {
                         for (var level = Engine.spriteLevelCount - 1; level >= 0; level--)
                         {

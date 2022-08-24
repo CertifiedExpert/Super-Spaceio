@@ -36,6 +36,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,13 +48,14 @@
   <ItemGroup>
     <Compile Include="Engine\Chunk.cs" />
     <Compile Include="Engine\Collider.cs" />
+    <Compile Include="Engine\Serializer.cs" />
     <Compile Include="Engine\Sprites\Bitmap.cs" />
     <Compile Include="Engine\Sprites\Animator.cs" />
     <Compile Include="Engine\Button.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\Engine.cs" />
     <Compile Include="Engine\ImputManager.cs" />
-    <Compile Include="Engine\Math\Util.cs" />
+    <Compile Include="Engine\Util.cs" />
     <Compile Include="Engine\ResourceManager.cs" />
     <Compile Include="Engine\Sprites\Sprite.cs" />
     <Compile Include="Engine\Math\Vec2f.cs" />

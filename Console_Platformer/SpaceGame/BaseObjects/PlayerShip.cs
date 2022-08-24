@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Console_Platformer.Engine;
 
-namespace SpaceGame.Platformer
+namespace SpaceGame
 {
+    [DataContract(IsReference = true)]
     class PlayerShip : Ship
     {
         public PlayerShip(Vec2i position, int mass, Game game) : base(position, mass, game)
@@ -74,16 +76,16 @@ namespace SpaceGame.Platformer
         protected override void OnChunkTraverse(int chunkX, int chunkY)
         {
             base.OnChunkTraverse(chunkX, chunkY);
-            ///*
-            //TODO: optimise this so maybe we do not need to iterate over all chunks
-            for (var i = 0; i < Engine.chunks.GetLength(0); i++)
+
+            var chunksToBeUnloaded = new List<Chunk>();
+            for (var x = 0; x < Engine.chunks.GetLength(0); x++)
             {
-                for (var j = 0; j < Engine.chunks.GetLength(1); j++)
+                for (var y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    Engine.chunks[i, j].IsLoaded = false;
+                    if (Game.IsChunkLoaded(new Vec2i(x, y))) chunksToBeUnloaded.Add(Game.chunks[x, y]);
                 }
-            }//*/
-    
+            }
+            
             var begginX = chunkX - Engine.chunkLoadRadius + 1;
             var begginY = chunkY - Engine.chunkLoadRadius + 1;
             if (begginX < 0) begginX = 0;
@@ -97,8 +99,34 @@ namespace SpaceGame.Platformer
             {
                 for (var x = begginX; x <= endX; x++)
                 {
-                    Engine.chunks[x, y].IsLoaded = true;
+                    if (Game.IsChunkLoaded(new Vec2i(x, y)))
+                    {
+                        chunksToBeUnloaded.Remove(Game.chunks[x, y]);
+                    }
+                    else Game.LoadChunk(new Vec2i(x, y));
                 }
+            }
+
+            foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(new Vec2i(chunk.Index.X, chunk.Index.Y));
+        }
+
+        public override void PrepareForDeserialization()
+        {
+            base.PrepareForDeserialization();
+
+            foreach (var sprite in movementSprites)
+            {
+                sprite.PrepareForDeserialization();
+            }
+        }
+
+        public override void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        {
+            base.CompleteDataAfterSerialization(engine, index);
+
+            foreach (var sprite in movementSprites)
+            {
+                sprite.OnDeserialization();
             }
         }
     }

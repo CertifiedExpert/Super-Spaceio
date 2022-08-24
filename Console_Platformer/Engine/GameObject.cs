@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
+    [DataContract(IsReference = true)]
     abstract class GameObject
     {
         // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
         // In which chunk the GameObject resides
         public Chunk Chunk { get; private set; }
+        [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
+        [DataMember]
         public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
+        [DataMember]
         public List<Collider> Colliders { get; set; }
+        [DataMember]
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
 
+        [DataMember]
         private int _spriteLevel;
         public int SpriteLevel //u
         {
@@ -28,6 +35,7 @@ namespace Console_Platformer.Engine
                 else _spriteLevel = Engine.spriteLevelCount;
             }
         }
+
         public GameObject(Vec2i position, Engine engine)
         {
             Position = position.Copy();
@@ -65,16 +73,23 @@ namespace Console_Platformer.Engine
                 }
 
                 // Chunk traverse detection
-                var chunkX = Position.X / Engine.chunkSize;
-                var chunkY = Position.Y / Engine.chunkSize;
-                if (Chunk != Engine.chunks[chunkX, chunkY])
+                var newChunkX = Position.X / Engine.chunkSize;
+                var newChunkY = Position.Y / Engine.chunkSize;
+                if (Chunk != Engine.chunks[newChunkX, newChunkY])
                 {
-                    Chunk.gameObjectsToRemove.Add(this);
-                    Chunk.gameObjectRenderLists[SpriteLevel].Remove(this);
-                    Chunk = Engine.chunks[chunkX, chunkY];
-                    Chunk.gameObjectsToAdd.Add(this);
-                    Chunk.gameObjectRenderLists[SpriteLevel].Add(this);
-                    OnChunkTraverse(chunkX, chunkY);
+                    Chunk.UnInsertGameObject(this);
+                    Chunk = Engine.chunks[newChunkX, newChunkY];
+
+                    if (Engine.IsChunkLoaded(new Vec2i(newChunkX, newChunkY)))
+                    {
+                        Chunk.InsertGameObject(this);
+                        OnChunkTraverse(newChunkX, newChunkY); 
+                    }
+                    else
+                    {
+                        Engine.unloadedChunkTransitionGameObjects[newChunkX, newChunkY].Add(this);
+                    }
+                    
                 }
 
                 return true;
@@ -90,7 +105,7 @@ namespace Console_Platformer.Engine
             {
                 for (int y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    if (Engine.chunks[x, y].IsLoaded)
+                    if (Engine.IsChunkLoaded(new Vec2i(x, y)))
                     {
                         foreach (var gameObject in Engine.chunks[x, y].gameObjects)
                         {
@@ -139,6 +154,29 @@ namespace Console_Platformer.Engine
             foreach (var sprite in Sprites)
             {
                 sprite?.Animator?.Update();
+            }
+        }
+
+        public void OnUnloadedChunkAwake(int chunkX, int chunkY)
+        {
+            OnChunkTraverse(chunkX, chunkY);
+        }
+        public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        {
+            Engine = engine;
+            Chunk = engine.chunks[index.X, index.Y];
+
+            foreach (var sprite in Sprites)
+            {
+                if (sprite != null) sprite.OnDeserialization();
+            }
+        }
+
+        public virtual void PrepareForDeserialization()
+        {
+            foreach (var sprite in Sprites)
+            {
+                if (sprite != null) sprite.PrepareForDeserialization();
             }
         }
         public abstract void OnCollision(GameObject collidingObject);
