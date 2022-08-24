@@ -48,7 +48,8 @@ namespace Console_Platformer.Engine
         public readonly int debugLinesLength = 40;
         public string[] debugLines;
 
-        private string chunkSaveFolderPath = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug\SaveData\Chunks";
+        protected string pathSavesFolder = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug\Saves";
+        protected string pathCurrentLoadedSave;
 
 
         // Applicaton loop
@@ -140,12 +141,25 @@ namespace Console_Platformer.Engine
             Console.Title = title;
             Console.OutputEncoding = Encoding.Unicode;
 
-            // Initialise chunks and transition lists
+            // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
+            serializer = new Serializer();
+            Camera = new Camera(new Vec2i(0, 0), new Vec2i(189, 99));
+            Renderer = new Renderer(this);
+            ImputManager = new ImputManager();
+            ResourceManager.Init();
+
+            // Initialise the file system
+
+            //var dt = DateTime.Now; 
+            //AddNewSaveData($"{dt.Day}-{dt.Month}-{dt.Year}_{dt.Hour}-{dt.Minute}-{dt.Second}");
+
+            LoadSaveData("debug");
+
+            // Initialise transition lists
             for (var x = 0; x < chunks.GetLength(0); x++)
             {
                 for (var y = 0; y < chunks.GetLength(1); y++)
                 {
-                    chunks[x, y] = new Chunk(new Vec2i(x, y),  this);
                     unloadedChunkTransitionGameObjects[x, y] = new List<GameObject>();
                 }
             }
@@ -160,13 +174,6 @@ namespace Console_Platformer.Engine
             // Set up frame timers
             lastFrame = DateTime.Now;
             //deltaTime = TimeSpan.Zero;
-
-            // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
-            serializer = new Serializer();
-            Camera = new Camera(new Vec2i(0, 0), new Vec2i(189, 99));
-            Renderer = new Renderer(this);
-            ImputManager = new ImputManager();
-            ResourceManager.Init();
         }
 
 
@@ -175,6 +182,8 @@ namespace Console_Platformer.Engine
         {
             var chunkX = gameObject.Position.X / chunkSize;
             var chunkY = gameObject.Position.Y / chunkSize;
+
+            gameObject.Chunk = chunks[chunkX, chunkY];
             if (IsChunkLoaded(new Vec2i(chunkX, chunkY))) chunks[chunkX, chunkY].InsertGameObject(gameObject);
             else unloadedChunkTransitionGameObjects[chunkX, chunkY].Add(gameObject);
         }
@@ -182,11 +191,9 @@ namespace Console_Platformer.Engine
         {
             gameObject.Chunk.UnInsertGameObject(gameObject);
         }
-
         public virtual void LoadChunk(Vec2i index)
         {
-            var path = $"{chunkSaveFolderPath}\\chunk{index.X}_{index.Y}";
-            chunks[index.X, index.Y] = serializer.FromFile<Chunk>(path);
+            chunks[index.X, index.Y] = serializer.FromFile<Chunk>($"{pathCurrentLoadedSave}\\Chunks\\chunk{index.X}_{index.Y}");
 
             // Fill misssing data
             chunks[index.X, index.Y].CompleteDataAfterSerialization(this, index);
@@ -202,7 +209,6 @@ namespace Console_Platformer.Engine
             }
             unloadedChunkTransitionGameObjects[index.X, index.Y].Clear();
         }
-
         private void UnloadChunk(Chunk chunk)
         {
             foreach (var gameObject in chunk.gameObjects)
@@ -210,17 +216,13 @@ namespace Console_Platformer.Engine
                 gameObject.PrepareForDeserialization();
             }
 
-            var fullPath = $"{chunkSaveFolderPath}\\chunk{chunk.Index.X}_{chunk.Index.Y}";
-            serializer.ToFile(chunk, fullPath);
-
+            serializer.ToFile(chunk, $"{pathCurrentLoadedSave}\\Chunks\\chunk{chunk.Index.X}_{chunk.Index.Y}");
             chunks[chunk.Index.X, chunk.Index.Y] = null;
         }
-
         public void ScheduleUnloadChunk(Vec2i index)
         {
             chunksToBeUnloaded.Add(chunks[index.X, index.Y]);
         }
-
         public bool IsChunkLoaded(Vec2i index)
         {
             if (chunks[index.X, index.Y] != null) return true;
@@ -232,6 +234,46 @@ namespace Console_Platformer.Engine
             else return false;
         }
 
+        protected void LoadSaveData(string name)
+        {
+            pathCurrentLoadedSave = $"{pathSavesFolder}\\{name}";
+        }
+        protected void AddNewSaveData(string name)
+        {
+            var dir = $"{pathSavesFolder}\\{name}";
+            var existingCopies = 1;
+            while (Directory.Exists(dir))
+            {
+                dir = $"{pathSavesFolder}\\{name}-copy({existingCopies})";
+                existingCopies++;
+            }
+            Directory.CreateDirectory(dir);
+
+            pathCurrentLoadedSave = dir;
+
+            Directory.CreateDirectory($"{dir}\\Chunks");
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    using (var fs = File.Create($"{pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}")) { }
+                }
+            }
+
+            CreateChunks();
+        }
+        protected virtual void CreateChunks()
+        {
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    chunks[x, y] = new Chunk(new Vec2i(x, y), this);
+                    serializer.ToFile(chunks[x, y], $"{pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}");
+                    chunks[x, y] = null;
+                }
+            }
+        }
         protected abstract void OnLoad();
         protected abstract void Update();
     }

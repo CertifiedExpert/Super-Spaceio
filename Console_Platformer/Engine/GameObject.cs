@@ -13,7 +13,7 @@ namespace Console_Platformer.Engine
         // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
         // In which chunk the GameObject resides
-        public Chunk Chunk { get; private set; }
+        public Chunk Chunk { get; set; }
         [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
         [DataMember]
@@ -44,7 +44,7 @@ namespace Console_Platformer.Engine
             SpriteLevel = 5;
             Sprites = new Sprite[Engine.spriteMaxCount];
             Colliders = new List<Collider>();
-            Chunk = Engine.chunks[Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize];
+            //Chunk = Engine.chunks[Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize];
         }
 
         // Moves the gameObject and return a boolean to indicate whether the object was moved successfully
@@ -159,6 +159,7 @@ namespace Console_Platformer.Engine
 
         public void OnUnloadedChunkAwake(int chunkX, int chunkY)
         {
+            Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
         public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)

@@ -26,6 +26,7 @@ namespace SpaceGame
             serializer.knownTypes.Add(typeof(Ship));
             serializer.knownTypes.Add(typeof(PlayerShip));
             serializer.knownTypes.Add(typeof(Enemy));
+
             playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
             AddBaseObject(playerShip);
 
@@ -54,7 +55,7 @@ namespace SpaceGame
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
             debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
-            debugLines[4] = $"Current chunk X: {playerShip.Chunk.Index.X} | Y: {playerShip.Chunk.Index.Y}";
+            debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
             debugLines[5] = $"Loaded chunks: {loadedChunks}";
         }
 
@@ -103,11 +104,11 @@ namespace SpaceGame
         }
         private void LoadLevel()
         {
-            for (var i = 0; i < 100000; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 var astSize = gRandom.Next(1, 30);
                 var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),
-                    new Vec2i(astSize, astSize), this);
+                new Vec2i(astSize, astSize), this);
                 AddBaseObject(ast);
             }
         }

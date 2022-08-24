@@ -21,13 +21,36 @@ namespace Console_Platformer.Engine
                 serializer.WriteObject(fs, instance);
             } 
         }
-
         public T FromFile<T>(string path)
         {
             using (var fs = new FileStream(path, FileMode.Open))
             {
                 var serializer = new DataContractSerializer(typeof(T), knownTypes);
                 return (T)serializer.ReadObject(fs);
+            }
+        }
+
+        
+        public string ToString<T>(T instance)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            using (StreamReader reader = new StreamReader(memoryStream))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(instance.GetType(), knownTypes);
+                serializer.WriteObject(memoryStream, instance);
+                memoryStream.Position = 0;
+                return reader.ReadToEnd();
+            }
+        }
+        public T FromString<T>(string xml, T instance)
+        {
+            using (Stream stream = new MemoryStream())
+            {
+                byte[] data = Encoding.UTF8.GetBytes(xml);
+                stream.Write(data, 0, data.Length);
+                stream.Position = 0;
+                DataContractSerializer deserializer = new DataContractSerializer(typeof(T), knownTypes);
+                return (T)deserializer.ReadObject(stream);
             }
         }
     }
