@@ -8,12 +8,12 @@ using Console_Platformer.Engine;
 
 namespace SpaceGame
 {
-    //TODO: find a fix for setting the Game property of BaseObject after deserialization
-    //[DataContract(IsReference = true)]
+    [DataContract(IsReference = true)]
     class Game : Engine
     {
         // Settings
         public int milisecondsPerPlayerMove = 50;
+        public const int chunkLoadRadius = 3;
 
         public PlayerShip playerShip;
 
@@ -21,11 +21,16 @@ namespace SpaceGame
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
-            serializer.knownTypes.Add(typeof(BaseObject));
-            serializer.knownTypes.Add(typeof(Asteroid));
-            serializer.knownTypes.Add(typeof(Ship));
-            serializer.knownTypes.Add(typeof(PlayerShip));
-            serializer.knownTypes.Add(typeof(Enemy));
+            Serializer.knownTypes.Add(typeof(Engine));
+            Serializer.knownTypes.Add(typeof(Game));
+            Serializer.knownTypes.Add(typeof(BaseObject));
+            Serializer.knownTypes.Add(typeof(Asteroid));
+            Serializer.knownTypes.Add(typeof(Ship));
+            Serializer.knownTypes.Add(typeof(PlayerShip));
+            Serializer.knownTypes.Add(typeof(Enemy));
+
+            //AddNewSaveData($"{dt.Day}-{dt.Month}-{dt.Year}_{dt.Hour}-{dt.Minute}-{dt.Second}");
+            LoadSavedData("debug");
 
             playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
             AddBaseObject(playerShip);
@@ -106,8 +111,8 @@ namespace SpaceGame
         {
             for (var i = 0; i < 10000; i++)
             {
-                var astSize = gRandom.Next(1, 30);
-                var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),
+                var astSize = Random.Next(1, 30);
+                var ast = new Asteroid(new Vec2i(Random.Next(0, worldSize.X), Random.Next(0, worldSize.Y)),
                 new Vec2i(astSize, astSize), this);
                 AddBaseObject(ast);
             }

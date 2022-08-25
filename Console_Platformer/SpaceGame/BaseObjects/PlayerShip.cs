@@ -86,12 +86,12 @@ namespace SpaceGame
                 }
             }
             
-            var begginX = chunkX - Engine.chunkLoadRadius + 1;
-            var begginY = chunkY - Engine.chunkLoadRadius + 1;
+            var begginX = chunkX - Game.chunkLoadRadius + 1;
+            var begginY = chunkY - Game.chunkLoadRadius + 1;
             if (begginX < 0) begginX = 0;
             if (begginY < 0) begginY = 0;
-            var endX = chunkX + Engine.chunkLoadRadius - 1;
-            var endY = chunkY + Engine.chunkLoadRadius - 1;
+            var endX = chunkX + Game.chunkLoadRadius - 1;
+            var endY = chunkY + Game.chunkLoadRadius - 1;
             if (endX >= Engine.chunks.GetLength(0)) endX = 0;
             if (endY >= Engine.chunks.GetLength(1)) endY = 0;
 

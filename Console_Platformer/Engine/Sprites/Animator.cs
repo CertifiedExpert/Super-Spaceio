@@ -30,7 +30,7 @@ namespace Console_Platformer.Engine
             this.loopable = loopable;
             this.sprite = sprite;
 
-            if (randomiseStartFrame) currentFrame = Engine.gRandom.Next(0, frames.Count());
+            if (randomiseStartFrame) currentFrame = Util.random.Next(0, frames.Count());
         }
 
         

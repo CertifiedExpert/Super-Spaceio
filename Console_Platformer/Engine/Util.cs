@@ -8,6 +8,7 @@ namespace Console_Platformer.Engine
 {
     class Util
     {
+        public static Random random = new Random();
         public static float RadToDeg(float rad)
         {
             return (float)(rad * 180 / Math.PI);

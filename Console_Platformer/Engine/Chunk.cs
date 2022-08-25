@@ -11,19 +11,21 @@ namespace Console_Platformer.Engine
     class Chunk
     {
         [DataMember]
-        public List<GameObject>[] gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
+        public List<GameObject>[] gameObjectRenderLists;
         [DataMember]
         public List<GameObject> gameObjects = new List<GameObject>();
 
         public List<GameObject> gameObjectsToRemove = new List<GameObject>();
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
         [DataMember]
-        public DateTime lastUnloaded = DateTime.MinValue;
+        public DateTime lastUnloaded = DateTime.MinValue; //TODO: update this every time is unloaded
         public Vec2i Index { get; set; }
         public Engine Engine { get; set; }
         public Chunk(Vec2i index, Engine engine)
         {
             Engine = engine;
+
+            gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
             for (var i = 0; i < gameObjectRenderLists.Length; i++)
             {
                 gameObjectRenderLists[i] = new List<GameObject>();
