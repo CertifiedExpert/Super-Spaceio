@@ -29,6 +29,8 @@ namespace Console_Platformer.Engine
         [DataMember] public int chunkSize { get; private set; }//100;
         [DataMember] public int milisecondsForNextFrame; //= 20;
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; }
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; }
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; }
         private Camera _camera;
 
         [DataMember] public Camera Camera
@@ -44,7 +46,8 @@ namespace Console_Platformer.Engine
 
         public Vec2i worldSize { get; private set; }
         public Chunk[,] chunks { get; private set; } 
-        public List<GameObject>[,] unloadedChunkTransitionGameObjects { get; private set; } //= new List<GameObject>[chunkCountX, chunkCountY];
+        public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; } 
+        public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; }
         private List<Chunk> chunksToBeUnloaded = new List<Chunk>();
 
         //"  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -94,6 +97,8 @@ namespace Console_Platformer.Engine
 
                 deltaTime = (int)(DateTime.Now - lastFrame).TotalMilliseconds;
             }
+
+            SaveGame();
         }
 
         // Functions required to run each frame by the engine
@@ -176,11 +181,12 @@ namespace Console_Platformer.Engine
 
             gameObject.Chunk = chunks[chunkX, chunkY];
             if (IsChunkLoaded(new Vec2i(chunkX, chunkY))) chunks[chunkX, chunkY].InsertGameObject(gameObject);
-            else unloadedChunkTransitionGameObjects[chunkX, chunkY].Add(gameObject);
+            else unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
         }
         public void RemoveGameObject(GameObject gameObject)
         {
-            gameObject.Chunk.UnInsertGameObject(gameObject);
+            if (IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.UnInsertGameObject(gameObject);
+            else unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
         }
         public virtual void LoadChunk(Vec2i index)
         {
@@ -189,16 +195,21 @@ namespace Console_Platformer.Engine
             // Fill misssing data
             chunks[index.X, index.Y].CompleteDataAfterSerialization(this, index);
 
-            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state
-            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state (or delete them)
+            foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[index.X, index.Y])
+            {
+                chunks[index.X, index.Y].UnInsertGameObject(gameObject);
+            }
+            foreach (var gameObject in unloadedChunkTransitionAddGameObjects[index.X, index.Y])
             {
                 chunks[index.X, index.Y].InsertGameObject(gameObject);
             }
-            foreach (var gameObject in unloadedChunkTransitionGameObjects[index.X, index.Y])
+            foreach (var gameObject in unloadedChunkTransitionAddGameObjects[index.X, index.Y])
             {
                 gameObject.OnUnloadedChunkAwake(index.X, index.Y);
             }
-            unloadedChunkTransitionGameObjects[index.X, index.Y].Clear();
+            unloadedChunkTransitionRemoveGameObjects[index.X, index.Y].Clear();
+            unloadedChunkTransitionAddGameObjects[index.X, index.Y].Clear();
         }
         private void UnloadChunk(Chunk chunk)
         {
@@ -212,7 +223,7 @@ namespace Console_Platformer.Engine
         }
         public void ScheduleUnloadChunk(Vec2i index)
         {
-            chunksToBeUnloaded.Add(chunks[index.X, index.Y]);
+            if (IsChunkLoaded(chunks[index.X, index.Y]) && !chunksToBeUnloaded.Contains(chunks[index.X, index.Y])) chunksToBeUnloaded.Add(chunks[index.X, index.Y]);
         }
         public bool IsChunkLoaded(Vec2i index)
         {
@@ -234,11 +245,15 @@ namespace Console_Platformer.Engine
             var data = Serializer.FromFile<Engine>($"{pathCurrentLoadedSave}\\gameState");
             LoadTemplate(data);
 
+            unloadedChunkTransitionAddGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionAddGameObjects_serialize);
+            unloadedChunkTransitionRemoveGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionRemoveGameObject_serialize);
             var wasChunkLoadedMap2d = Util.UnJaggedize2dArray(data.wasChunkLoadedMap_serialize);
             for (var x = 0; x < chunkCountX; x++)
             {
                 for (var y = 0; y < chunkCountY; y++)
                 {
+                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y)); 
+                    foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y));
                     if (wasChunkLoadedMap2d[x, y]) LoadChunk(new Vec2i(x, y));
                 }
             }
@@ -302,6 +317,16 @@ namespace Console_Platformer.Engine
             }
 
             wasChunkLoadedMap_serialize = Util.Jaggedize2dArray(wasChunkLoadedMap2d);
+
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.PrepareForDeserialization();
+                }
+            }
+            unloadedChunkTransitionAddGameObjects_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionAddGameObjects);
+            unloadedChunkTransitionRemoveGameObject_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionRemoveGameObjects);
             Serializer.ToFile(this, $"{pathCurrentLoadedSave}\\gameState");
         }
         private void LoadTemplate(Engine data)
@@ -325,12 +350,14 @@ namespace Console_Platformer.Engine
             Random = new Random();
 
             // Initialise transition lists
-            unloadedChunkTransitionGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
+            unloadedChunkTransitionAddGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
+            unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
             for (var x = 0; x < chunks.GetLength(0); x++)
             {
                 for (var y = 0; y < chunks.GetLength(1); y++)
                 {
-                    unloadedChunkTransitionGameObjects[x, y] = new List<GameObject>();
+                    unloadedChunkTransitionAddGameObjects[x, y] = new List<GameObject>();
+                    unloadedChunkTransitionRemoveGameObjects[x, y] = new List<GameObject>();
                 }
             }
 

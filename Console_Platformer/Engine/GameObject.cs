@@ -87,7 +87,7 @@ namespace Console_Platformer.Engine
                     }
                     else
                     {
-                        Engine.unloadedChunkTransitionGameObjects[newChunkX, newChunkY].Add(this);
+                        Engine.unloadedChunkTransitionAddGameObjects[newChunkX, newChunkY].Add(this);
                     }
                     
                 }
