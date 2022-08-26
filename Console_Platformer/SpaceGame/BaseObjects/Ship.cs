@@ -77,5 +77,25 @@ namespace SpaceGame
             Velocity = new Vec2f(0, 0);
             restOfVelocity = new Vec2f(0, 0);
         }
+
+        public override void PrepareForDeserialization()
+        {
+            base.PrepareForDeserialization();
+
+            foreach (var sprite in movementSprites)
+            {
+                sprite.PrepareForDeserialization();
+            }
+        }
+
+        public override void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        {
+            base.CompleteDataAfterSerialization(engine, index);
+
+            foreach (var sprite in movementSprites)
+            {
+                sprite.OnDeserialization();
+            }
+        }
     }
 }

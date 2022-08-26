@@ -16,6 +16,7 @@ namespace SpaceGame
         public const int chunkLoadRadius = 3;
 
         public PlayerShip playerShip;
+        public GoBind test;
 
         public int milisecondsSinceLastPlayerMove = 0;
         public bool playerMovedInThisFrame = false;
@@ -29,10 +30,15 @@ namespace SpaceGame
             Serializer.knownTypes.Add(typeof(PlayerShip));
             Serializer.knownTypes.Add(typeof(Enemy));
 
-            LoadSavedData("debug");
+            LoadSavedData("reflection");
 
-            //AddNewSavedData("debug");
+            //AddNewSavedData("reflection");
             //CreateChunks();
+            //
+            //var enm = new Enemy(new Vec2i(5, 5), 1, this);
+            //AddBaseObject(enm);
+            //test = new GoBind(enm, "test", this);
+            //
             //
             //playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
             //AddBaseObject(playerShip);
@@ -41,6 +47,7 @@ namespace SpaceGame
 
         protected override void Update()
         {
+            if (Util.random.Next(0, 30) == 5 && test?.IsActive == true) test.Val.Position.X++;
             if (ImputManager.Escape.IsPressed) gameShouldClose = true;
 
             UpdateCamera();

@@ -14,7 +14,7 @@ namespace SpaceGame
         public PlayerShip(Vec2i position, int mass, Game game) : base(position, mass, game)
         {
             Sprites[0] = new Sprite(ResourceManager.fighter1Right);
-            Colliders.Add(new Collider(new Vec2i(9, 9))); 
+            Colliders.Add(new Collider(new Vec2i(9, 9)));
             SpriteLevel = 0;
 
             movementSprites[0] = new Sprite(ResourceManager.fighter1Right);
@@ -85,7 +85,7 @@ namespace SpaceGame
                     if (Game.IsChunkLoaded(new Vec2i(x, y))) chunksToBeUnloaded.Add(Game.chunks[x, y]);
                 }
             }
-            
+
             var begginX = chunkX - Game.chunkLoadRadius + 1;
             var begginY = chunkY - Game.chunkLoadRadius + 1;
             if (begginX < 0) begginX = 0;
@@ -108,26 +108,6 @@ namespace SpaceGame
             }
 
             foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(new Vec2i(chunk.Index.X, chunk.Index.Y));
-        }
-
-        public override void PrepareForDeserialization()
-        {
-            base.PrepareForDeserialization();
-
-            foreach (var sprite in movementSprites)
-            {
-                sprite.PrepareForDeserialization();
-            }
-        }
-
-        public override void CompleteDataAfterSerialization(Engine engine, Vec2i index)
-        {
-            base.CompleteDataAfterSerialization(engine, index);
-
-            foreach (var sprite in movementSprites)
-            {
-                sprite.OnDeserialization();
-            }
         }
     }
 }

@@ -19,10 +19,11 @@ namespace Console_Platformer.Engine
         [DataMember]
         public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
         [DataMember]
-        public List<Collider> Colliders { get; set; }
+        public List<Collider> Colliders { get; private set; }
         [DataMember]
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
-
+        [DataMember]
+        public List<GoBind> Binds { get; private set; }
         [DataMember]
         private int _spriteLevel;
         public int SpriteLevel //u
@@ -36,6 +37,7 @@ namespace Console_Platformer.Engine
             }
         }
 
+
         public GameObject(Vec2i position, Engine engine)
         {
             Position = position.Copy();
@@ -44,7 +46,7 @@ namespace Console_Platformer.Engine
             SpriteLevel = 5;
             Sprites = new Sprite[Engine.spriteMaxCount];
             Colliders = new List<Collider>();
-            //Chunk = Engine.chunks[Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize];
+            Binds = new List<GoBind>();
         }
 
         // Moves the gameObject and return a boolean to indicate whether the object was moved successfully
@@ -171,6 +173,8 @@ namespace Console_Platformer.Engine
             {
                 if (sprite != null) sprite.OnDeserialization();
             }
+
+            foreach (var bind in Binds) bind.OnDeserialized(this);
         }
 
         public virtual void PrepareForDeserialization()
@@ -178,6 +182,11 @@ namespace Console_Platformer.Engine
             foreach (var sprite in Sprites)
             {
                 if (sprite != null) sprite.PrepareForDeserialization();
+            }
+
+            foreach (var bind in Binds)
+            {
+                bind.IsActive = false;
             }
         }
         public abstract void OnCollision(GameObject collidingObject);
