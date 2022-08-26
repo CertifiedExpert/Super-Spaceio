@@ -28,6 +28,7 @@ namespace Console_Platformer.Engine
         [DataMember] public int chunkCountY { get; private set; }//100;
         [DataMember] public int chunkSize { get; private set; }//100;
         [DataMember] public int milisecondsForNextFrame; //= 20;
+        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; }
         private Camera _camera;
 
         [DataMember] public Camera Camera
@@ -226,14 +227,25 @@ namespace Console_Platformer.Engine
         #endregion
 
         #region FILES/LOADING/UNLOADING
-        protected virtual void LoadSavedData(string saveName)
+        protected void LoadSavedData(string saveName)
         {
             pathCurrentLoadedSave = $"{pathSavesFolder}\\{saveName}";
 
             var data = Serializer.FromFile<Engine>($"{pathCurrentLoadedSave}\\gameState");
             LoadTemplate(data);
-            Camera = data.Camera;
+
+            var wasChunkLoadedMap2d = Util.UnJaggedize2dArray(data.wasChunkLoadedMap_serialize);
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    if (wasChunkLoadedMap2d[x, y]) LoadChunk(new Vec2i(x, y));
+                }
+            }
+
+            OnSaveDataLoad(data);
         }
+        protected virtual void OnSaveDataLoad(Engine data) { }
         protected virtual void AddNewSavedData(string name)
         {
             var dir = $"{pathSavesFolder}\\{name}";
@@ -255,6 +267,8 @@ namespace Console_Platformer.Engine
             }
 
             using (var fs = File.Create($"{dir}\\gameState")) { }
+
+            pathCurrentLoadedSave = dir;
         }
         protected virtual void CreateChunks()
         {
@@ -263,10 +277,32 @@ namespace Console_Platformer.Engine
                 for (var y = 0; y < chunkCountY; y++)
                 {
                     chunks[x, y] = new Chunk(new Vec2i(x, y), this);
-                    Serializer.ToFile(chunks[x, y], $"{pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}");
+                    UnloadChunk(chunks[x, y]);
                     chunks[x, y] = null;
                 }
             }
+        }
+        protected virtual void SaveGame()
+        {
+            var wasChunkLoadedMap2d = new bool[chunkCountX, chunkCountY];
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    if (IsChunkLoaded(chunks[x, y]))
+                    {
+                        UnloadChunk(chunks[x, y]);
+                        wasChunkLoadedMap2d[x, y] = true;
+                    }
+                    else
+                    {
+                        wasChunkLoadedMap2d[x, y] = false;
+                    }
+                }
+            }
+
+            wasChunkLoadedMap_serialize = Util.Jaggedize2dArray(wasChunkLoadedMap2d);
+            Serializer.ToFile(this, $"{pathCurrentLoadedSave}\\gameState");
         }
         private void LoadTemplate(Engine data)
         {
@@ -281,7 +317,6 @@ namespace Console_Platformer.Engine
             milisecondsForNextFrame = data.milisecondsForNextFrame;
             Camera = data.Camera;
         }
-
         private void FinaliseVariableInit()
         {
             chunks = new Chunk[chunkCountX, chunkCountY];
@@ -305,6 +340,8 @@ namespace Console_Platformer.Engine
             {
                 debugLines[i] = "";
             }
+
+            Renderer = new Renderer(this);
 
             // Set up frame timers
             lastFrame = DateTime.Now;

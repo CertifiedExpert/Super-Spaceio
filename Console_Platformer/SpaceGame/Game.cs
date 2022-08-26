@@ -29,13 +29,14 @@ namespace SpaceGame
             Serializer.knownTypes.Add(typeof(PlayerShip));
             Serializer.knownTypes.Add(typeof(Enemy));
 
-            //AddNewSaveData($"{dt.Day}-{dt.Month}-{dt.Year}_{dt.Hour}-{dt.Minute}-{dt.Second}");
             LoadSavedData("debug");
 
-            playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
-            AddBaseObject(playerShip);
-
-            LoadLevel();
+            //AddNewSavedData("debug");
+            //CreateChunks();
+            //
+            //playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
+            //AddBaseObject(playerShip);
+            //LoadLevel();
         }
 
         protected override void Update()
@@ -60,7 +61,7 @@ namespace SpaceGame
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
             debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
-            debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
+            //debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
             debugLines[5] = $"Loaded chunks: {loadedChunks}";
         }
 
