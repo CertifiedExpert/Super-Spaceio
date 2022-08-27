@@ -22,7 +22,6 @@ namespace SpaceGame
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
-            Serializer.knownTypes.Add(typeof(Engine));
             Serializer.knownTypes.Add(typeof(Game));
             Serializer.knownTypes.Add(typeof(BaseObject));
             Serializer.knownTypes.Add(typeof(Asteroid));
@@ -54,22 +53,19 @@ namespace SpaceGame
 
             //UpdateAllBaseObjects();
             var loadedGameObjectCount = 0;
-            var loadedChunks = 0;
-            foreach (var c in chunks)
+            var lChunks = 0;
+            foreach (var chunk in loadedChunks)
             {
-                if (IsChunkLoaded(c))
+                foreach (var go in chunk.gameObjects)
                 {
-                    foreach (var go in c.gameObjects)
-                    {
-                        loadedGameObjectCount++;
-                    }
-                    loadedChunks++;
+                    loadedGameObjectCount++;
                 }
+                lChunks++;
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
             debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
             //debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
-            debugLines[5] = $"Loaded chunks: {loadedChunks}";
+            debugLines[5] = $"Loaded chunks: {lChunks}";
         }
 
         private void UpdateCamera()

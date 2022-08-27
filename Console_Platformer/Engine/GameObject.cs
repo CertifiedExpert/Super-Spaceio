@@ -82,7 +82,7 @@ namespace Console_Platformer.Engine
                     Chunk.UnInsertGameObject(this);
                     Chunk = Engine.chunks[newChunkX, newChunkY];
 
-                    if (Engine.IsChunkLoaded(new Vec2i(newChunkX, newChunkY)))
+                    if (Engine.IsChunkLoaded(newChunkX, newChunkY))
                     {
                         Chunk.InsertGameObject(this);
                         OnChunkTraverse(newChunkX, newChunkY); 
@@ -107,7 +107,7 @@ namespace Console_Platformer.Engine
             {
                 for (int y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    if (Engine.IsChunkLoaded(new Vec2i(x, y)))
+                    if (Engine.IsChunkLoaded(x, y))
                     {
                         foreach (var gameObject in Engine.chunks[x, y].gameObjects)
                         {

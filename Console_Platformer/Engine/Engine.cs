@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.IO;
 using SpaceGame;
+using System.Reflection;
 
 namespace Console_Platformer.Engine
 {
     [DataContract(IsReference = true)]
     abstract class Engine
     {
-        //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
-        //TODO: many times the Engine is called from SpaceGame. Game shoud be called instead
-        //TODO: file system. Everything is hardcoded for now.
          
         public bool gameShouldClose = false; // Flag whether the game is set to close.
         public int deltaTime = 0; // Miliseconds which passed since last frame.
@@ -69,7 +67,7 @@ namespace Console_Platformer.Engine
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
         public string[] debugLines;
-
+ 
         protected string pathRootFolder = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug"; // The root folder of the whole application.
         protected string pathSavesFolder;
         protected string pathCurrentLoadedSave;
@@ -115,11 +113,12 @@ namespace Console_Platformer.Engine
             ImputManager = new ImputManager();
             ResourceManager.Init();
 
+            pathRootFolder = GetAssemblyDirectory();
+            pathSavesFolder = $"{pathRootFolder}\\Saves";
             var defaultTemplateData = Serializer.FromFile<Engine>($"{pathRootFolder}\\Templates\\defaultTemplate"); 
             LoadTemplate(defaultTemplateData);
             FinaliseVariableInit();
 
-            pathSavesFolder = $"{pathRootFolder}\\Saves";
 
             // Console settings
             Console.CursorVisible = false;
@@ -373,6 +372,13 @@ namespace Console_Platformer.Engine
 
             // Set up frame timers
             lastFrame = DateTime.Now;
+        }
+        public string GetAssemblyDirectory() //TODO: test this. this might produce and error
+        {
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            return Path.GetDirectoryName(path);
         }
         #endregion
 

@@ -59,11 +59,11 @@ namespace SpaceGame
         }
         private void Move()
         {
-            var totalX = Velocity.X * Engine.deltaTime / Mass / 1000 + restOfVelocity.X;
+            var totalX = Velocity.X * Game.deltaTime / Mass / 1000 + restOfVelocity.X;
             var finalX = (int)totalX;
             restOfVelocity.X = totalX - finalX;
 
-            var totalY = Velocity.Y * Engine.deltaTime / Mass / 1000 + restOfVelocity.Y;
+            var totalY = Velocity.Y * Game.deltaTime / Mass / 1000 + restOfVelocity.Y;
             var finalY = (int)totalY;
             restOfVelocity.Y = totalY - finalY;
 

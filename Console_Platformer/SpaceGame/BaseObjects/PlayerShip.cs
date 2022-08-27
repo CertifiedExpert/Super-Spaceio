@@ -27,7 +27,7 @@ namespace SpaceGame
             movementSprites[7] = new Sprite(ResourceManager.fighter1DownRight);
             ThrustStrength = 4;
 
-            OnChunkTraverse(Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize); // Call this with the curren position in order to load in chunks for the first time
+            OnChunkTraverse(Position.X / Game.chunkSize, Position.Y / Game.chunkSize); // Call this with the curren position in order to load in chunks for the first time
         }
 
         public override void Update()
@@ -78,11 +78,11 @@ namespace SpaceGame
             base.OnChunkTraverse(chunkX, chunkY);
 
             var chunksToBeUnloaded = new List<Chunk>();
-            for (var x = 0; x < Engine.chunks.GetLength(0); x++)
+            for (var x = 0; x < Game.chunks.GetLength(0); x++)
             {
-                for (var y = 0; y < Engine.chunks.GetLength(1); y++)
+                for (var y = 0; y < Game.chunks.GetLength(1); y++)
                 {
-                    if (Game.IsChunkLoaded(new Vec2i(x, y))) chunksToBeUnloaded.Add(Game.chunks[x, y]);
+                    if (Game.IsChunkLoaded(x, y)) chunksToBeUnloaded.Add(Game.chunks[x, y]);
                 }
             }
 
@@ -92,14 +92,14 @@ namespace SpaceGame
             if (begginY < 0) begginY = 0;
             var endX = chunkX + Game.chunkLoadRadius - 1;
             var endY = chunkY + Game.chunkLoadRadius - 1;
-            if (endX >= Engine.chunks.GetLength(0)) endX = 0;
-            if (endY >= Engine.chunks.GetLength(1)) endY = 0;
+            if (endX >= Game.chunks.GetLength(0)) endX = 0;
+            if (endY >= Game.chunks.GetLength(1)) endY = 0;
 
             for (var y = begginY; y <= endY; y++)
             {
                 for (var x = begginX; x <= endX; x++)
                 {
-                    if (Game.IsChunkLoaded(new Vec2i(x, y)))
+                    if (Game.IsChunkLoaded(x, y))
                     {
                         chunksToBeUnloaded.Remove(Game.chunks[x, y]);
                     }
@@ -107,7 +107,7 @@ namespace SpaceGame
                 }
             }
 
-            foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(new Vec2i(chunk.Index.X, chunk.Index.Y));
+            foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(chunk.Index.X, chunk.Index.Y);
         }
     }
 }
