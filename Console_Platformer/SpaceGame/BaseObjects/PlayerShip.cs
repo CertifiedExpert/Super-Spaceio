@@ -103,7 +103,7 @@ namespace SpaceGame
                     {
                         chunksToBeUnloaded.Remove(Game.chunks[x, y]);
                     }
-                    else Game.LoadChunk(new Vec2i(x, y));
+                    else Game.LoadChunk(x, y);
                 }
             }
 

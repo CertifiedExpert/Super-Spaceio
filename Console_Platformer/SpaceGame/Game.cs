@@ -106,11 +106,11 @@ namespace SpaceGame
         }
         */
 
-        public override void LoadChunk(Vec2i index)
+        public override void LoadChunk(int x, int y)
         {
-            base.LoadChunk(index);
+            base.LoadChunk(x, y);
 
-            foreach (var gameObject in chunks[index.X, index.Y].gameObjects)
+            foreach (var gameObject in chunks[x, y].gameObjects)
             {
                 ((BaseObject)gameObject).Game = this;
             }
