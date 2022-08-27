@@ -15,30 +15,31 @@ namespace Console_Platformer.Engine
         //TODO: there are some nested for loops over chunks whereas a foreach loop would possibly work
         //TODO: many times the Engine is called from SpaceGame. Game shoud be called instead
         //TODO: file system. Everything is hardcoded for now.
-        public bool gameShouldClose = false;
-        public int deltaTime = 0; // Miliseconds since last frame
+
+        public bool gameShouldClose = false; 
+        public int deltaTime = 0; 
 
         #region SERIALIZABLE_VARIABLES
-        [DataMember] public int spriteMaxCount { get; private set; } //10 
-        [DataMember] public int spriteLevelCount { get; private set; }//10;
-        [DataMember] public char backgroudPixel { get; private set; }//' ';
-        [DataMember] public string pixelSpacingCharacters { get; private set; }//" ";
-        [DataMember] public string title { get; private set; }//"default title";
-        [DataMember] public int chunkCountX { get; private set; }//100;              
-        [DataMember] public int chunkCountY { get; private set; }//100;
-        [DataMember] public int chunkSize { get; private set; }//100;
-        [DataMember] public int milisecondsForNextFrame; //= 20;
-        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; }
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; }
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; }
-        private Camera _camera;
+        [DataMember] public int spriteMaxCount { get; private set; } 
+        [DataMember] public int spriteLevelCount { get; private set; } 
+        [DataMember] public char backgroudPixel { get; private set; } 
+        [DataMember] public string pixelSpacingCharacters { get; private set; }
+        [DataMember] public string title { get; private set; } 
+        [DataMember] public int chunkCountX { get; private set; } 
+        [DataMember] public int chunkCountY { get; private set; } 
+        [DataMember] public int chunkSize { get; private set; } 
+        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } 
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } 
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } 
+        [DataMember] public int milisecondsForNextFrame; 
+        private Camera _camera; 
 
-        [DataMember] public Camera Camera
+        [DataMember] public Camera Camera 
         {
             get { return _camera; }
             private set 
             {
-                if (_camera != null) Renderer = new Renderer(this); //TODO: this might be a bug inducing code!! Add a concrete check if the camera is first time initialized instead of this (somebody can set camera to null and this will not reset the renderer.)
+                if (_camera != null && _camera.Size.X == value.Size.X && _camera.Size.Y == value.Size.Y) Renderer = new Renderer(this); 
                 _camera = value;
             }
         }
