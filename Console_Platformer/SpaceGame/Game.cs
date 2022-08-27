@@ -8,32 +8,46 @@ using Console_Platformer.Engine;
 
 namespace SpaceGame
 {
-    //TODO: find a fix for setting the Game property of BaseObject after deserialization
-    //[DataContract(IsReference = true)]
+    [DataContract(IsReference = true)]
     class Game : Engine
     {
         // Settings
         public int milisecondsPerPlayerMove = 50;
+        public const int chunkLoadRadius = 3;
 
         public PlayerShip playerShip;
+        public GoBind test;
 
         public int milisecondsSinceLastPlayerMove = 0;
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
-            serializer.knownTypes.Add(typeof(BaseObject));
-            serializer.knownTypes.Add(typeof(Asteroid));
-            serializer.knownTypes.Add(typeof(Ship));
-            serializer.knownTypes.Add(typeof(PlayerShip));
-            serializer.knownTypes.Add(typeof(Enemy));
-            playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
-            AddBaseObject(playerShip);
+            Serializer.knownTypes.Add(typeof(Engine));
+            Serializer.knownTypes.Add(typeof(Game));
+            Serializer.knownTypes.Add(typeof(BaseObject));
+            Serializer.knownTypes.Add(typeof(Asteroid));
+            Serializer.knownTypes.Add(typeof(Ship));
+            Serializer.knownTypes.Add(typeof(PlayerShip));
+            Serializer.knownTypes.Add(typeof(Enemy));
 
-            LoadLevel();
+            LoadSavedData("reflection");
+
+            //AddNewSavedData("reflection");
+            //CreateChunks();
+            //
+            //var enm = new Enemy(new Vec2i(5, 5), 1, this);
+            //AddBaseObject(enm);
+            //test = new GoBind(enm, "test", this);
+            //
+            //
+            //playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
+            //AddBaseObject(playerShip);
+            //LoadLevel();
         }
 
         protected override void Update()
         {
+            if (Util.random.Next(0, 30) == 5 && test?.IsActive == true) test.Val.Position.X++;
             if (ImputManager.Escape.IsPressed) gameShouldClose = true;
 
             UpdateCamera();
@@ -54,7 +68,7 @@ namespace SpaceGame
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
             debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
-            debugLines[4] = $"Current chunk X: {playerShip.Chunk.Index.X} | Y: {playerShip.Chunk.Index.Y}";
+            //debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
             debugLines[5] = $"Loaded chunks: {loadedChunks}";
         }
 
@@ -103,11 +117,11 @@ namespace SpaceGame
         }
         private void LoadLevel()
         {
-            for (var i = 0; i < 100000; i++)
+            for (var i = 0; i < 10000; i++)
             {
-                var astSize = gRandom.Next(1, 30);
-                var ast = new Asteroid(new Vec2i(gRandom.Next(0, worldSize.X), gRandom.Next(0, worldSize.Y)),
-                    new Vec2i(astSize, astSize), this);
+                var astSize = Random.Next(1, 30);
+                var ast = new Asteroid(new Vec2i(Random.Next(0, worldSize.X), Random.Next(0, worldSize.Y)),
+                new Vec2i(astSize, astSize), this);
                 AddBaseObject(ast);
             }
         }

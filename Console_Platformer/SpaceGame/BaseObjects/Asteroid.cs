@@ -26,10 +26,10 @@ namespace SpaceGame
             var borderY = (int)(maxSize.Y * 0.15f);
             var minYLength = (int)(maxSize.Y * 0.35f);
             int corner1, corner2, corner3, corner4;
-            corner1 = Game.gRandom.Next(borderX, maxSize.X / 2 - minXLength / 2);             //top
-            corner2 = Game.gRandom.Next(maxSize.X / 2 + minXLength / 2, maxSize.X - borderX); //bottom
-            corner3 = Game.gRandom.Next(borderY, maxSize.Y / 2 - minYLength / 2);             //left
-            corner4 = Game.gRandom.Next(maxSize.Y / 2 + minYLength / 2, maxSize.Y - borderY); //right
+            corner1 = Game.Random.Next(borderX, maxSize.X / 2 - minXLength / 2);             //top
+            corner2 = Game.Random.Next(maxSize.X / 2 + minXLength / 2, maxSize.X - borderX); //bottom
+            corner3 = Game.Random.Next(borderY, maxSize.Y / 2 - minYLength / 2);             //left
+            corner4 = Game.Random.Next(maxSize.Y / 2 + minYLength / 2, maxSize.Y - borderY); //right
 
             var size1 = new Vec2i(Math.Abs(corner1 - corner2) + 1, maxSize.Y);
             var attach1 = new Vec2i(Math.Min(corner1, corner2), 0);

@@ -13,16 +13,17 @@ namespace Console_Platformer.Engine
         // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
         // In which chunk the GameObject resides
-        public Chunk Chunk { get; private set; }
+        public Chunk Chunk { get; set; }
         [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
         [DataMember]
         public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
         [DataMember]
-        public List<Collider> Colliders { get; set; }
+        public List<Collider> Colliders { get; private set; }
         [DataMember]
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
-
+        [DataMember]
+        public List<GoBind> Binds { get; private set; }
         [DataMember]
         private int _spriteLevel;
         public int SpriteLevel //u
@@ -36,6 +37,7 @@ namespace Console_Platformer.Engine
             }
         }
 
+
         public GameObject(Vec2i position, Engine engine)
         {
             Position = position.Copy();
@@ -44,7 +46,7 @@ namespace Console_Platformer.Engine
             SpriteLevel = 5;
             Sprites = new Sprite[Engine.spriteMaxCount];
             Colliders = new List<Collider>();
-            Chunk = Engine.chunks[Position.X / Engine.chunkSize, Position.Y / Engine.chunkSize];
+            Binds = new List<GoBind>();
         }
 
         // Moves the gameObject and return a boolean to indicate whether the object was moved successfully
@@ -87,7 +89,7 @@ namespace Console_Platformer.Engine
                     }
                     else
                     {
-                        Engine.unloadedChunkTransitionGameObjects[newChunkX, newChunkY].Add(this);
+                        Engine.unloadedChunkTransitionAddGameObjects[newChunkX, newChunkY].Add(this);
                     }
                     
                 }
@@ -159,6 +161,7 @@ namespace Console_Platformer.Engine
 
         public void OnUnloadedChunkAwake(int chunkX, int chunkY)
         {
+            Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
         public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)
@@ -170,6 +173,8 @@ namespace Console_Platformer.Engine
             {
                 if (sprite != null) sprite.OnDeserialization();
             }
+
+            foreach (var bind in Binds) bind.OnDeserialized(this);
         }
 
         public virtual void PrepareForDeserialization()
@@ -177,6 +182,11 @@ namespace Console_Platformer.Engine
             foreach (var sprite in Sprites)
             {
                 if (sprite != null) sprite.PrepareForDeserialization();
+            }
+
+            foreach (var bind in Binds)
+            {
+                bind.IsActive = false;
             }
         }
         public abstract void OnCollision(GameObject collidingObject);

@@ -40,7 +40,7 @@ namespace Console_Platformer.Engine
             {
                 for (var y = 0; y < buffer.GetLength(1); y++)
                 {
-                    buffer[x, y] = Engine.backgroudPixel;
+                    buffer[x, y] = engine.backgroudPixel;
                 }
             }
         }
@@ -48,13 +48,13 @@ namespace Console_Platformer.Engine
         // Draws all gameobjects to the screenBuffer 
         private void DrawGameObjectsToFrameBuffer() 
         {
-            for (var x = 0; x < Engine.chunkCountX; x++)
+            for (var x = 0; x < engine.chunkCountX; x++)
             {
-                for (var y = 0; y < Engine.chunkCountY; y++)
+                for (var y = 0; y < engine.chunkCountY; y++)
                 {
                     if (engine.IsChunkLoaded(new Vec2i(x, y)))
                     {
-                        for (var level = Engine.spriteLevelCount - 1; level >= 0; level--)
+                        for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
                         {
                             foreach (var gameObject in engine.chunks[x, y].gameObjectRenderLists[level])
                             {
@@ -91,7 +91,7 @@ namespace Console_Platformer.Engine
                 for (int x = 0; x < engine.Camera.Size.X; x++)
                 {
                     line += screenBuffer[x, y].ToString();
-                    line += Engine.pixelSpacingCharacters;
+                    line += engine.pixelSpacingCharacters;
                 }
 
                 finalString += line + "\n";
