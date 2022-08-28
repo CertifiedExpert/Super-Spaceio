@@ -9,7 +9,7 @@ namespace Console_Platformer.Engine
     class Button
     {
         public bool IsPressed { get; set; }
-        // NOT last held, but DateTime of the last time IsPressed switched from false to true
+        // Last time when IsPressed switched from false to true, (NOT when it was last held!)
         public DateTime LastPressed { get; set; }
         public Button()
         {

@@ -13,7 +13,7 @@ namespace Console_Platformer.Engine
     [DataContract(IsReference = true)]
     abstract class Engine
     {
-         
+        //TODO: clean up pass by reference and pass by value inconsistencies
         public bool gameShouldClose = false; // Flag whether the game is set to close.
         public int deltaTime = 0; // Miliseconds which passed since last frame.
 
@@ -46,10 +46,12 @@ namespace Console_Platformer.Engine
 
         public Vec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
         public Chunk[,] chunks { get; private set; } // A 2d-array of chunks in the engine. If the chunk is null then it is unloaded, otherwise is loaded.
-        public List<Chunk> loadedChunks { get; private set; } //TODO: this might not work. A list of all chunks which are loaded. Can be used instead of chunks[,] during interation for the conveniance of not checking if the chunk is loaded.
+        public List<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunks[,] during interation for the conveniance of not checking if the chunk is loaded.
         public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
         public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
         private List<Chunk> chunksToBeUnloaded = new List<Chunk>(); // List of chunks which have been scheduled to be unloaded.
+        private List<Chunk> chunksToBeAddedToLoadedChunks { get; set; }
+        private List<Chunk> chunksToBeRemovedFromLoadedChunks { get; set; }
 
         // Possible configurations.
         // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -68,7 +70,7 @@ namespace Console_Platformer.Engine
         public readonly int debugLinesLength = 40;
         public string[] debugLines;
  
-        protected string pathRootFolder = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug"; // The root folder of the whole application.
+        protected string pathRootFolder = @"C:\Users\Admin\source\repos\Console_Platformer\Console_Platformer\bin\Debug"; // The root folder of the executable.
         protected string pathSavesFolder;
         protected string pathCurrentLoadedSave;
 
@@ -104,7 +106,7 @@ namespace Console_Platformer.Engine
             SaveGame();
         }
 
-        // Functions required to run each frame by the engine
+        // Called once on engine load. Initializes the engine.
         private void OnEngineLoad()
         {
             // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
@@ -125,9 +127,11 @@ namespace Console_Platformer.Engine
             Console.Title = title;
             Console.OutputEncoding = Encoding.Unicode;
         }
+
+        // Called once every frame
         private void EngineUpdate()
         {
-            // Registers imput
+            // Registers imput.
             ImputManager.UpdateImput(this);
 
             // Lazy removing game objects. 
@@ -140,7 +144,7 @@ namespace Console_Platformer.Engine
                 chunk.gameObjectsToRemove.Clear(); 
             }
 
-            // Lazy adding GameObjects
+            // Lazy adding GameObjects.
             foreach (var chunk in loadedChunks)
             {
                 foreach (var gameObject in chunk.gameObjectsToAdd)
@@ -150,7 +154,7 @@ namespace Console_Platformer.Engine
                 chunk.gameObjectsToAdd.Clear(); 
             }
 
-            // Updates all GameObject
+            // Updates all GameObject.
             foreach (var chunk in loadedChunks)
             {
                 foreach (var gameObject in chunk.gameObjects)
@@ -159,7 +163,13 @@ namespace Console_Platformer.Engine
                 }
             }
 
-            // Lazy unloading Chunks
+            // Update the loadedChunks list.
+            foreach (var chunk in chunksToBeAddedToLoadedChunks) loadedChunks.Add(chunk);
+            chunksToBeAddedToLoadedChunks.Clear();
+            foreach (var chunk in chunksToBeRemovedFromLoadedChunks) loadedChunks.Remove(chunk);
+            chunksToBeRemovedFromLoadedChunks.Clear();
+
+            // Lazy unloading Chunks.
             foreach (var chunk in chunksToBeUnloaded)
             {
                 UnloadChunk(chunk.Index.X, chunk.Index.Y);
@@ -168,7 +178,7 @@ namespace Console_Platformer.Engine
         }
 
         #region UTIL_FUNCTIONS
-        // Adds and deletes gameobjects
+        // Adds GameObject to the engine.
         public void AddGameObject(GameObject gameObject)
         {
             var chunkX = gameObject.Position.X / chunkSize;
@@ -178,11 +188,13 @@ namespace Console_Platformer.Engine
             if (IsChunkLoaded(chunkX, chunkY)) chunks[chunkX, chunkY].InsertGameObject(gameObject);
             else unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
         }
+        // Removes GameObject from the engine.
         public void RemoveGameObject(GameObject gameObject)
         {
             if (IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.UnInsertGameObject(gameObject);
             else unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
         }
+        // Loads the Chunk at specified index from file into the engine.
         public virtual void LoadChunk(int x, int y)
         {
             chunks[x, y] = Serializer.FromFile<Chunk>($"{pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}");
@@ -190,7 +202,8 @@ namespace Console_Platformer.Engine
             // Fill misssing data
             chunks[x, y].CompleteDataAfterSerialization(this, new Vec2i(x, y));
 
-            loadedChunks.Add(chunks[x, y]);
+            chunksToBeAddedToLoadedChunks.Add(chunks[x, y]);
+            chunks[x, y].OnChunkLoaded();
 
             // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state (or delete them)
             foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y])
@@ -208,6 +221,27 @@ namespace Console_Platformer.Engine
             unloadedChunkTransitionRemoveGameObjects[x, y].Clear();
             unloadedChunkTransitionAddGameObjects[x, y].Clear();
         }
+        // Scheudles the Chunk to be unloaded at the at the beginning of the next frame.
+        public void ScheduleUnloadChunk(int x, int y)
+        {
+            if (IsChunkLoaded(chunks[x, y]) && !chunksToBeUnloaded.Contains(chunks[x, y])) chunksToBeUnloaded.Add(chunks[x, y]);
+
+            chunksToBeRemovedFromLoadedChunks.Add(chunks[x, y]);
+            chunks[x, y].OnChunkUnLoaded();
+        }
+        // Checks if the chunk is loaded and returns the result as a bool.
+        public bool IsChunkLoaded(int x, int y)
+        {
+            if (chunks[x, y] != null) return true;
+            else return false;
+        }
+        // Checks if the chunk is loaded and returns the result as a bool.
+        public bool IsChunkLoaded(Chunk chunk)
+        {
+            if (chunk != null) return true;
+            else return false;
+        }
+        // Unloads the Chunk at specified index to file and deletes it from the engine.
         private void UnloadChunk(int x, int y)
         {
             foreach (var gameObject in chunks[x, y].gameObjects)
@@ -218,25 +252,10 @@ namespace Console_Platformer.Engine
             Serializer.ToFile(chunks[x, y], $"{pathCurrentLoadedSave}\\Chunks\\chunk{chunks[x, y].Index.X}_{chunks[x, y].Index.Y}");
             chunks[chunks[x, y].Index.X, chunks[x, y].Index.Y] = null;
         }
-        public void ScheduleUnloadChunk(int x, int y)
-        {
-            if (IsChunkLoaded(chunks[x, y]) && !chunksToBeUnloaded.Contains(chunks[x, y])) chunksToBeUnloaded.Add(chunks[x, y]);
-
-            loadedChunks.Remove(chunks[x, y]);
-        }
-        public bool IsChunkLoaded(int x, int y)
-        {
-            if (chunks[x, y] != null) return true;
-            else return false;
-        }
-        public bool IsChunkLoaded(Chunk chunk)
-        {
-            if (chunk != null) return true;
-            else return false;
-        }
         #endregion
 
         #region FILES/LOADING/UNLOADING
+        // Loads save data from a gameState file. Sets all necessary engine variables based on the file contents.
         protected void LoadSavedData(string saveName)
         {
             pathCurrentLoadedSave = $"{pathSavesFolder}\\{saveName}";
@@ -259,14 +278,16 @@ namespace Console_Platformer.Engine
 
             OnSaveDataLoad(data);
         }
+        // Called after the save data has been loaded. Has the contents of the gameState file passed to it as an Engine.
         protected virtual void OnSaveDataLoad(Engine data) { }
-        protected virtual void AddNewSavedData(string name)
+        // Add a new save folder with save information in it and sets the pathCurrentLoadedSave to it. (Does not save any actual information, just makes place for it)
+        protected virtual void AddNewSavedData(string saveName)
         {
-            var dir = $"{pathSavesFolder}\\{name}";
+            var dir = $"{pathSavesFolder}\\{saveName}";
             var existingCopies = 1;
             while (Directory.Exists(dir))
             {
-                dir = $"{pathSavesFolder}\\{name}-copy({existingCopies})";
+                dir = $"{pathSavesFolder}\\{saveName}-copy({existingCopies})";
                 existingCopies++;
             }
             Directory.CreateDirectory(dir);
@@ -284,6 +305,7 @@ namespace Console_Platformer.Engine
 
             pathCurrentLoadedSave = dir;
         }
+        // Fills the save file with empty chunks.
         protected virtual void CreateChunks()
         {
             for (var x = 0; x < chunkCountX; x++)
@@ -296,6 +318,7 @@ namespace Console_Platformer.Engine
                 }
             }
         }
+        // Saves the currnet state of the game including chunks
         protected virtual void SaveGame()
         {
             var wasChunkLoadedMap2d = new bool[chunkCountX, chunkCountY];
@@ -328,6 +351,7 @@ namespace Console_Platformer.Engine
             unloadedChunkTransitionRemoveGameObject_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionRemoveGameObjects);
             Serializer.ToFile(this, $"{pathCurrentLoadedSave}\\gameState");
         }
+        // Loads a minimal necessary amout of data from an instance of Engine
         private void LoadTemplate(Engine data)
         {
             spriteMaxCount = data.spriteMaxCount;
@@ -341,12 +365,15 @@ namespace Console_Platformer.Engine
             milisecondsForNextFrame = data.milisecondsForNextFrame;
             Camera = data.Camera;
         }
+        // Initializes the variables of an engine which do not require additional information for initialization.
         private void FinaliseVariableInit()
         {
             chunks = new Chunk[chunkCountX, chunkCountY];
             worldSize = new Vec2i(chunkCountX * chunkSize, chunkCountY * chunkSize);
             chunksToBeUnloaded = new List<Chunk>();
             loadedChunks = new List<Chunk>();
+            chunksToBeAddedToLoadedChunks = new List<Chunk>();
+            chunksToBeRemovedFromLoadedChunks = new List<Chunk>();
             Random = new Random();
 
             // Initialise transition lists
@@ -373,6 +400,7 @@ namespace Console_Platformer.Engine
             // Set up frame timers
             lastFrame = DateTime.Now;
         }
+        // Gets the assembly directory of the executable
         public string GetAssemblyDirectory() //TODO: test this. this might produce and error
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
@@ -382,7 +410,9 @@ namespace Console_Platformer.Engine
         }
         #endregion
 
+        // Called once after engine load. Initializes the derived engine.
         protected abstract void OnLoad();
+        // Called once every frame after the engine has updated.
         protected abstract void Update();
     }
 }

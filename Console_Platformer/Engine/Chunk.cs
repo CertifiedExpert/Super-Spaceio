@@ -18,7 +18,7 @@ namespace Console_Platformer.Engine
         public List<GameObject> gameObjectsToRemove = new List<GameObject>();
         public List<GameObject> gameObjectsToAdd = new List<GameObject>();
         [DataMember]
-        public DateTime lastUnloaded = DateTime.MinValue; //TODO: update this every time is unloaded
+        public DateTime lastUnloaded = DateTime.MinValue;
         public Vec2i Index { get; set; }
         public Engine Engine { get; set; }
         public Chunk(Vec2i index, Engine engine)
@@ -33,7 +33,7 @@ namespace Console_Platformer.Engine
 
             Index = index;
         }
-
+        // Completes missing data in the chunk after serialization and calls to complete data in all GameObjects residing in it.
         public void CompleteDataAfterSerialization(Engine engine, Vec2i index)
         {
             Engine = engine;
@@ -47,11 +47,24 @@ namespace Console_Platformer.Engine
             }
         }
 
+        // Gets called when the chunk gets loaded.
+        public void OnChunkLoaded()
+        {
+
+        }
+        // Gets called when the chunk gets unloaded.
+        public void OnChunkUnLoaded()
+        {
+            lastUnloaded = DateTime.Now;
+        }
+
+        // Adds GameObject to chunk.
         public void InsertGameObject(GameObject gameObject)
         {
             gameObjectsToAdd.Add(gameObject);
             gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
         }
+        // Removes GameObject from chunk.
         public void UnInsertGameObject(GameObject gameObject)
         {
             gameObjectsToRemove.Add(gameObject);

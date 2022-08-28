@@ -38,7 +38,7 @@ namespace Console_Platformer.Engine
                 {'@','%', '%', '%', '%','%', '%', '%', '@'},
                 {' ',' ', '\\', '#', ' ','#', '/', ' ', ' '},
             };
-            fighter1Up = new Bitmap(fighter1UpSize, PrepareData(fighter1UpBitmap));
+            fighter1Up = new Bitmap(PrepareData(fighter1UpBitmap));
 
             var fighter1DownSize = new Vec2i(9, 9);
             var fighter1DownBitmap = new char[9, 9]
@@ -53,7 +53,7 @@ namespace Console_Platformer.Engine
                 {' ',' ', ' ', ' ', '%',' ', ' ', ' ', ' '},
                 {' ',' ', ' ', ' ', '%',' ', ' ', ' ', ' '},
             };
-            fighter1Down = new Bitmap(fighter1DownSize, PrepareData(fighter1DownBitmap));
+            fighter1Down = new Bitmap(PrepareData(fighter1DownBitmap));
 
             var fighter1RightSize = new Vec2i(9, 9);
             var fighter1RightBitmap = new char[9, 9]
@@ -68,7 +68,7 @@ namespace Console_Platformer.Engine
                 {' ','%', '%', ' ', ' ',' ', ' ', ' ', ' '},
                 {' ','@', '―', '-', ' ',' ', ' ', ' ', ' '},
             };
-            fighter1Right = new Bitmap(fighter1RightSize, PrepareData(fighter1RightBitmap));
+            fighter1Right = new Bitmap(PrepareData(fighter1RightBitmap));
             
 
             var fighter1LeftSize = new Vec2i(9, 9);
@@ -84,7 +84,7 @@ namespace Console_Platformer.Engine
                 {' ',' ', ' ', ' ', ' ',' ', '%', '%', ' '},
                 {' ',' ', ' ', ' ', ' ','-', '―', '@', ' '},
             };
-            fighter1Left = new Bitmap(fighter1LeftSize, PrepareData(fighter1LeftBitmap));
+            fighter1Left = new Bitmap(PrepareData(fighter1LeftBitmap));
             
 
             var fighter1UpLeftSize = new Vec2i(9, 9);
@@ -100,7 +100,7 @@ namespace Console_Platformer.Engine
                 {' ','\\', '%', '%', '―','#', ' ', ' ', ' '},
                 {' ',' ', '@', ' ', ' ',' ', ' ', ' ', ' '}
             };
-            fighter1UpLeft = new Bitmap(fighter1UpLeftSize, PrepareData(fighter1UpLeftBitmap));
+            fighter1UpLeft = new Bitmap(PrepareData(fighter1UpLeftBitmap));
 
             var fighter1UpRightSize = new Vec2i(9, 9);
             var fighter1UpRightBitmap = new char[9, 9]
@@ -115,7 +115,7 @@ namespace Console_Platformer.Engine
                 {' ',' ', ' ', '#', '―','%', '%', '/', ' '},
                 {' ',' ', ' ', ' ', ' ',' ', '@', ' ', ' '}
             };
-            fighter1UpRight = new Bitmap(fighter1UpRightSize, PrepareData(fighter1UpRightBitmap));
+            fighter1UpRight = new Bitmap(PrepareData(fighter1UpRightBitmap));
 
             var fighter1DownLeftSize = new Vec2i(9, 9);
             var fighter1DownLeftBitmap = new char[9, 9]
@@ -130,7 +130,7 @@ namespace Console_Platformer.Engine
                 {'%','.', '.', '%', '%','%', ' ', '/', ' '},
                 {'%','%', '%', ' ', ' ',' ', '/', ' ', ' '},
             };
-            fighter1DownLeft = new Bitmap(fighter1DownLeftSize, PrepareData(fighter1DownLeftBitmap));
+            fighter1DownLeft = new Bitmap(PrepareData(fighter1DownLeftBitmap));
 
             var fighter1DownRightSize = new Vec2i(9, 9);
             var fighter1DownRightBitmap = new char[9, 9]
@@ -145,7 +145,7 @@ namespace Console_Platformer.Engine
                 {' ','\\', ' ', '%', '%','%', '.', '.', '%'},
                 {' ',' ', '\\', ' ', ' ',' ', '%', '%', '%'},
             };
-            fighter1DownRight = new Bitmap(fighter1DownRightSize, PrepareData(fighter1DownRightBitmap));
+            fighter1DownRight = new Bitmap(PrepareData(fighter1DownRightBitmap));
             #endregion
 
             #region EnemyDefaults
@@ -157,7 +157,7 @@ namespace Console_Platformer.Engine
                 {'#', '+', '#'},
                 {'#', '+', '#'},
             };
-            enemyDefault = new Bitmap(enemyDefaultSize, PrepareData(enemyDefaultBitmap));
+            enemyDefault = new Bitmap(PrepareData(enemyDefaultBitmap));
 
             var enemyDefault2Size = new Vec2i(3, 4);
             var enemyDefault2Bitmap = new char[4, 3]
@@ -167,7 +167,7 @@ namespace Console_Platformer.Engine
                 {'#', ' ', '#'},
                 {'#', ' ', '#'},
             };
-            enemyDefault2 = new Bitmap(enemyDefault2Size, PrepareData(enemyDefault2Bitmap));
+            enemyDefault2 = new Bitmap(PrepareData(enemyDefault2Bitmap));
             #endregion
 
             var asteroidSize = new Vec2i(18, 18);
@@ -193,7 +193,7 @@ namespace Console_Platformer.Engine
                 {' ', ' ', ' ', ' ', ' ', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛'},
             };
 
-            asteroid = new Bitmap(asteroidSize, PrepareData(asteroidBitamp));
+            asteroid = new Bitmap(PrepareData(asteroidBitamp));
         }
 
 

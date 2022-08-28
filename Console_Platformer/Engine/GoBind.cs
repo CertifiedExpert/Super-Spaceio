@@ -8,6 +8,19 @@ using System.Runtime.Serialization;
 
 namespace Console_Platformer.Engine
 {
+    /// <summary>
+    /// GoBind is a way for tracking specific GameObject instances in the engine. Due to the serializer returning new identical 
+    /// instances of GameObjects instead of returning references to previous GameObjects after deserialization, the GameObject 
+    /// fields stored are not bound to their GameObject instances in the engnie. Without using GoBind, after deserializatoin, an example
+    /// field "private GameObject gameObject = ..." would hold the reference to an identical, separate instance of GameObject 
+    /// than the one which is stored in the engine, causing any changes to the "gameObject" not to be reflected in the engine. 
+    /// Instead, what can be done is to create a GoBind field ex. "private GoBind gameObject = ..." and access its "Val" property
+    /// to get the always correct GameObject reference.
+    /// 
+    /// NOTE: before accessing "Val" property of GoBind, it must always be made sure that the GoBind is active by checking 
+    /// if IsActive equals to true. A GoBind is not active when the referenced GameObject is unloaded, preventing making changes
+    /// to an unloaded GameObject.
+    /// </summary>
     [DataContract]
     class GoBind
     {

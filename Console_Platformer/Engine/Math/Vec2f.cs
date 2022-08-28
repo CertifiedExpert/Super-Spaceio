@@ -77,7 +77,6 @@ namespace Console_Platformer.Engine
             X /= length;
             Y /= length;
         }
-
         public float Dot(Vec2f a)
         {
             return X * a.X + Y * a.Y;

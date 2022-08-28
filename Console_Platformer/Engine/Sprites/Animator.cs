@@ -34,7 +34,7 @@ namespace Console_Platformer.Engine
         }
 
         
-        // Gets called every frame by the engine
+        // Gets called every frame by the engine. Updates the animator
         public void Update()
         {
             if ((DateTime.Now - lastFrameUpdate).TotalMilliseconds >= milisecondsForFrameStep)

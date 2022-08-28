@@ -10,9 +10,7 @@ namespace Console_Platformer.Engine
     [DataContract(IsReference = true)]
     abstract class GameObject
     {
-        // Which game engine the gameobject belongs to
         public Engine Engine { get; private set; }
-        // In which chunk the GameObject resides
         public Chunk Chunk { get; set; }
         [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
@@ -21,17 +19,17 @@ namespace Console_Platformer.Engine
         [DataMember]
         public List<Collider> Colliders { get; private set; }
         [DataMember]
-        public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects //u
+        public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects. 
         [DataMember]
-        public List<GoBind> Binds { get; private set; }
+        public List<GoBind> Binds { get; private set; } // A list of GoBinds refering to this GameObject.
         [DataMember]
         private int _spriteLevel;
-        public int SpriteLevel //u
+        public int SpriteLevel 
         {
             get { return _spriteLevel; }
             set
             {
-                // Checks whether the SpriteLevel value is valid and sets it to minimum priority if it's invalid
+                // Checks whether the SpriteLevel value is valid and sets it to minimum priority if it's invalid.
                 if (value >= 0 && value < Engine.spriteLevelCount) _spriteLevel = value;
                 else _spriteLevel = Engine.spriteLevelCount;
             }
@@ -49,32 +47,33 @@ namespace Console_Platformer.Engine
             Binds = new List<GoBind>();
         }
 
-        // Moves the gameObject and return a boolean to indicate whether the object was moved successfully
+        // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully
         public virtual bool MoveGameObject(int x, int y)
         {
-            // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite
-            if (Position.X + x < Engine.worldSize.X && // Most far right part of the screen - position + size to get the most far right part of the sprite but - 1 because position is counted as the first character to the left INCLUDING it
+            // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite.
+            if (Position.X + x < Engine.worldSize.X && 
                 Position.X + x >= 0 &&
                 Position.Y + y < Engine.worldSize.Y &&
                 Position.Y + y >= 0)
             {
+                // Moves the player.
                 Position.X += x;
-                Position.Y += y; // Moves the player
+                Position.Y += y; 
 
-                // Collision detection
+                // Collision detection.
                 if (Collidable)
                 {
                     var isColliding = CollisionDetection();
 
                     if (isColliding)
                     {
-                        Position.X -= x; // Unmove them because such a movement would result in gameObjects overlaping
+                        Position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlaping.
                         Position.Y -= y;
                         return false;
                     }
                 }
 
-                // Chunk traverse detection
+                // Chunk traverse detection.
                 var newChunkX = Position.X / Engine.chunkSize;
                 var newChunkY = Position.Y / Engine.chunkSize;
                 if (Chunk != Engine.chunks[newChunkX, newChunkY])
@@ -99,7 +98,7 @@ namespace Console_Platformer.Engine
             else return false;
         }
 
-        // Returns a boolean to indicate whether a collision was detected
+        // Returns a boolean to indicate whether a collision was detected. If a collision was detected, it calls OnCollision in both GameObjects.
         private bool CollisionDetection()
         {
             var isColliding = false;
@@ -129,6 +128,7 @@ namespace Console_Platformer.Engine
 
             return isColliding;
         }
+        // Checks if this GameObject is colliding with a GameObject specified in the parameter. Return the result as a bool.
         public bool IsCollidingWith(GameObject other)
         {
             foreach (var col in Colliders)
@@ -147,10 +147,10 @@ namespace Console_Platformer.Engine
 
             return false;
         }
-
+        // Is called when a chunk was traversed by the GameObject.
         protected virtual void OnChunkTraverse(int chunkX, int chunkY) { }
 
-        // Updates the animators of GameObject if it has any (if it doesn't, Animation property is set to null and is ignored)
+        // Is called each frame and updates the GameObject. Updated all Animators of GameObject if it has any (if it doesn't, Animation property is null and is ignored).
         public virtual void Update()
         {
             foreach (var sprite in Sprites)
@@ -158,12 +158,13 @@ namespace Console_Platformer.Engine
                 sprite?.Animator?.Update();
             }
         }
-
+        // Is called when a Chunk to which the GameObject started belonging during it being unloaded is finally loaded. Calls OnChunkTraverse and sets GameObject.Chunk because when a GameObject is added to an unloaded Chunk is it automatically treated as if it was unloaded itself, so the OnChunkTraverse() or GameObject.Chunk.set() is not called as that would be calling a method on an unloaded GameObject meaning the GameObject must be processed after the chunk awakens to have all data.
         public void OnUnloadedChunkAwake(int chunkX, int chunkY)
         {
             Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
+        // Completes data after the GameObject has been serilized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
         public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)
         {
             Engine = engine;
@@ -176,7 +177,7 @@ namespace Console_Platformer.Engine
 
             foreach (var bind in Binds) bind.OnDeserialized(this);
         }
-
+        // Prepares the GameObject for deserialization. (Deactivates its binds as the GameObject is about to be deserialized.)
         public virtual void PrepareForDeserialization()
         {
             foreach (var sprite in Sprites)
@@ -189,6 +190,7 @@ namespace Console_Platformer.Engine
                 bind.IsActive = false;
             }
         }
+        // Gets called when a collision has been detected. Passes the GameObject which it collided with.
         public abstract void OnCollision(GameObject collidingObject);
     }
 }

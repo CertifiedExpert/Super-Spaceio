@@ -25,16 +25,16 @@ namespace Console_Platformer.Engine
             Bitmap = bitmap;
             Animator = animator;
         }
-
+        // Prepares the sprite for deserialization (serializer does not allow for 2d-arrays but allows jagged arrays)
         public void PrepareForDeserialization()
         {
             jaggedizedBitmapData_serialize = Util.Jaggedize2dArray(Bitmap.Data);
         }
-
+        // Called on deserialization of the sprite. Brings it back to it's pre-jaggedized state.
         public void OnDeserialization()
         {
             var data = Util.UnJaggedize2dArray(jaggedizedBitmapData_serialize);
-            Bitmap = new Bitmap(new Vec2i(data.GetLength(0), data.GetLength(1)), data);
+            Bitmap = new Bitmap(data);
             jaggedizedBitmapData_serialize = null;
         }
     }

@@ -10,16 +10,15 @@ namespace Console_Platformer.Engine
     {
         public Vec2i Size { get; set; }
         public char[,] Data { get; set; }
-        //TODO: delete size from constructor. It can be deduced inside from data
-        public Bitmap(Vec2i size, char[,] data)
+        public Bitmap(char[,] data)
         {
-            Size = size;
+            Size = new Vec2i(data.GetLength(0), data.GetLength(1));
             Data = data;
         }
 
         public static Bitmap CreateStaticFillBitmap(Vec2i size, char fillChar)
         {
-            var bitmap = new Bitmap(size, new char[size.X, size.Y]);
+            var bitmap = new Bitmap(new char[size.X, size.Y]);
             for (var i = 0; i < size.X; i++)
             {
                 for (var j = 0; j < size.Y; j++)
