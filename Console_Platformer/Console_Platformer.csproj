@@ -49,6 +49,7 @@
     <Compile Include="Engine\Chunk.cs" />
     <Compile Include="Engine\Collider.cs" />
     <Compile Include="Engine\GoBind.cs" />
+    <Compile Include="Engine\Math\ReadOnlyVec2i.cs" />
     <Compile Include="Engine\Serializer.cs" />
     <Compile Include="Engine\Sprites\Bitmap.cs" />
     <Compile Include="Engine\Sprites\Animator.cs" />

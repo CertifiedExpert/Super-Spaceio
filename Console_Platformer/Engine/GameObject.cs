@@ -12,10 +12,12 @@ namespace Console_Platformer.Engine
     {
         public Engine Engine { get; private set; }
         public Chunk Chunk { get; set; }
+
         [DataMember]
         public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
+
         [DataMember]
-        public Sprite[] Sprites { get; private set; } //TODO: perhaps try to add some safety features for indexes etc.
+        public Sprite[] Sprites { get; private set; } 
         [DataMember]
         public List<Collider> Colliders { get; private set; }
         [DataMember]
