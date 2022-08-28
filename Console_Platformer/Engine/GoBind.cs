@@ -41,13 +41,13 @@ namespace Console_Platformer.Engine
 
             Val.Binds.Add(this);
         }
-
-        public void RebindProperty()
+        // Sets the stored field to the stored value
+        private void RebindProperty()
         {
             if (varType == VarType.Field) engine.GetType().GetField(name).SetValue(engine, this);
             else engine.GetType().GetProperty(name).SetValue(engine, this);
         }
-
+        // Called when its GameObject is deserialized and needs to have its references rebound.
         public void OnDeserialized(GameObject gameObject)
         {
             engine = gameObject.Engine;
@@ -56,9 +56,14 @@ namespace Console_Platformer.Engine
             IsActive = true;
             RebindProperty();
         }
+        // Removes the GoBind and sets its values to null to signal it has been deleted.
         public void Remove()
         {
             Val.Binds.Remove(this);
+            Val = null;
+            IsActive = false;
+            engine = null;
+            name = null;
         }
     }
 

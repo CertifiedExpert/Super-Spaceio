@@ -11,8 +11,10 @@ namespace Console_Platformer.Engine
 {
     class Serializer
     {
-        //public EngineDataContractResolver engineDataContractResolver { get; set; }
+        // List of types recognised by the Serializer.
         public List<Type> knownTypes = new List<Type>() {typeof(GameObject) }; 
+
+        // Saves an instance of T to the specified file.
         public void ToFile<T>(T instance, string path)
         {
             using (var fs = new FileStream(path, FileMode.Create))
@@ -21,6 +23,7 @@ namespace Console_Platformer.Engine
                 serializer.WriteObject(fs, instance);
             } 
         }
+        // Returns an instance of T from a specified file.
         public T FromFile<T>(string path)
         {
             using (var fs = new FileStream(path, FileMode.Open))
@@ -30,7 +33,7 @@ namespace Console_Platformer.Engine
             }
         }
 
-        
+        // Returs a string of xml data of the specified instance of T.
         public string ToXmlString<T>(T instance)
         {
             using (MemoryStream memoryStream = new MemoryStream())
@@ -42,6 +45,8 @@ namespace Console_Platformer.Engine
                 return reader.ReadToEnd();
             }
         }
+
+        // Returns an instance of T from the specified string of xml data.
         public T FromXmlString<T>(string xml, T instance)
         {
             using (Stream stream = new MemoryStream())

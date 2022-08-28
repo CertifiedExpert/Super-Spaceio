@@ -15,14 +15,14 @@ namespace Console_Platformer.Engine
         {
             this.engine = engine;
 
-            // Initialize the screenBuffer
+            // Initialize the screenBuffer.
             screenBuffer = new char[engine.Camera.Size.X, engine.Camera.Size.Y];
 
-            // Fill screenBuffer with backgroud pixels initializing all pixels
+            // Fill screenBuffer with backgroud pixels initializing all pixels.
             ClearBuffer(screenBuffer);
         }
 
-        // Writes all gameobjects to the framebuffer and then draws the framebuffer
+        // Writes all GameObjects to the framebuffer and then draws the framebuffer.
         public void Render()
         {
             ClearBuffer(screenBuffer);
@@ -33,7 +33,7 @@ namespace Console_Platformer.Engine
             Draw();
         }
 
-        // Fills the screen buffer with blank spaces
+        // Fills the screen buffer with background pixels.
         private void ClearBuffer(char[,] buffer)
         {
             for (var x = 0; x < buffer.GetLength(0); x++)
@@ -45,30 +45,24 @@ namespace Console_Platformer.Engine
             }
         }
 
-        // Draws all gameobjects to the screenBuffer 
+        // Draws all GameObjects to the screenBuffer.
         private void DrawGameObjectsToFrameBuffer() 
         {
-            for (var x = 0; x < engine.chunkCountX; x++)
+            foreach (var chunk in engine.loadedChunks)
             {
-                for (var y = 0; y < engine.chunkCountY; y++)
+                for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
                 {
-                    if (engine.IsChunkLoaded(x, y))
+                    foreach (var gameObject in chunk.gameObjectRenderLists[level])
                     {
-                        for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
-                        {
-                            foreach (var gameObject in engine.chunks[x, y].gameObjectRenderLists[level])
-                            {
-                                WriteSpritesToScreenBuffer(gameObject);
-                            }
-                        }
+                        WriteSpritesToScreenBuffer(gameObject);
                     }
                 }
             }
         }
-
+        // Draws debug lines to the top right portion of the screen.
         private void DrawDebugLines()
         {
-            // Draws the debug window with debug lines
+            // Draws the debug window with debug lines.
             for (var i = 0; i < engine.debugLinesCount; i++)
             {
                 for (var x = 0; x < engine.debugLines[i].Length; x++)
@@ -79,7 +73,7 @@ namespace Console_Platformer.Engine
             }
         }
 
-        // Draws the contents of the screenbuffer to the console
+        // Draws the contents of the screenBuffer to the console with pixelSpacingCharacters inbetween them to account for the unequal ration of height and width of unicode characters.
         private void Draw()
         {
             Console.SetCursorPosition(0, 0);
@@ -100,9 +94,7 @@ namespace Console_Platformer.Engine
             Console.WriteLine(finalString);
         }
 
-        
-
-        // Writes the gameobject's sprite into the specified framebuffer
+        // Writes the GameObject's Sprites into the screenBuffer.
         public void WriteSpritesToScreenBuffer(GameObject gameObject) 
         {
             foreach (var sprite in gameObject.Sprites)

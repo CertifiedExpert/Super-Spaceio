@@ -401,7 +401,7 @@ namespace Console_Platformer.Engine
             lastFrame = DateTime.Now;
         }
         // Gets the assembly directory of the executable
-        public string GetAssemblyDirectory() //TODO: test this. this might produce and error
+        public string GetAssemblyDirectory()
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
