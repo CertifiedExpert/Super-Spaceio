@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Spaceio.Engine
+{
+    [DataContract]
+    class Sprite
+    {//TODO: derive a NormalSprite and a StaticFillSprite from this to save memory (can constitute to over 50% total memory usage)
+        public Bitmap Bitmap { get; set; }
+        [DataMember]
+        public Vec2i AttachmentPos { get; set; }
+        [DataMember]
+        public Animator Animator { get; set; }
+
+        [DataMember]
+        private char[][] jaggedizedBitmapData_serialize;
+        public Sprite(Bitmap bitmap, Vec2i attachmentInfo = null, Animator animator = null)
+        {
+            if (attachmentInfo == null) AttachmentPos = new Vec2i(0, 0);
+            else AttachmentPos = attachmentInfo;
+            Bitmap = bitmap;
+            Animator = animator;
+        }
+        // Prepares the sprite for deserialization (serializer does not allow for 2d-arrays but allows jagged arrays)
+        public void PrepareForDeserialization()
+        {
+            jaggedizedBitmapData_serialize = Util.Jaggedize2dArray(Bitmap.Data);
+        }
+        // Called on deserialization of the sprite. Brings it back to it's pre-jaggedized state.
+        public void OnDeserialization()
+        {
+            var data = Util.UnJaggedize2dArray(jaggedizedBitmapData_serialize);
+            Bitmap = new Bitmap(data);
+            jaggedizedBitmapData_serialize = null;
+        }
+    }
+}
