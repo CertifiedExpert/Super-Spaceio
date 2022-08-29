@@ -15,8 +15,8 @@ namespace SpaceGame
         public int milisecondsPerPlayerMove = 50;
         public const int chunkLoadRadius = 3;
 
-        public PlayerShip playerShip;
-        public GoBind test;
+        public GoBind playerShip;
+        public GoBind enemy;
 
         public int milisecondsSinceLastPlayerMove = 0;
         public bool playerMovedInThisFrame = false;
@@ -31,22 +31,24 @@ namespace SpaceGame
 
             LoadSavedData("test");
 
-            //AddNewSavedData("test");
+            //AddNewSaveFiles("test");
             //CreateChunks();
             //
             //var enm = new Enemy(new Vec2i(5, 5), 1, this);
             //AddBaseObject(enm);
-            //test = new GoBind(enm, "test", this);
+            //enemy = new GoBind(enm, "test", this);
             //
             //
-            //playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
-            //AddBaseObject(playerShip);
+            //var p = new PlayerShip(new Vec2i(40, 40), 1, this);
+            //AddBaseObject(p);
+            //playerShip = new GoBind(p, "playerShip", this);
+            //
             //LoadLevel();
         }
 
         protected override void Update()
         {
-            if (Util.random.Next(0, 30) == 5 && test?.IsActive == true) test.Val.MoveGameObject(1, 0);
+            if (Util.random.Next(0, 30) == 5 && enemy?.IsActive == true) enemy.Val.MoveGameObject(1, 0);
             if (ImputManager.Escape.IsPressed) gameShouldClose = true;
 
             UpdateCamera();
@@ -64,7 +66,7 @@ namespace SpaceGame
             }
             debugLines[0] = $"Loaded GameObjects: {loadedGameObjectCount}";
             debugLines[3] = $"Camera X: {Camera.Position.X} | Y: {Camera.Position.Y}";
-            //debugLines[4] = $"Current chunk X: {playerShip.Chunk?.Index.X} | Y: {playerShip.Chunk?.Index.Y}";
+            if (playerShip.IsActive) debugLines[4] = $"Current chunk X: {playerShip.Val.Chunk.Index.X} | Y: {playerShip.Val.Chunk.Index.Y}";
             debugLines[5] = $"Loaded chunks: {lChunks}";
         }
 

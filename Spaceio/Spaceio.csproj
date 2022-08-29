@@ -46,20 +46,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine\Chunk.cs" />
-    <Compile Include="Engine\Collider.cs" />
-    <Compile Include="Engine\GoBind.cs" />
+    <Compile Include="Engine\Core\Chunk.cs" />
+    <Compile Include="Engine\Physics\Collider.cs" />
+    <Compile Include="Engine\Misc\GoBind.cs" />
     <Compile Include="Engine\Math\ReadOnlyVec2i.cs" />
-    <Compile Include="Engine\Serializer.cs" />
-    <Compile Include="Engine\Sprites\Bitmap.cs" />
-    <Compile Include="Engine\Sprites\Animator.cs" />
-    <Compile Include="Engine\Button.cs" />
-    <Compile Include="Engine\Camera.cs" />
-    <Compile Include="Engine\Engine.cs" />
-    <Compile Include="Engine\ImputManager.cs" />
-    <Compile Include="Engine\Util.cs" />
-    <Compile Include="Engine\ResourceManager.cs" />
-    <Compile Include="Engine\Sprites\Sprite.cs" />
+    <Compile Include="Engine\Misc\Serializer.cs" />
+    <Compile Include="Engine\Graphics\Bitmap.cs" />
+    <Compile Include="Engine\Graphics\Animator.cs" />
+    <Compile Include="Engine\Imput\Button.cs" />
+    <Compile Include="Engine\Graphics\Camera.cs" />
+    <Compile Include="Engine\Core\Engine.cs" />
+    <Compile Include="Engine\Imput\ImputManager.cs" />
+    <Compile Include="Engine\Misc\Util.cs" />
+    <Compile Include="Engine\Misc\ResourceManager.cs" />
+    <Compile Include="Engine\Graphics\Sprite.cs" />
     <Compile Include="Engine\Math\Vec2f.cs" />
     <Compile Include="SpaceGame\BaseObjects\Asteroid.cs" />
     <Compile Include="SpaceGame\BaseObjects\BaseObject.cs" />
@@ -67,10 +67,10 @@
     <Compile Include="SpaceGame\BaseObjects\PlayerShip.cs" />
     <Compile Include="SpaceGame\BaseObjects\Ship.cs" />
     <Compile Include="SpaceGame\Game.cs" />
-    <Compile Include="Engine\GameObject.cs" />
-    <Compile Include="Engine\Program.cs" />
+    <Compile Include="Engine\Core\GameObject.cs" />
+    <Compile Include="Engine\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Engine\Renderer.cs" />
+    <Compile Include="Engine\Graphics\Renderer.cs" />
     <Compile Include="Engine\Math\Vec2i.cs" />
   </ItemGroup>
   <ItemGroup>

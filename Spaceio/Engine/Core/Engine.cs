@@ -177,6 +177,7 @@ namespace Spaceio.Engine
             chunksToBeUnloaded.Clear();
         }
 
+
         #region UTIL_FUNCTIONS
         // Adds GameObject to the engine.
         public void AddGameObject(GameObject gameObject)
@@ -254,6 +255,7 @@ namespace Spaceio.Engine
         }
         #endregion
 
+
         #region FILES/LOADING/UNLOADING
         // Loads save data from a gameState file. Sets all necessary engine variables based on the file contents.
         protected void LoadSavedData(string saveName)
@@ -305,19 +307,6 @@ namespace Spaceio.Engine
 
             pathCurrentLoadedSave = dir;
         }
-        // Fills the save file with empty chunks.
-        protected virtual void CreateChunks()
-        {
-            for (var x = 0; x < chunkCountX; x++)
-            {
-                for (var y = 0; y < chunkCountY; y++)
-                {
-                    chunks[x, y] = new Chunk(new Vec2i(x, y), this);
-                    UnloadChunk(x, y);
-                    chunks[x, y] = null;
-                }
-            }
-        }
         // Saves the currnet state of the game including chunks and settings.
         protected virtual void SaveGame()
         {
@@ -351,6 +340,19 @@ namespace Spaceio.Engine
             unloadedChunkTransitionRemoveGameObject_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionRemoveGameObjects);
             Serializer.ToFile(this, $"{pathCurrentLoadedSave}\\gameState");
         }
+        // Fills the save file with empty chunks.
+        protected virtual void FillCurrentSaveWithEmptyChunks()
+        {
+            for (var x = 0; x < chunkCountX; x++)
+            {
+                for (var y = 0; y < chunkCountY; y++)
+                {
+                    chunks[x, y] = new Chunk(new Vec2i(x, y), this);
+                    UnloadChunk(x, y);
+                    chunks[x, y] = null;
+                }
+            }
+        }
 
 
         // Sets the engine settings and updates the variables to accomodate those settings. Takes in a path to the settings file or the settings data.
@@ -368,6 +370,7 @@ namespace Spaceio.Engine
             LoadSettingsData(settingsData);
             FinaliseVariableInit();
         }
+
 
         // Loads setting variables from an instance of Engine.
         private void LoadSettingsData(Engine data)
@@ -421,6 +424,7 @@ namespace Spaceio.Engine
             // Set up frame timers
             lastFrame = DateTime.Now;
         }
+
         // Gets the assembly directory of the executable
         public string GetAssemblyDirectory()
         {
@@ -430,6 +434,7 @@ namespace Spaceio.Engine
             return Path.GetDirectoryName(path);
         }
         #endregion
+
 
         // Called once after engine load. Initializes the derived engine.
         protected abstract void OnLoad();
