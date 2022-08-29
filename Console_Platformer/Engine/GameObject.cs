@@ -13,8 +13,9 @@ namespace Console_Platformer.Engine
         public Engine Engine { get; private set; }
         public Chunk Chunk { get; set; }
 
-        [DataMember]
-        public Vec2i Position { get; private set; } //TODO: maybe change this to a readonly Vec2i so that the position cannot be accessed directly
+        [DataMember] 
+        private Vec2i _position { get; set; }
+        public ReadOnlyVec2i Position { get; private set; }
 
         [DataMember]
         public Sprite[] Sprites { get; private set; } 
@@ -37,10 +38,10 @@ namespace Console_Platformer.Engine
             }
         }
 
-
         public GameObject(Vec2i position, Engine engine)
         {
-            Position = position.Copy();
+            _position = position.Copy();
+            Position = new ReadOnlyVec2i(_position);
             Engine = engine;
             Collidable = true;
             SpriteLevel = 5;
@@ -49,7 +50,7 @@ namespace Console_Platformer.Engine
             Binds = new List<GoBind>();
         }
 
-        // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully
+        // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
         public virtual bool MoveGameObject(int x, int y)
         {
             // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite.
@@ -59,8 +60,8 @@ namespace Console_Platformer.Engine
                 Position.Y + y >= 0)
             {
                 // Moves the player.
-                Position.X += x;
-                Position.Y += y; 
+                _position.X += x;
+                _position.Y += y; 
 
                 // Collision detection.
                 if (Collidable)
@@ -69,8 +70,8 @@ namespace Console_Platformer.Engine
 
                     if (isColliding)
                     {
-                        Position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlaping.
-                        Position.Y -= y;
+                        _position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlaping.
+                        _position.Y -= y;
                         return false;
                     }
                 }
@@ -171,6 +172,7 @@ namespace Console_Platformer.Engine
         {
             Engine = engine;
             Chunk = engine.chunks[index.X, index.Y];
+            Position = new ReadOnlyVec2i(_position);
 
             foreach (var sprite in Sprites)
             {

@@ -29,24 +29,24 @@ namespace SpaceGame
             Serializer.knownTypes.Add(typeof(PlayerShip));
             Serializer.knownTypes.Add(typeof(Enemy));
 
-            LoadSavedData("reflection");
+            //LoadSavedData("reflection");
 
-            //AddNewSavedData("reflection");
-            //CreateChunks();
-            //
-            //var enm = new Enemy(new Vec2i(5, 5), 1, this);
-            //AddBaseObject(enm);
-            //test = new GoBind(enm, "test", this);
-            //
-            //
-            //playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
-            //AddBaseObject(playerShip);
-            //LoadLevel();
+            AddNewSavedData("reflection");
+            CreateChunks();
+            
+            var enm = new Enemy(new Vec2i(5, 5), 1, this);
+            AddBaseObject(enm);
+            test = new GoBind(enm, "test", this);
+            
+            
+            playerShip = new PlayerShip(new Vec2i(40, 40), 1, this);
+            AddBaseObject(playerShip);
+            LoadLevel();
         }
 
         protected override void Update()
         {
-            if (Util.random.Next(0, 30) == 5 && test?.IsActive == true) test.Val.Position.X++;
+            if (Util.random.Next(0, 30) == 5 && test?.IsActive == true) test.Val.MoveGameObject(1, 0);
             if (ImputManager.Escape.IsPressed) gameShouldClose = true;
 
             UpdateCamera();

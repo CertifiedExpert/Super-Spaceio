@@ -43,7 +43,6 @@ namespace Console_Platformer.Engine
             }
         }
         #endregion
-
         public Vec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
         public Chunk[,] chunks { get; private set; } // A 2d-array of chunks in the engine. If the chunk is null then it is unloaded, otherwise is loaded.
         public List<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunks[,] during interation for the conveniance of not checking if the chunk is loaded.
