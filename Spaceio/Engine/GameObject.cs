@@ -13,8 +13,8 @@ namespace Spaceio.Engine
         public Engine Engine { get; private set; }
         public Chunk Chunk { get; set; }
 
-        [DataMember] 
-        private Vec2i _position { get; set; }
+        [DataMember]
+        private Vec2i _position;
         public ReadOnlyVec2i Position { get; private set; }
 
         [DataMember]
