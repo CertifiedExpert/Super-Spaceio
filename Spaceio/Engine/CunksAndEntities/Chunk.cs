@@ -25,7 +25,7 @@ namespace Spaceio.Engine
         {
             Engine = engine;
 
-            gameObjectRenderLists = new List<GameObject>[Engine.spriteLevelCount];
+            gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
             for (var i = 0; i < gameObjectRenderLists.Length; i++)
             {
                 gameObjectRenderLists[i] = new List<GameObject>();
@@ -62,13 +62,13 @@ namespace Spaceio.Engine
         public void InsertGameObject(GameObject gameObject)
         {
             gameObjectsToAdd.Add(gameObject);
-            gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
+            //gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
         }
         // Removes GameObject from chunk.
         public void UnInsertGameObject(GameObject gameObject)
         {
             gameObjectsToRemove.Add(gameObject);
-            gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
+            //gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
         }
     }
 }

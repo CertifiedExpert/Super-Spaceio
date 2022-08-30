@@ -1,58 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Spaceio.Engine
 {
+    [DataContract(IsReference = true)]
     class ImputManager
     {
         // Imput state machine
-        public Button D1 { get; private set; }
-        public Button D2 { get; private set; }
-        public Button D3 { get; private set; }
-        public Button D4 { get; private set; }
-        public Button D5 { get; private set; }
-        public Button D6 { get; private set; }
-        public Button D7 { get; private set; }
-        public Button D8 { get; private set; }
-        public Button D9 { get; private set; }
-        public Button D0 { get; private set; }
-        public Button W { get; private set; }
-        public Button A { get; private set; }
-        public Button S { get; private set; }
-        public Button D { get; private set; }
-        public Button F { get; private set; }
-        public Button G { get; private set; }
-        public Button H { get; private set; }
-        public Button J { get; private set; }
-        public Button K { get; private set; }
-        public Button L { get; private set; }
-        public Button Z { get; private set; }
-        public Button X { get; private set; }
-        public Button C { get; private set; }
-        public Button V { get; private set; }
-        public Button B { get; private set; }
-        public Button N { get; private set; }
-        public Button M { get; private set; }
+        [DataMember]public Button D1 { get; private set; }
+        [DataMember]public Button D2 { get; private set; }
+        [DataMember]public Button D3 { get; private set; }
+        [DataMember]public Button D4 { get; private set; }
+        [DataMember]public Button D5 { get; private set; }
+        [DataMember]public Button D6 { get; private set; }
+        [DataMember]public Button D7 { get; private set; }
+        [DataMember]public Button D8 { get; private set; }
+        [DataMember]public Button D9 { get; private set; }
+        [DataMember]public Button D0 { get; private set; }
+        [DataMember]public Button W { get; private set; }
+        [DataMember]public Button A { get; private set; }
+        [DataMember]public Button S { get; private set; }
+        [DataMember]public Button D { get; private set; }
+        [DataMember]public Button F { get; private set; }
+        [DataMember]public Button G { get; private set; }
+        [DataMember]public Button H { get; private set; }
+        [DataMember]public Button J { get; private set; }
+        [DataMember]public Button K { get; private set; }
+        [DataMember]public Button L { get; private set; }
+        [DataMember]public Button Z { get; private set; }
+        [DataMember]public Button X { get; private set; }
+        [DataMember]public Button C { get; private set; }
+        [DataMember]public Button V { get; private set; }
+        [DataMember]public Button B { get; private set; }
+        [DataMember]public Button N { get; private set; }
+        [DataMember]public Button M { get; private set; }
+        
+        [DataMember]public Button Tab { get; private set; }
+        [DataMember]public Button CapsLock { get; private set; }
+        [DataMember]public Button LeftShift { get; private set; }
+        [DataMember]public Button LeftControl { get; private set; }
+        [DataMember]public Button BackSpace { get; private set; }
+        [DataMember]public Button Enter { get; private set; }
+        
+        [DataMember]public Button Delete { get; private set; }
 
-        public Button Tab { get; private set; }
-        public Button CapsLock { get; private set; }
-        public Button LeftShift { get; private set; }
-        public Button LeftControl { get; private set; }
-        public Button BackSpace { get; private set; }
-        public Button Enter { get; private set; }
-
-        public Button Delete { get; private set; }
-
-        public Button Escape { get; private set; }
-        public Button Space { get; private set; }
-        public Button ArrowUp { get; private set; }
-        public Button ArrowDown { get; private set; }
-        public Button ArrowLeft { get; private set; }
-        public Button ArrowRight { get; private set; }
+        [DataMember]public Button Escape { get; private set; }
+        [DataMember]public Button Space { get; private set; }
+        [DataMember]public Button ArrowUp { get; private set; }
+        [DataMember]public Button ArrowDown { get; private set; }
+        [DataMember]public Button ArrowLeft { get; private set; }
+        [DataMember]public Button ArrowRight { get; private set; }
 
         public ImputManager()
         {

@@ -27,7 +27,7 @@ namespace SpaceGame
             movementSprites[7] = new Sprite(ResourceManager.fighter1DownRight);
             ThrustStrength = 4;
 
-            OnChunkTraverse(Position.X / Game.chunkSize, Position.Y / Game.chunkSize); // Call this with the curren position in order to load in chunks for the first time
+            OnChunkTraverse(Position.X / Game.Settings.chunkSize, Position.Y / Game.Settings.chunkSize); // Call this with the curren position in order to load in chunks for the first time
         }
 
         public override void Update()

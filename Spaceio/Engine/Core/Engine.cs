@@ -17,32 +17,27 @@ namespace Spaceio.Engine
         public bool gameShouldClose = false; // Flag whether the game is set to close.
         public int deltaTime = 0; // Miliseconds which passed since last frame.
 
-        #region SERIALIZABLE_VARIABLES
-        [DataMember] public int spriteMaxCount { get; private set; } // The maximum number of sprites a GameObject may have.
-        [DataMember] public int spriteLevelCount { get; private set; } // The maximum number of renderer levels a Sprite can have.
-        [DataMember] public char backgroudPixel { get; private set; } // The pixel which is used as the backgroud.
-        [DataMember] public string pixelSpacingCharacters { get; private set; } // Unchanbable pixels put inbetween two changable pixels to account for difference in width and height of unicode characters.
-        [DataMember] public string title { get; private set; } // The title of the console window.
-        [DataMember] public int chunkCountX { get; private set; } // The number of chunks in the X-axis.
-        [DataMember] public int chunkCountY { get; private set; } // The number of chunks in the Y-axis.
-        [DataMember] public int chunkSize { get; private set; } // The size of each chunk (both in X- and Y- axis as the chunk is a square.
-        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // TODO: make private and deserialize through reflection. A temporary variable used to save a 2d array of GameObject which needs to be added to a chunk after it gets loaded. (The position in the array corresponds to the chunk)
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // TODO: same here .A temporary variable used to save a 2d array of GameObject which needs to be removed from a chunk after it gets loaded. (The position in the array corresponds to the chunk)
-        [DataMember] public int milisecondsForNextFrame; // Minimum number of miliseconds which needs to pass for the next frame to 
+        // Systems
+        [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
+        [DataMember] public Renderer Renderer { get; set; } // The current renderer of the game.
+        [DataMember] public ImputManager ImputManager { get; private set; } // The current imput renderer of the game.
+        [DataMember] public Serializer Serializer { get; private set; } // The current serializer of the game.
         private Camera _camera;
 
         [DataMember]
         public Camera Camera // The camera used in the engine. Each time the camera is changed and its size is different from the current camera create a new renderer. (Renderer is critically dependent on the cammera size because it uses it as a viewport.)
         {
-            get { return _camera; }
+            get { return _camera; } //TODO: remove this. Changing settings will come later on
             private set
             {
                 if (_camera != null && _camera.Size.X == value.Size.X && _camera.Size.Y == value.Size.Y) Renderer = new Renderer(this); // Only changes the Render if _camera is different from null because if it is null it means that the engine was just created and is being initialised, meaning that the Renderer wil be added later.
                 _camera = value;
             }
         }
-        #endregion
+        
+        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // TODO: make private and deserialize through reflection. A temporary variable used to save a 2d array of GameObject which needs to be added to a chunk after it gets loaded. (The position in the array corresponds to the chunk)
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // TODO: same here .A temporary variable used to save a 2d array of GameObject which needs to be removed from a chunk after it gets loaded. (The position in the array corresponds to the chunk)
 
         #region OTHER_VARIABLES
         private Vec2i _worldSize;
@@ -60,10 +55,6 @@ namespace Spaceio.Engine
         // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
         // " " <and> font 10 | width 189 | height 99
 
-        public Renderer Renderer { get; set; } // The current renderer of the game.
-        public ImputManager ImputManager { get; private set; } // The current imput renderer of the game.
-        public Serializer Serializer { get; private set; } // The current serializer of the game.
-        public Random Random { get; private set; } // The current serializer of the game.
 
         private DateTime lastFrame; // The time of last frame.
 
@@ -71,7 +62,7 @@ namespace Spaceio.Engine
         public readonly bool allowDebug = true;
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
-        public string[] debugLines;
+        public string[] debugLines = new string[10];
 
         protected string pathRootFolder; // The root folder of the executable.
         protected string pathSavesFolder;
@@ -87,7 +78,7 @@ namespace Spaceio.Engine
 
             while (!gameShouldClose)
             {
-                if (deltaTime > milisecondsForNextFrame)
+                if (deltaTime > Settings.milisecondsForNextFrame)
                 {
 
                     debugLines[1] = $"DeltaTime:  {deltaTime}";
@@ -112,20 +103,18 @@ namespace Spaceio.Engine
         // Called once on engine load. Initializes the engine.
         private void OnEngineLoad()
         {
-            // Set up the Renderer, the Camera, the ImputManager and initialize the static Resourcemanager
-            Serializer = new Serializer();
-            Serializer.knownTypes.Add(GetType());
-            ImputManager = new ImputManager();
-            ResourceManager.Init();
-
             pathRootFolder = GetAssemblyDirectory();
             pathSavesFolder = $"{pathRootFolder}\\Saves";
+
             SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
 
             // Console settings
             Console.CursorVisible = false;
-            Console.Title = title;
+            Console.Title = Settings.title;
             Console.OutputEncoding = Encoding.Unicode;
+
+            for (var i = 0; i < debugLines.Length; i++) debugLines[i] = "";
+            lastFrame = DateTime.Now;
         }
 
         // Called once every frame
@@ -135,11 +124,12 @@ namespace Spaceio.Engine
             ImputManager.UpdateImput(this);
 
             // Lazy removing game objects. 
-            foreach (var chunk in loadedChunks)
+            foreach (var chunk in loadedChunks) //TODO: combine some loops. 
             {
                 foreach (var gameObject in chunk.gameObjectsToRemove)
                 {
                     chunk.gameObjects.Remove(gameObject);
+                    chunk.gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
                 }
                 chunk.gameObjectsToRemove.Clear(); 
             }
@@ -150,6 +140,7 @@ namespace Spaceio.Engine
                 foreach (var gameObject in chunk.gameObjectsToAdd)
                 {
                     chunk.gameObjects.Add(gameObject);
+                    chunk.gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
                 }
                 chunk.gameObjectsToAdd.Clear(); 
             }
@@ -182,8 +173,8 @@ namespace Spaceio.Engine
         // Adds GameObject to the engine.
         public void AddGameObject(GameObject gameObject)
         {
-            var chunkX = gameObject.Position.X / chunkSize;
-            var chunkY = gameObject.Position.Y / chunkSize;
+            var chunkX = gameObject.Position.X / Settings.chunkSize;
+            var chunkY = gameObject.Position.Y / Settings.chunkSize;
 
             gameObject.Chunk = chunks[chunkX, chunkY];
             if (IsChunkLoaded(chunkX, chunkY)) chunks[chunkX, chunkY].InsertGameObject(gameObject);
@@ -257,63 +248,15 @@ namespace Spaceio.Engine
 
 
         #region FILES/LOADING/UNLOADING
-        // Loads save data from a gameState file. Sets all necessary engine variables based on the file contents.
-        protected void LoadSavedData(string saveName)
-        {
-            pathCurrentLoadedSave = $"{pathSavesFolder}\\{saveName}";
-
-            var data = Serializer.FromFile<Engine>($"{pathCurrentLoadedSave}\\gameState");
-            SetupEngineWithSettings(data);
-
-            unloadedChunkTransitionAddGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionAddGameObjects_serialize);
-            unloadedChunkTransitionRemoveGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionRemoveGameObject_serialize);
-            var wasChunkLoadedMap2d = Util.UnJaggedize2dArray(data.wasChunkLoadedMap_serialize);
-            for (var x = 0; x < chunkCountX; x++)
-            {
-                for (var y = 0; y < chunkCountY; y++)
-                {
-                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y)); 
-                    foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y));
-                    if (wasChunkLoadedMap2d[x, y]) LoadChunk(x, y);
-                }
-            }
-
-            OnSaveDataLoad(data);
-        }
-        // Called after the save data has been loaded. Has the contents of the gameState file passed to it as an Engine.
-        protected virtual void OnSaveDataLoad(Engine data) { }
-        // Add a new save folder with save information in it and sets the pathCurrentLoadedSave to it. (Does not save any actual information, just makes place for it)
-        protected virtual void AddNewSaveFiles(string saveName)
-        {
-            var dir = $"{pathSavesFolder}\\{saveName}";
-            var existingCopies = 1;
-            while (Directory.Exists(dir))
-            {
-                dir = $"{pathSavesFolder}\\{saveName}-copy({existingCopies})";
-                existingCopies++;
-            }
-            Directory.CreateDirectory(dir);
-
-            Directory.CreateDirectory($"{dir}\\Chunks");
-            for (var x = 0; x < chunkCountX; x++)
-            {
-                for (var y = 0; y < chunkCountY; y++)
-                {
-                    using (var fs = File.Create($"{dir}\\Chunks\\chunk{x}_{y}")) { }
-                }
-            }
-
-            using (var fs = File.Create($"{dir}\\gameState")) { }
-
-            pathCurrentLoadedSave = dir;
-        }
         // Saves the currnet state of the game including chunks and settings.
         protected virtual void SaveGame()
         {
-            var wasChunkLoadedMap2d = new bool[chunkCountX, chunkCountY];
-            for (var x = 0; x < chunkCountX; x++)
+            Serializer.SaveKnownTypes($"{pathCurrentLoadedSave}\\knownTypes");
+
+            var wasChunkLoadedMap2d = new bool[Settings.chunkCountX, Settings.chunkCountY];
+            for (var x = 0; x < Settings.chunkCountX; x++)
             {
-                for (var y = 0; y < chunkCountY; y++)
+                for (var y = 0; y < Settings.chunkCountY; y++)
                 {
                     if (IsChunkLoaded(chunks[x, y]))
                     {
@@ -329,9 +272,9 @@ namespace Spaceio.Engine
 
             wasChunkLoadedMap_serialize = Util.Jaggedize2dArray(wasChunkLoadedMap2d);
 
-            for (var x = 0; x < chunkCountX; x++)
+            for (var x = 0; x < Settings.chunkCountX; x++)
             {
-                for (var y = 0; y < chunkCountY; y++)
+                for (var y = 0; y < Settings.chunkCountY; y++)
                 {
                     foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.PrepareForDeserialization();
                 }
@@ -340,69 +283,83 @@ namespace Spaceio.Engine
             unloadedChunkTransitionRemoveGameObject_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionRemoveGameObjects);
             Serializer.ToFile(this, $"{pathCurrentLoadedSave}\\gameState");
         }
-        // Fills the save file with empty chunks.
-        protected virtual void FillCurrentSaveWithEmptyChunks()
+        // Loads save data from a gameState file. Sets all necessary engine variables based on the file contents.
+        protected void LoadSavedData(string saveName)
         {
-            for (var x = 0; x < chunkCountX; x++)
+            pathCurrentLoadedSave = $"{pathSavesFolder}\\{saveName}";
+
+            Serializer.ReadKnownTypes($"{pathCurrentLoadedSave}\\knownTypes");
+            var data = Serializer.FromFile<Engine>($"{pathCurrentLoadedSave}\\gameState");
+            
+            // Systems.
+            Settings = data.Settings;
+            Renderer = data.Renderer;
+            Renderer.CompleteDataAfterDeserialization(this);
+            ImputManager = data.ImputManager;
+            data.Serializer.knownTypes = Serializer.knownTypes;
+            Serializer = data.Serializer;
+            Camera = data.Camera;
+            ResourceManager.Init();
+
+            // Initiate all necessary variables other than those depending on deserialization.
+            SetupAllVariablesNotRelyingOnSerialization();
+
+            // Initialte variables depending on deserialization.
+            unloadedChunkTransitionAddGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionAddGameObjects_serialize);
+            unloadedChunkTransitionRemoveGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionRemoveGameObject_serialize);
+            var wasChunkLoadedMap2d = Util.UnJaggedize2dArray(data.wasChunkLoadedMap_serialize);
+            for (var x = 0; x < Settings.chunkCountX; x++)
             {
-                for (var y = 0; y < chunkCountY; y++)
+                for (var y = 0; y < Settings.chunkCountY; y++)
                 {
-                    chunks[x, y] = new Chunk(new Vec2i(x, y), this);
-                    UnloadChunk(x, y);
-                    chunks[x, y] = null;
+                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y)); 
+                    foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y));
+                    if (wasChunkLoadedMap2d[x, y]) LoadChunk(x, y);
                 }
             }
+
+            OnSaveDataLoad(data);
         }
-
-
+        // Called after the save data has been loaded. Has the contents of the gameState file passed to it as an Engine.
+        protected virtual void OnSaveDataLoad(Engine data) { }
         // Sets the engine settings and updates the variables to accomodate those settings. Takes in a path to the settings file or the settings data.
         protected void SetupEngineWithSettings(string settingsFilePath)
         {
-            var settingsData = Serializer.FromFile<Engine>(settingsFilePath);
-            SetupEngineWithSettingsInternal(settingsData);
-        }
-        protected void SetupEngineWithSettings(Engine settingsData)
-        {
-            SetupEngineWithSettingsInternal(settingsData);
-        }
-        private void SetupEngineWithSettingsInternal(Engine settingsData)
-        {
-            LoadSettingsData(settingsData);
-            FinaliseVariableInit();
-        }
+            Serializer = new Serializer();
+            Settings = Serializer.FromFile<Settings>(settingsFilePath);
+            Camera = new Camera(Settings.CameraStartPosition, new Vec2i(Settings.CameraSizeX, Settings.CameraSizeY));
+            Renderer = new Renderer(this);
+            ImputManager = new ImputManager();
+            ResourceManager.Init();
 
+            // Variables which have nothing to do with serialization.
+            SetupAllVariablesNotRelyingOnSerialization();
 
-        // Loads setting variables from an instance of Engine.
-        private void LoadSettingsData(Engine data)
-        {
-            spriteMaxCount = data.spriteMaxCount;
-            spriteLevelCount = data.spriteLevelCount;
-            backgroudPixel = data.backgroudPixel;
-            pixelSpacingCharacters = data.pixelSpacingCharacters;
-            title = data.title;
-            chunkCountX = data.chunkCountX;
-            chunkCountY = data.chunkCountY;
-            chunkSize = data.chunkSize;
-            milisecondsForNextFrame = data.milisecondsForNextFrame;
-            Camera = data.Camera;
+            // Variables which can be dependant on serialization.
+            unloadedChunkTransitionAddGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountX];
+            unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountX];
+            for (var x = 0; x < Settings.chunkCountX; x++)
+            {
+                for (var y = 0; y < Settings.chunkCountY; y++)
+                {
+                    unloadedChunkTransitionAddGameObjects[x, y] = new List<GameObject>();
+                    unloadedChunkTransitionRemoveGameObjects[x, y] = new List<GameObject>();
+                }
+            }
         }
-        // Basing on settings variables, initializes the variables of an engine which do not require additional information for initialization.
-        private void FinaliseVariableInit()
+        
+        private void SetupAllVariablesNotRelyingOnSerialization()
         {
-            chunks = new Chunk[chunkCountX, chunkCountY];
-            _worldSize = new Vec2i(chunkCountX * chunkSize, chunkCountY * chunkSize);
+            _worldSize = new Vec2i(Settings.chunkCountX * Settings.chunkSize, Settings.chunkCountY * Settings.chunkSize);
             worldSize = new ReadOnlyVec2i(_worldSize);
-            chunksToBeUnloaded = new List<Chunk>();
+
+            chunks = new Chunk[Settings.chunkCountX, Settings.chunkCountY];
+
             _loadedChunks = new List<Chunk>();
             loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
-            chunksToBeAddedToLoadedChunks = new List<Chunk>();
-            chunksToBeRemovedFromLoadedChunks = new List<Chunk>();
 
-            Random = new Random();
-
-            // Initialise transition lists
-            unloadedChunkTransitionAddGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
-            unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[chunkCountX, chunkCountY];
+            unloadedChunkTransitionAddGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountY];
+            unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountY];
             for (var x = 0; x < chunks.GetLength(0); x++)
             {
                 for (var y = 0; y < chunks.GetLength(1); y++)
@@ -411,18 +368,46 @@ namespace Spaceio.Engine
                     unloadedChunkTransitionRemoveGameObjects[x, y] = new List<GameObject>();
                 }
             }
-
-            // Debug
-            debugLines = new string[debugLinesCount];
-            for (var i = 0; i < debugLines.Length; i++)
+        }
+        // Add a new save folder with save information in it and sets the pathCurrentLoadedSave to it. (Does not save any actual information, just makes place for it)
+        protected virtual void AddNewSaveFiles(string saveName)
+        {
+            var dir = $"{pathSavesFolder}\\{saveName}";
+            var existingCopies = 1;
+            while (Directory.Exists(dir))
             {
-                debugLines[i] = "";
+                dir = $"{pathSavesFolder}\\{saveName}-copy({existingCopies})";
+                existingCopies++;
+            }
+            Directory.CreateDirectory(dir);
+
+            Directory.CreateDirectory($"{dir}\\Chunks");
+            for (var x = 0; x < Settings.chunkCountX; x++)
+            {
+                for (var y = 0; y < Settings.chunkCountY; y++)
+                {
+                    using (var fs = File.Create($"{dir}\\Chunks\\chunk{x}_{y}")) { }
+                }
             }
 
-            Renderer = new Renderer(this);
+            using (var fs = File.Create($"{dir}\\gameState")) { }
+            using (var fs = File.Create($"{dir}\\knownTypes")) { }
 
-            // Set up frame timers
-            lastFrame = DateTime.Now;
+            pathCurrentLoadedSave = dir;
+        }
+
+        // Fills the save file with empty chunks.
+        protected virtual void FillCurrentSaveWithEmptyChunks()
+        {
+            for (var x = 0; x < Settings.chunkCountX; x++)
+            {
+                for (var y = 0; y < Settings.chunkCountY; y++)
+                {
+                    chunks[x, y] = new Chunk(new Vec2i(x, y), this);
+                    UnloadChunk(x, y);
+                    chunks[x, y] = null;
+                }
+            }
         }
 
         // Gets the assembly directory of the executable

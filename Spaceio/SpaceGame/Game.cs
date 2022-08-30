@@ -22,28 +22,28 @@ namespace SpaceGame
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
-            Serializer.knownTypes.Add(typeof(Game));
-            Serializer.knownTypes.Add(typeof(BaseObject));
-            Serializer.knownTypes.Add(typeof(Asteroid));
-            Serializer.knownTypes.Add(typeof(Ship));
-            Serializer.knownTypes.Add(typeof(PlayerShip));
-            Serializer.knownTypes.Add(typeof(Enemy));
-
-            LoadSavedData("test");
-
             //AddNewSaveFiles("test");
-            //CreateChunks();
+            //SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
+            //FillCurrentSaveWithEmptyChunks();
+            //
+            //Serializer.knownTypes.Add(typeof(Game));
+            //Serializer.knownTypes.Add(typeof(BaseObject));
+            //Serializer.knownTypes.Add(typeof(Asteroid));
+            //Serializer.knownTypes.Add(typeof(Ship));
+            //Serializer.knownTypes.Add(typeof(PlayerShip));
+            //Serializer.knownTypes.Add(typeof(Enemy));
             //
             //var enm = new Enemy(new Vec2i(5, 5), 1, this);
             //AddBaseObject(enm);
-            //enemy = new GoBind(enm, "test", this);
-            //
+            //enemy = new GoBind(enm, "enemy", this);
             //
             //var p = new PlayerShip(new Vec2i(40, 40), 1, this);
             //AddBaseObject(p);
             //playerShip = new GoBind(p, "playerShip", this);
             //
             //LoadLevel();
+            
+            LoadSavedData("test");
         }
 
         protected override void Update()
@@ -117,8 +117,8 @@ namespace SpaceGame
         {
             for (var i = 0; i < 10000; i++)
             {
-                var astSize = Random.Next(1, 30);
-                var ast = new Asteroid(new Vec2i(Random.Next(0, worldSize.X), Random.Next(0, worldSize.Y)),
+                var astSize = Util.random.Next(1, 30);
+                var ast = new Asteroid(new Vec2i(Util.random.Next(0, worldSize.X), Util.random.Next(0, worldSize.Y)),
                 new Vec2i(astSize, astSize), this);
                 AddBaseObject(ast);
             }

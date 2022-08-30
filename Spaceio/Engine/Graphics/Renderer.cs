@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Spaceio.Engine
 {
+    [DataContract(IsReference = true)]
     class Renderer
     {
         private Engine engine;
+        
         private char[,] screenBuffer;
 
         public Renderer(Engine engine)
@@ -40,7 +43,7 @@ namespace Spaceio.Engine
             {
                 for (var y = 0; y < buffer.GetLength(1); y++)
                 {
-                    buffer[x, y] = engine.backgroudPixel;
+                    buffer[x, y] = engine.Settings.backgroudPixel;
                 }
             }
         }
@@ -50,7 +53,7 @@ namespace Spaceio.Engine
         {
             foreach (var chunk in engine.loadedChunks)
             {
-                for (var level = engine.spriteLevelCount - 1; level >= 0; level--)
+                for (var level = engine.Settings.spriteLevelCount - 1; level >= 0; level--)
                 {
                     foreach (var gameObject in chunk.gameObjectRenderLists[level])
                     {
@@ -85,7 +88,7 @@ namespace Spaceio.Engine
                 for (int x = 0; x < engine.Camera.Size.X; x++)
                 {
                     line += screenBuffer[x, y].ToString();
-                    line += engine.pixelSpacingCharacters;
+                    line += engine.Settings.pixelSpacingCharacters;
                 }
 
                 finalString += line + "\n";
@@ -121,6 +124,12 @@ namespace Spaceio.Engine
                     }
                 } 
             }
+        }
+
+        public void CompleteDataAfterDeserialization(Engine engine)
+        {
+            this.engine = engine;
+            screenBuffer = new char[engine.Settings.CameraSizeX, engine.Settings.CameraSizeY];
         }
     }
 }

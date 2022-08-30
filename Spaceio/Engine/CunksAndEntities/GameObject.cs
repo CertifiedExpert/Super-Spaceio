@@ -33,8 +33,8 @@ namespace Spaceio.Engine
             set
             {
                 // Checks whether the SpriteLevel value is valid and sets it to minimum priority if it's invalid.
-                if (value >= 0 && value < Engine.spriteLevelCount) _spriteLevel = value;
-                else _spriteLevel = Engine.spriteLevelCount;
+                if (value >= 0 && value < Engine.Settings.spriteLevelCount) _spriteLevel = value;
+                else _spriteLevel = Engine.Settings.spriteLevelCount;
             }
         }
 
@@ -45,7 +45,7 @@ namespace Spaceio.Engine
             Engine = engine;
             Collidable = true;
             SpriteLevel = 5;
-            Sprites = new Sprite[Engine.spriteMaxCount];
+            Sprites = new Sprite[Engine.Settings.spriteMaxCount];
             Colliders = new List<Collider>();
             Binds = new List<GoBind>();
         }
@@ -77,8 +77,8 @@ namespace Spaceio.Engine
                 }
 
                 // Chunk traverse detection.
-                var newChunkX = Position.X / Engine.chunkSize;
-                var newChunkY = Position.Y / Engine.chunkSize;
+                var newChunkX = Position.X / Engine.Settings.chunkSize;
+                var newChunkY = Position.Y / Engine.Settings.chunkSize;
                 if (Chunk != Engine.chunks[newChunkX, newChunkY])
                 {
                     Chunk.UnInsertGameObject(this);
