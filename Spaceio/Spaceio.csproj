@@ -46,6 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\Core\GameObjectManager.cs" />
     <Compile Include="Engine\CunksAndEntities\ChunkManager.cs" />
     <Compile Include="Engine\CunksAndEntities\Chunk.cs" />
     <Compile Include="Engine\Core\Settings.cs" />

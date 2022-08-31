@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.IO;
-using SpaceGame;
 using System.Reflection;
-using System.Collections.ObjectModel;
 
 namespace Spaceio.Engine
 {
@@ -15,7 +11,7 @@ namespace Spaceio.Engine
     abstract class Engine
     {
         public bool gameShouldClose = false; // Flag whether the game is set to close.
-        public int deltaTime = 0; // Miliseconds which passed since last frame.
+        public int deltaTime = 0; // Milliseconds which passed since last frame.
 
         // Systems
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
@@ -23,6 +19,8 @@ namespace Spaceio.Engine
         [DataMember] public ImputManager ImputManager { get; private set; } // The current imput renderer of the game.
         [DataMember] public Serializer Serializer { get; private set; } // The current serializer of the game.
         [DataMember] public ChunkManager ChunkManager { get; private set; }
+        [DataMember] public GameObjectManager GameObjectManager { get; private set; }
+
         private Camera _camera;
 
         [DataMember]
@@ -47,7 +45,7 @@ namespace Spaceio.Engine
         
         public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
         public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
-        
+
 
         // Possible configurations.
         // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -65,6 +63,7 @@ namespace Spaceio.Engine
         public string pathRootFolder; // The root folder of the executable.
         public string pathSavesFolder;
         public string pathCurrentLoadedSave;
+
         #endregion
 
         // Applicaton loop
@@ -96,6 +95,7 @@ namespace Spaceio.Engine
             }
 
             SaveGame();
+            GameObjectManager = new GameObjectManager(this);
         }
 
         // Called once on engine load. Initializes the engine.
@@ -121,36 +121,7 @@ namespace Spaceio.Engine
             // Registers imput.
             ImputManager.UpdateImput(this);
 
-            // Lazy removing game objects. 
-            foreach (var chunk in ChunkManager.loadedChunks) //TODO: combine some loops. 
-            {
-                foreach (var gameObject in chunk.gameObjectsToRemove)
-                {
-                    chunk.gameObjects.Remove(gameObject);
-                    chunk.gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
-                }
-                chunk.gameObjectsToRemove.Clear(); 
-            }
-
-            // Lazy adding GameObjects.
-            foreach (var chunk in ChunkManager.loadedChunks)
-            {
-                foreach (var gameObject in chunk.gameObjectsToAdd)
-                {
-                    chunk.gameObjects.Add(gameObject);
-                    chunk.gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
-                }
-                chunk.gameObjectsToAdd.Clear(); 
-            }
-
-            // Updates all GameObject.
-            foreach (var chunk in ChunkManager.loadedChunks)
-            {
-                foreach (var gameObject in chunk.gameObjects)
-                {
-                    gameObject.Update();
-                }
-            }
+            GameObjectManager.Update();
 
             ChunkManager.Update();
         }
@@ -158,20 +129,14 @@ namespace Spaceio.Engine
         // Adds GameObject to the engine.
         public void AddGameObject(GameObject gameObject)
         {
-            var chunkX = gameObject.Position.X / Settings.chunkSize;
-            var chunkY = gameObject.Position.Y / Settings.chunkSize;
-
-            gameObject.Chunk = chunks[chunkX, chunkY];
-            if (ChunkManager.IsChunkLoaded(chunkX, chunkY)) chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
-            else unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
+            GameObjectManager.AddGameObject(gameObject);
         }
         // Removes GameObject from the engine.
         public void RemoveGameObject(GameObject gameObject)
         {
-            if (ChunkManager.IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
-            else unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
+            GameObjectManager.RemoveGameObject(gameObject);
         }
-
+                
 
         #region FILES/LOADING/UNLOADING
         // Saves the currnet state of the game including chunks and settings.
@@ -228,6 +193,8 @@ namespace Spaceio.Engine
             ResourceManager.Init();
             ChunkManager = data.ChunkManager;
             ChunkManager.CompleteDataAfterDeserialization(this);
+            GameObjectManager = data.GameObjectManager;
+            GameObjectManager.CompleteDataAfterDeserialization(this);
 
             // Initiate all necessary variables other than those depending on deserialization.
             SetupAllVariablesNotRelyingOnSerialization();
@@ -260,11 +227,12 @@ namespace Spaceio.Engine
             ImputManager = new ImputManager();
             ResourceManager.Init();
             ChunkManager = new ChunkManager(this);
+            GameObjectManager = new GameObjectManager(this);
 
             // Variables which have nothing to do with serialization.
             SetupAllVariablesNotRelyingOnSerialization();
 
-            // Variables which can be dependant on serialization.
+            // Variables which can be dependent on serialization.
             unloadedChunkTransitionAddGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountX];
             unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountX];
             for (var x = 0; x < Settings.chunkCountX; x++)
