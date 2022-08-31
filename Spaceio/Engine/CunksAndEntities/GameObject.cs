@@ -96,6 +96,8 @@ namespace Spaceio.Engine
             }
             else return false;
         }
+        // Is called when a chunk was traversed by the GameObject.
+        protected virtual void OnChunkTraverse(int chunkX, int chunkY) { }
 
         // Returns a boolean to indicate whether a collision was detected. If a collision was detected, it calls OnCollision in both GameObjects.
         private bool CollisionDetection()
@@ -146,9 +148,9 @@ namespace Spaceio.Engine
 
             return false;
         }
-        // Is called when a chunk was traversed by the GameObject.
-        protected virtual void OnChunkTraverse(int chunkX, int chunkY) { }
-
+        // Gets called when a collision has been detected. Passes the GameObject which it collided with.
+        public abstract void OnCollision(GameObject collidingObject);
+        
         // Is called each frame and updates the GameObject. Updated all Animators of GameObject if it has any (if it doesn't, Animation property is null and is ignored).
         public virtual void Update()
         {
@@ -164,6 +166,7 @@ namespace Spaceio.Engine
             OnChunkTraverse(chunkX, chunkY);
         }
         // Completes data after the GameObject has been serialized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
+        
         public virtual void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
         {
             Engine = engine;
@@ -190,8 +193,5 @@ namespace Spaceio.Engine
                 bind.IsActive = false;
             }
         }
-
-        // Gets called when a collision has been detected. Passes the GameObject which it collided with.
-        public abstract void OnCollision(GameObject collidingObject);
     }
 }

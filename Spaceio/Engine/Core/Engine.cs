@@ -9,10 +9,7 @@ namespace Spaceio.Engine
     [DataContract(IsReference = true)]
     abstract class Engine
     {
-        public bool gameShouldClose = false; // Flag whether the game is set to close.
-        public int deltaTime = 0; // Milliseconds which passed since last frame.
-
-        // Systems
+        // Systems.
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
         [DataMember] public Renderer Renderer { get; set; } // The renderer of the game.
         [DataMember] public InputManager InputManager { get; private set; } // The input renderer of the game.
@@ -23,40 +20,37 @@ namespace Spaceio.Engine
 
         
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // TODO: make private and deserialize through reflection. A temporary variable used to save a 2d array of GameObject which needs to be added to a chunk after it gets loaded. (The position in the array corresponds to the chunk)
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // TODO: same here .A temporary variable used to save a 2d array of GameObject which needs to be removed from a chunk after it gets loaded. (The position in the array corresponds to the chunk)
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionAddGameObjects.
+        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionRemoveGameObjects.
 
-        #region OTHER_VARIABLES
+        public bool gameShouldClose = false; // Flag whether the game is set to close.
+        public int deltaTime = 0; // Milliseconds which passed since last frame.
         private Vec2i _worldSize;
         public ReadOnlyVec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
         public Chunk[,] chunks { get; private set; } // A 2d-array of chunks in the engine. If the chunk is null then it is unloaded, otherwise is loaded.
-        
         public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
         public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
 
-
-        // Possible configurations.
-        // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
-        // " " <and> font 10 | width 189 | height 99
-
-
         private DateTime lastFrame; // The time of last frame.
 
-        // Debug
+        // Debug.
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
         public string[] debugLines = new string[10];
 
+        // Paths.
         public string pathRootFolder; // The root folder of the executable.
         public string pathSavesFolder;
         public string pathCurrentLoadedSave;
 
-        #endregion
-
-        // Application loop
+        // Possible configurations.
+        // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
+        // " " <and> font 10 | width 189 | height 99
+        
+        // Application loop.
         protected Engine()
         {
-            // Loading 
+            // Loading. 
             OnEngineLoad();
             OnLoad();
 
@@ -70,11 +64,11 @@ namespace Spaceio.Engine
 
                     lastFrame = DateTime.Now;
 
-                    // Updating
+                    // Updating.
                     EngineUpdate();
                     Update();
 
-                    // Rendering
+                    // Rendering.
                     Renderer.Render();
                 }
 
@@ -125,7 +119,7 @@ namespace Spaceio.Engine
                 
 
         #region FILES/LOADING/UNLOADING
-        // Saves the current state of the game including chunks and settings.
+        // Saves the current state of the game including settings and chunks in their own folder.
         protected virtual void SaveGame()
         {
             Serializer.SaveKnownTypes($"{pathCurrentLoadedSave}\\knownTypes");
@@ -230,7 +224,7 @@ namespace Spaceio.Engine
                 }
             }
         }
-        
+        // Sets up all the variables which are not dependent on serialization.
         private void SetupAllVariablesNotRelyingOnSerialization()
         {
             _worldSize = new Vec2i(Settings.chunkCountX * Settings.chunkSize, Settings.chunkCountY * Settings.chunkSize);
@@ -276,7 +270,7 @@ namespace Spaceio.Engine
             pathCurrentLoadedSave = dir;
         }
 
-        // Fills the save file with empty chunks.
+        // Fills the currently loaded save file with empty chunks.
         protected virtual void FillCurrentSaveWithEmptyChunks()
         {
             for (var x = 0; x < Settings.chunkCountX; x++)

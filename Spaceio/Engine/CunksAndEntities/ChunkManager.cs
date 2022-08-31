@@ -17,7 +17,7 @@ namespace Spaceio.Engine
 
         public ChunkManager(Engine engine)
         {
-            this.Engine = engine;
+            Engine = engine;
 
             _loadedChunks = new List<Chunk>();
             loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
@@ -103,7 +103,6 @@ namespace Spaceio.Engine
             if (chunk != null) return true;
             else return false;
         }
-
 
         public void CompleteDataAfterDeserialization(Engine engine)
         {

@@ -11,7 +11,7 @@ namespace Spaceio.Engine
         {
             Engine = engine;
         }
-
+        
         public void Update()
         {
             foreach (var chunk in Engine.ChunkManager.loadedChunks)
