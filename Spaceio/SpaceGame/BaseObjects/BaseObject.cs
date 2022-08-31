@@ -21,5 +21,12 @@ namespace SpaceGame
         {
 
         }
+
+        public override void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
+        {
+            base.CompleteDataAfterDeserialization(engine, index);
+
+            Game = (Game)engine;
+        }
     }
 }

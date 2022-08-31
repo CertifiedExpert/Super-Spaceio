@@ -78,9 +78,9 @@ namespace SpaceGame
             restOfVelocity = new Vec2f(0, 0);
         }
 
-        public override void PrepareForDeserialization()
+        public override void PrepareForSerialization()
         {
-            base.PrepareForDeserialization();
+            base.PrepareForSerialization();
 
             foreach (var sprite in movementSprites)
             {
@@ -88,9 +88,9 @@ namespace SpaceGame
             }
         }
 
-        public override void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        public override void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
         {
-            base.CompleteDataAfterSerialization(engine, index);
+            base.CompleteDataAfterDeserialization(engine, index);
 
             foreach (var sprite in movementSprites)
             {

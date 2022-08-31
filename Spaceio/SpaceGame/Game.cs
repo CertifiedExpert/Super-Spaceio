@@ -56,7 +56,7 @@ namespace SpaceGame
             //UpdateAllBaseObjects();
             var loadedGameObjectCount = 0;
             var lChunks = 0;
-            foreach (var chunk in loadedChunks)
+            foreach (var chunk in ChunkManager.loadedChunks)
             {
                 foreach (var go in chunk.gameObjects)
                 {
@@ -103,7 +103,7 @@ namespace SpaceGame
             }
         }
         */
-
+        /*
         public override void LoadChunk(int x, int y)
         {
             base.LoadChunk(x, y);
@@ -113,6 +113,7 @@ namespace SpaceGame
                 ((BaseObject)gameObject).Game = this;
             }
         }
+        */
         private void LoadLevel()
         {
             for (var i = 0; i < 10000; i++)

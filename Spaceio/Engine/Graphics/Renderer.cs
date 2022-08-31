@@ -51,7 +51,7 @@ namespace Spaceio.Engine
         // Draws all GameObjects to the screenBuffer.
         private void DrawGameObjectsToFrameBuffer() 
         {
-            foreach (var chunk in engine.loadedChunks)
+            foreach (var chunk in engine.ChunkManager.loadedChunks)
             {
                 for (var level = engine.Settings.spriteLevelCount - 1; level >= 0; level--)
                 {

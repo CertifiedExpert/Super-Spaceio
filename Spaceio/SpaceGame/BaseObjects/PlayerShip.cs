@@ -82,7 +82,7 @@ namespace SpaceGame
             {
                 for (var y = 0; y < Game.chunks.GetLength(1); y++)
                 {
-                    if (Game.IsChunkLoaded(x, y)) chunksToBeUnloaded.Add(Game.chunks[x, y]);
+                    if (Game.ChunkManager.IsChunkLoaded(x, y)) chunksToBeUnloaded.Add(Game.chunks[x, y]);
                 }
             }
 
@@ -99,15 +99,15 @@ namespace SpaceGame
             {
                 for (var x = begginX; x <= endX; x++)
                 {
-                    if (Game.IsChunkLoaded(x, y))
+                    if (Game.ChunkManager.IsChunkLoaded(x, y))
                     {
                         chunksToBeUnloaded.Remove(Game.chunks[x, y]);
                     }
-                    else Game.LoadChunk(x, y);
+                    else Game.ChunkManager.LoadChunk(x, y);
                 }
             }
 
-            foreach (var chunk in chunksToBeUnloaded) Game.ScheduleUnloadChunk(chunk.Index.X, chunk.Index.Y);
+            foreach (var chunk in chunksToBeUnloaded) Game.ChunkManager.ScheduleUnloadChunk(chunk.Index.X, chunk.Index.Y);
         }
     }
 }

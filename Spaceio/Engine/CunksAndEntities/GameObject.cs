@@ -81,12 +81,12 @@ namespace Spaceio.Engine
                 var newChunkY = Position.Y / Engine.Settings.chunkSize;
                 if (Chunk != Engine.chunks[newChunkX, newChunkY])
                 {
-                    Chunk.UnInsertGameObject(this);
+                    Chunk.gameObjectsToRemove.Add(this);
                     Chunk = Engine.chunks[newChunkX, newChunkY];
 
-                    if (Engine.IsChunkLoaded(newChunkX, newChunkY))
+                    if (Engine.ChunkManager.IsChunkLoaded(newChunkX, newChunkY))
                     {
-                        Chunk.InsertGameObject(this);
+                        Chunk.gameObjectsToAdd.Add(this);
                         OnChunkTraverse(newChunkX, newChunkY); 
                     }
                     else
@@ -109,7 +109,7 @@ namespace Spaceio.Engine
             {
                 for (int y = 0; y < Engine.chunks.GetLength(1); y++)
                 {
-                    if (Engine.IsChunkLoaded(x, y))
+                    if (Engine.ChunkManager.IsChunkLoaded(x, y))
                     {
                         foreach (var gameObject in Engine.chunks[x, y].gameObjects)
                         {
@@ -168,7 +168,7 @@ namespace Spaceio.Engine
             OnChunkTraverse(chunkX, chunkY);
         }
         // Completes data after the GameObject has been serilized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
-        public virtual void CompleteDataAfterSerialization(Engine engine, Vec2i index)
+        public virtual void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
         {
             Engine = engine;
             Chunk = engine.chunks[index.X, index.Y];
@@ -182,7 +182,7 @@ namespace Spaceio.Engine
             foreach (var bind in Binds) bind.OnDeserialized(this);
         }
         // Prepares the GameObject for deserialization. (Deactivates its binds as the GameObject is about to be deserialized.)
-        public virtual void PrepareForDeserialization()
+        public virtual void PrepareForSerialization()
         {
             foreach (var sprite in Sprites)
             {
@@ -194,6 +194,7 @@ namespace Spaceio.Engine
                 bind.IsActive = false;
             }
         }
+
         // Gets called when a collision has been detected. Passes the GameObject which it collided with.
         public abstract void OnCollision(GameObject collidingObject);
     }

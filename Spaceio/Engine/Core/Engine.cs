@@ -22,6 +22,7 @@ namespace Spaceio.Engine
         [DataMember] public Renderer Renderer { get; set; } // The current renderer of the game.
         [DataMember] public ImputManager ImputManager { get; private set; } // The current imput renderer of the game.
         [DataMember] public Serializer Serializer { get; private set; } // The current serializer of the game.
+        [DataMember] public ChunkManager ChunkManager { get; private set; }
         private Camera _camera;
 
         [DataMember]
@@ -43,13 +44,10 @@ namespace Spaceio.Engine
         private Vec2i _worldSize;
         public ReadOnlyVec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
         public Chunk[,] chunks { get; private set; } // A 2d-array of chunks in the engine. If the chunk is null then it is unloaded, otherwise is loaded.
-        private List<Chunk> _loadedChunks;
-        public ReadOnlyCollection<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunks[,] during interation for the conveniance of not checking if the chunk is loaded.
+        
         public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
         public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
-        private List<Chunk> chunksToBeUnloaded = new List<Chunk>(); // List of chunks which have been scheduled to be unloaded.
-        private List<Chunk> chunksToBeAddedToLoadedChunks = new List<Chunk>();
-        private List<Chunk> chunksToBeRemovedFromLoadedChunks = new List<Chunk>();
+        
 
         // Possible configurations.
         // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
@@ -64,9 +62,9 @@ namespace Spaceio.Engine
         public readonly int debugLinesLength = 40;
         public string[] debugLines = new string[10];
 
-        protected string pathRootFolder; // The root folder of the executable.
-        protected string pathSavesFolder;
-        protected string pathCurrentLoadedSave;
+        public string pathRootFolder; // The root folder of the executable.
+        public string pathSavesFolder;
+        public string pathCurrentLoadedSave;
         #endregion
 
         // Applicaton loop
@@ -124,7 +122,7 @@ namespace Spaceio.Engine
             ImputManager.UpdateImput(this);
 
             // Lazy removing game objects. 
-            foreach (var chunk in loadedChunks) //TODO: combine some loops. 
+            foreach (var chunk in ChunkManager.loadedChunks) //TODO: combine some loops. 
             {
                 foreach (var gameObject in chunk.gameObjectsToRemove)
                 {
@@ -135,7 +133,7 @@ namespace Spaceio.Engine
             }
 
             // Lazy adding GameObjects.
-            foreach (var chunk in loadedChunks)
+            foreach (var chunk in ChunkManager.loadedChunks)
             {
                 foreach (var gameObject in chunk.gameObjectsToAdd)
                 {
@@ -146,7 +144,7 @@ namespace Spaceio.Engine
             }
 
             // Updates all GameObject.
-            foreach (var chunk in loadedChunks)
+            foreach (var chunk in ChunkManager.loadedChunks)
             {
                 foreach (var gameObject in chunk.gameObjects)
                 {
@@ -154,22 +152,9 @@ namespace Spaceio.Engine
                 }
             }
 
-            // Update the loadedChunks list.
-            foreach (var chunk in chunksToBeAddedToLoadedChunks) _loadedChunks.Add(chunk);
-            chunksToBeAddedToLoadedChunks.Clear();
-            foreach (var chunk in chunksToBeRemovedFromLoadedChunks) _loadedChunks.Remove(chunk);
-            chunksToBeRemovedFromLoadedChunks.Clear();
-
-            // Lazy unloading Chunks.
-            foreach (var chunk in chunksToBeUnloaded)
-            {
-                UnloadChunk(chunk.Index.X, chunk.Index.Y);
-            }
-            chunksToBeUnloaded.Clear();
+            ChunkManager.Update();
         }
 
-
-        #region UTIL_FUNCTIONS
         // Adds GameObject to the engine.
         public void AddGameObject(GameObject gameObject)
         {
@@ -177,74 +162,15 @@ namespace Spaceio.Engine
             var chunkY = gameObject.Position.Y / Settings.chunkSize;
 
             gameObject.Chunk = chunks[chunkX, chunkY];
-            if (IsChunkLoaded(chunkX, chunkY)) chunks[chunkX, chunkY].InsertGameObject(gameObject);
+            if (ChunkManager.IsChunkLoaded(chunkX, chunkY)) chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
             else unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
         }
         // Removes GameObject from the engine.
         public void RemoveGameObject(GameObject gameObject)
         {
-            if (IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.UnInsertGameObject(gameObject);
+            if (ChunkManager.IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
             else unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
         }
-        // Loads the Chunk at specified index from file into the engine.
-        public virtual void LoadChunk(int x, int y)
-        {
-            chunks[x, y] = Serializer.FromFile<Chunk>($"{pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}");
-
-            // Fill misssing data
-            chunks[x, y].CompleteDataAfterSerialization(this, new Vec2i(x, y));
-
-            chunksToBeAddedToLoadedChunks.Add(chunks[x, y]);
-            chunks[x, y].OnChunkLoaded();
-
-            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state (or delete them)
-            foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y])
-            {
-                chunks[x, y].UnInsertGameObject(gameObject);
-            }
-            foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y])
-            {
-                chunks[x, y].InsertGameObject(gameObject);
-            }
-            foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y])
-            {
-                gameObject.OnUnloadedChunkAwake(x, y);
-            }
-            unloadedChunkTransitionRemoveGameObjects[x, y].Clear();
-            unloadedChunkTransitionAddGameObjects[x, y].Clear();
-        }
-        // Scheudles the Chunk to be unloaded at the at the beginning of the next frame.
-        public void ScheduleUnloadChunk(int x, int y)
-        {
-            if (IsChunkLoaded(chunks[x, y]) && !chunksToBeUnloaded.Contains(chunks[x, y])) chunksToBeUnloaded.Add(chunks[x, y]);
-
-            chunksToBeRemovedFromLoadedChunks.Add(chunks[x, y]);
-            chunks[x, y].OnChunkUnLoaded();
-        }
-        // Checks if the chunk is loaded and returns the result as a bool.
-        public bool IsChunkLoaded(int x, int y)
-        {
-            if (chunks[x, y] != null) return true;
-            else return false;
-        }
-        // Checks if the chunk is loaded and returns the result as a bool.
-        public bool IsChunkLoaded(Chunk chunk)
-        {
-            if (chunk != null) return true;
-            else return false;
-        }
-        // Unloads the Chunk at specified index to file and deletes it from the engine.
-        private void UnloadChunk(int x, int y)
-        {
-            foreach (var gameObject in chunks[x, y].gameObjects)
-            {
-                gameObject.PrepareForDeserialization();
-            }
-
-            Serializer.ToFile(chunks[x, y], $"{pathCurrentLoadedSave}\\Chunks\\chunk{chunks[x, y].Index.X}_{chunks[x, y].Index.Y}");
-            chunks[chunks[x, y].Index.X, chunks[x, y].Index.Y] = null;
-        }
-        #endregion
 
 
         #region FILES/LOADING/UNLOADING
@@ -258,9 +184,9 @@ namespace Spaceio.Engine
             {
                 for (var y = 0; y < Settings.chunkCountY; y++)
                 {
-                    if (IsChunkLoaded(chunks[x, y]))
+                    if (ChunkManager.IsChunkLoaded(chunks[x, y]))
                     {
-                        UnloadChunk(x, y);
+                        ChunkManager.ForceUnloadChunk(x, y);
                         wasChunkLoadedMap2d[x, y] = true;
                     }
                     else
@@ -276,7 +202,7 @@ namespace Spaceio.Engine
             {
                 for (var y = 0; y < Settings.chunkCountY; y++)
                 {
-                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.PrepareForDeserialization();
+                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.PrepareForSerialization();
                 }
             }
             unloadedChunkTransitionAddGameObjects_serialize = Util.Jaggedize2dArray(unloadedChunkTransitionAddGameObjects);
@@ -300,6 +226,8 @@ namespace Spaceio.Engine
             Serializer = data.Serializer;
             Camera = data.Camera;
             ResourceManager.Init();
+            ChunkManager = data.ChunkManager;
+            ChunkManager.CompleteDataAfterDeserialization(this);
 
             // Initiate all necessary variables other than those depending on deserialization.
             SetupAllVariablesNotRelyingOnSerialization();
@@ -312,9 +240,9 @@ namespace Spaceio.Engine
             {
                 for (var y = 0; y < Settings.chunkCountY; y++)
                 {
-                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y)); 
-                    foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y]) gameObject.CompleteDataAfterSerialization(this, new Vec2i(x, y));
-                    if (wasChunkLoadedMap2d[x, y]) LoadChunk(x, y);
+                    foreach (var gameObject in unloadedChunkTransitionAddGameObjects[x, y]) gameObject.CompleteDataAfterDeserialization(this, new Vec2i(x, y)); 
+                    foreach (var gameObject in unloadedChunkTransitionRemoveGameObjects[x, y]) gameObject.CompleteDataAfterDeserialization(this, new Vec2i(x, y));
+                    if (wasChunkLoadedMap2d[x, y]) ChunkManager.LoadChunk(x, y);
                 }
             }
 
@@ -331,6 +259,7 @@ namespace Spaceio.Engine
             Renderer = new Renderer(this);
             ImputManager = new ImputManager();
             ResourceManager.Init();
+            ChunkManager = new ChunkManager(this);
 
             // Variables which have nothing to do with serialization.
             SetupAllVariablesNotRelyingOnSerialization();
@@ -354,9 +283,6 @@ namespace Spaceio.Engine
             worldSize = new ReadOnlyVec2i(_worldSize);
 
             chunks = new Chunk[Settings.chunkCountX, Settings.chunkCountY];
-
-            _loadedChunks = new List<Chunk>();
-            loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
 
             unloadedChunkTransitionAddGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountY];
             unloadedChunkTransitionRemoveGameObjects = new List<GameObject>[Settings.chunkCountX, Settings.chunkCountY];
@@ -404,7 +330,7 @@ namespace Spaceio.Engine
                 for (var y = 0; y < Settings.chunkCountY; y++)
                 {
                     chunks[x, y] = new Chunk(new Vec2i(x, y), this);
-                    UnloadChunk(x, y);
+                    ChunkManager.ForceUnloadChunk(x, y);
                     chunks[x, y] = null;
                 }
             }

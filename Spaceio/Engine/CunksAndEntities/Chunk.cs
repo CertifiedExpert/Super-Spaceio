@@ -43,7 +43,7 @@ namespace Spaceio.Engine
 
             foreach (var gameObject in gameObjects)
             {
-                gameObject.CompleteDataAfterSerialization(engine, index);
+                gameObject.CompleteDataAfterDeserialization(engine, index);
             }
         }
 
@@ -56,19 +56,6 @@ namespace Spaceio.Engine
         public void OnChunkUnLoaded()
         {
             lastUnloaded = DateTime.Now;
-        }
-
-        // Adds GameObject to chunk.
-        public void InsertGameObject(GameObject gameObject)
-        {
-            gameObjectsToAdd.Add(gameObject);
-            //gameObjectRenderLists[gameObject.SpriteLevel].Add(gameObject);
-        }
-        // Removes GameObject from chunk.
-        public void UnInsertGameObject(GameObject gameObject)
-        {
-            gameObjectsToRemove.Add(gameObject);
-            //gameObjectRenderLists[gameObject.SpriteLevel].Remove(gameObject);
         }
     }
 }
