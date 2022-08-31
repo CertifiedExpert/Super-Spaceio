@@ -9,7 +9,7 @@ namespace Spaceio.Engine
     [DataContract(IsReference = true)]
     class Serializer
     {
-        // List of types recognised by the Serializer.
+        // List of types recognized by the Serializer.
         public List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
 
         [DataMember] private List<string> knownTypesStrings_serialize;
@@ -34,7 +34,7 @@ namespace Spaceio.Engine
             }
         }
 
-        // Returs a string of xml data of the specified instance of T.
+        // Returns a string of xml data of the specified instance of T.
         public string ToXmlString<T>(T instance)
         {
             using (MemoryStream memoryStream = new MemoryStream())

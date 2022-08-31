@@ -15,19 +15,19 @@ namespace Spaceio.Engine
             Y = y;
         }
 
-        static public Vec2i operator +(Vec2i a, Vec2i b)
+        public static Vec2i operator +(Vec2i a, Vec2i b)
         {
             return new Vec2i(a.X + b.X, a.Y + b.Y);
         }
-        static public Vec2i operator -(Vec2i a, Vec2i b)
+        public static Vec2i operator -(Vec2i a, Vec2i b)
         {
             return new Vec2i(a.X - b.X, a.Y - b.Y);
         }
-        static public Vec2i operator *(Vec2i a, int b)
+        public static Vec2i operator *(Vec2i a, int b)
         {
             return new Vec2i(a.X * b, a.Y * b);
         }
-        static public Vec2i operator /(Vec2i a, int b)
+        public static Vec2i operator /(Vec2i a, int b)
         {
             return new Vec2i(a.X / b, a.Y / b);
         }

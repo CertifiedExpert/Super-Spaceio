@@ -5,9 +5,9 @@ using System.Windows.Input;
 namespace Spaceio.Engine
 {
     [DataContract(IsReference = true)]
-    class ImputManager
+    class InputManager
     {
-        // Imput state machine
+        // Input state machine
         [DataMember]public Button D1 { get; private set; }
         [DataMember]public Button D2 { get; private set; }
         [DataMember]public Button D3 { get; private set; }
@@ -52,7 +52,7 @@ namespace Spaceio.Engine
         [DataMember]public Button ArrowLeft { get; private set; }
         [DataMember]public Button ArrowRight { get; private set; }
 
-        public ImputManager()
+        public InputManager()
         {
             D1 = new Button();
             D2 = new Button();
@@ -99,8 +99,8 @@ namespace Spaceio.Engine
             Escape = new Button();
         }
 
-        // Updates imputs with the currently held buttons + deactivates those released
-        public void UpdateImput(Engine engine)
+        // Updates inputs with the currently held buttons + deactivates those released
+        public void UpdateInput(Engine engine)
         {
             UpdateButton(Key.D1, D1);
             UpdateButton(Key.D2, D2);

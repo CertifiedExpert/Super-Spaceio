@@ -15,8 +15,7 @@ namespace Spaceio.Engine
         private char[][] jaggedizedBitmapData_serialize;
         public Sprite(Bitmap bitmap, Vec2i attachmentInfo = null, Animator animator = null)
         {
-            if (attachmentInfo == null) AttachmentPos = new Vec2i(0, 0);
-            else AttachmentPos = attachmentInfo;
+            AttachmentPos = attachmentInfo ?? new Vec2i(0, 0);
             Bitmap = bitmap;
             Animator = animator;
         }

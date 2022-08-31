@@ -7,7 +7,8 @@ namespace SpaceGame
     abstract class BaseObject : GameObject
     {
         public Game Game { get; set; }
-        public BaseObject(Vec2i position, Game game) : base(position, game)
+
+        protected BaseObject(Vec2i position, Game game) : base(position, game)
         {
             Game = game;
         }

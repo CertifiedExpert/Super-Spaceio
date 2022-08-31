@@ -4,16 +4,16 @@ using Spaceio.Engine;
 namespace SpaceGame
 {
     [DataContract(IsReference = true)]
-    class Game : Engine
+    sealed class Game : Engine
     {
         // Settings
-        public int milisecondsPerPlayerMove = 50;
+        public int millisecondsPerPlayerMove = 50;
         public const int chunkLoadRadius = 3;
 
         public GoBind playerShip;
         public GoBind enemy;
 
-        public int milisecondsSinceLastPlayerMove = 0;
+        public int millisecondsSinceLastPlayerMove = 0;
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
@@ -44,7 +44,7 @@ namespace SpaceGame
         protected override void Update()
         {
             if (Util.random.Next(0, 30) == 5 && enemy?.IsActive == true) enemy.Val.MoveGameObject(1, 0);
-            if (ImputManager.Escape.IsPressed) gameShouldClose = true;
+            if (InputManager.Escape.IsPressed) gameShouldClose = true;
 
             UpdateCamera();
 
@@ -67,10 +67,10 @@ namespace SpaceGame
 
         private void UpdateCamera()
         {
-            if (ImputManager.ArrowUp.IsPressed) Camera.Position.Y += 3;
-            if (ImputManager.ArrowDown.IsPressed) Camera.Position.Y -= 3;
-            if (ImputManager.ArrowLeft.IsPressed) Camera.Position.X -= 3;
-            if (ImputManager.ArrowRight.IsPressed) Camera.Position.X += 3;
+            if (InputManager.ArrowUp.IsPressed) Camera.Position.Y += 3;
+            if (InputManager.ArrowDown.IsPressed) Camera.Position.Y -= 3;
+            if (InputManager.ArrowLeft.IsPressed) Camera.Position.X -= 3;
+            if (InputManager.ArrowRight.IsPressed) Camera.Position.X += 3;
         }
         public void AddBaseObject(BaseObject baseObject)
         {

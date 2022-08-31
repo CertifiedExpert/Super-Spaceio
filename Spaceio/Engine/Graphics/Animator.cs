@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Spaceio.Engine
@@ -12,7 +11,7 @@ namespace Spaceio.Engine
         [DataMember]
         private List<Bitmap> frames;
         [DataMember]
-        private int milisecondsForFrameStep;
+        private int millisecondsForFrameStep;
         [DataMember]
         private bool loopable;
 
@@ -20,22 +19,22 @@ namespace Spaceio.Engine
         private int currentFrame = 0;
         [DataMember]
         private DateTime lastFrameUpdate = DateTime.Now;
-        public Animator(List<Bitmap> frames, int milisecondsForFrameStep, bool loopable, Sprite sprite,
-                        bool randomiseStartFrame = false)
+        public Animator(List<Bitmap> frames, int millisecondsForFrameStep, bool loopable, Sprite sprite,
+                        bool randomizeStartFrame = false)
         {
             this.frames = frames;
-            this.milisecondsForFrameStep = milisecondsForFrameStep;
+            this.millisecondsForFrameStep = millisecondsForFrameStep;
             this.loopable = loopable;
             this.sprite = sprite;
 
-            if (randomiseStartFrame) currentFrame = Util.random.Next(0, frames.Count());
+            if (randomizeStartFrame) currentFrame = Util.random.Next(0, frames.Count);
         }
 
         
         // Gets called every frame by the engine. Updates the animator
         public void Update()
         {
-            if ((DateTime.Now - lastFrameUpdate).TotalMilliseconds >= milisecondsForFrameStep)
+            if ((DateTime.Now - lastFrameUpdate).TotalMilliseconds >= millisecondsForFrameStep)
             {
                 currentFrame++;
                 if (currentFrame == frames.Count)
@@ -43,7 +42,7 @@ namespace Spaceio.Engine
                     if (loopable) currentFrame = 0;
                     else
                     {
-                        // If the animator run out of frames, terminate the animation and set the Animator propery of Sprite to null
+                        // If the animator run out of frames, terminate the animation and set the Animator property of Sprite to null
                         sprite.Animator = null;
                         return;
                     }

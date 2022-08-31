@@ -12,8 +12,7 @@ namespace Spaceio.Engine
 
         public Collider(Vec2i size, Vec2i attachmentPos = null)
         {
-            if (attachmentPos == null) AttachmentPos = new Vec2i(0, 0);
-            else AttachmentPos = attachmentPos;
+            AttachmentPos = attachmentPos ?? new Vec2i(0, 0);
             Size = size;
         }
     }

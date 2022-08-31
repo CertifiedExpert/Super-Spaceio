@@ -20,12 +20,12 @@ namespace Spaceio.Engine
         [DataMember]
         public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects. 
         [DataMember]
-        public List<GoBind> Binds { get; private set; } // A list of GoBinds refering to this GameObject.
+        public List<GoBind> Binds { get; private set; } // A list of GoBinds referring to this GameObject.
         [DataMember]
         private int _spriteLevel;
         public int SpriteLevel 
         {
-            get { return _spriteLevel; }
+            get => _spriteLevel;
             set
             {
                 // Checks whether the SpriteLevel value is valid and sets it to minimum priority if it's invalid.
@@ -34,7 +34,7 @@ namespace Spaceio.Engine
             }
         }
 
-        public GameObject(Vec2i position, Engine engine)
+        protected GameObject(Vec2i position, Engine engine)
         {
             _position = position.Copy();
             Position = new ReadOnlyVec2i(_position);
@@ -66,7 +66,7 @@ namespace Spaceio.Engine
 
                     if (isColliding)
                     {
-                        _position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlaping.
+                        _position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlapping.
                         _position.Y -= y;
                         return false;
                     }
@@ -115,7 +115,7 @@ namespace Spaceio.Engine
                                 {
                                     isColliding = true;
 
-                                    // Collsion detected
+                                    // Collision detected
                                     OnCollision(gameObject);
                                     gameObject.OnCollision(this);
                                 }
@@ -163,7 +163,7 @@ namespace Spaceio.Engine
             Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
-        // Completes data after the GameObject has been serilized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
+        // Completes data after the GameObject has been serialized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
         public virtual void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
         {
             Engine = engine;

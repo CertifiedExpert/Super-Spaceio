@@ -5,16 +5,16 @@ namespace Spaceio.Engine
     [DataContract]
     class GameObjectManager
     {
-        private Engine engine;
+        private Engine Engine { get; set; }
 
         public GameObjectManager(Engine engine)
         {
-            this.engine = engine;
+            Engine = engine;
         }
 
         public void Update()
         {
-            foreach (var chunk in engine.ChunkManager.loadedChunks)
+            foreach (var chunk in Engine.ChunkManager.loadedChunks)
             {
                 foreach (var gameObject in chunk.gameObjectsToAdd)
                 {
@@ -39,26 +39,26 @@ namespace Spaceio.Engine
 
         public void AddGameObject(GameObject gameObject)
         {
-            var chunkX = gameObject.Position.X / engine.Settings.chunkSize;
-            var chunkY = gameObject.Position.Y / engine.Settings.chunkSize;
+            var chunkX = gameObject.Position.X / Engine.Settings.chunkSize;
+            var chunkY = gameObject.Position.Y / Engine.Settings.chunkSize;
 
-            gameObject.Chunk = engine.chunks[chunkX, chunkY];
-            if (engine.ChunkManager.IsChunkLoaded(chunkX, chunkY))
-                engine.chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
+            gameObject.Chunk = Engine.chunks[chunkX, chunkY];
+            if (Engine.ChunkManager.IsChunkLoaded(chunkX, chunkY))
+                Engine.chunks[chunkX, chunkY].gameObjectsToAdd.Add(gameObject);
             else
-                engine.unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
+                Engine.unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject);
         }
 
         public void RemoveGameObject(GameObject gameObject)
         {
-            if (engine.ChunkManager.IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
+            if (Engine.ChunkManager.IsChunkLoaded(gameObject.Chunk)) gameObject.Chunk.gameObjectsToRemove.Add(gameObject);
             else
-                engine.unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
+                Engine.unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject);
         }
 
         public void CompleteDataAfterDeserialization(Engine engine)
         {
-            this.engine = engine;
+            Engine = engine;
         }
     }
 }

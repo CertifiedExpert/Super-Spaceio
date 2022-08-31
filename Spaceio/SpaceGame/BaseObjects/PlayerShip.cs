@@ -23,14 +23,14 @@ namespace SpaceGame
             movementSprites[7] = new Sprite(ResourceManager.fighter1DownRight);
             ThrustStrength = 4;
 
-            OnChunkTraverse(Position.X / Game.Settings.chunkSize, Position.Y / Game.Settings.chunkSize); // Call this with the curren position in order to load in chunks for the first time
+            OnChunkTraverse(Position.X / Game.Settings.chunkSize, Position.Y / Game.Settings.chunkSize); // Call this with the current position in order to load in chunks for the first time
         }
 
         public override void Update()
         {
             base.Update();
 
-            MoveThroughImput();
+            MoveThroughInput();
         }
 
         public override bool MoveGameObject(int x, int y)
@@ -46,26 +46,26 @@ namespace SpaceGame
             return result;
         }
 
-        private void MoveThroughImput()
+        private void MoveThroughInput()
         {
-            if (Game.milisecondsSinceLastPlayerMove > Game.milisecondsPerPlayerMove)
+            if (Game.millisecondsSinceLastPlayerMove > Game.millisecondsPerPlayerMove)
             {
-                if (Game.ImputManager.W.IsPressed && Game.ImputManager.D.IsPressed) ApplyForce(new Vec2f(1, 1) * ThrustStrength);
-                else if (Game.ImputManager.W.IsPressed && Game.ImputManager.A.IsPressed) ApplyForce(new Vec2f(-1, 1) * ThrustStrength);
-                else if (Game.ImputManager.S.IsPressed && Game.ImputManager.D.IsPressed) ApplyForce(new Vec2f(1, -1) * ThrustStrength);
-                else if (Game.ImputManager.S.IsPressed && Game.ImputManager.A.IsPressed) ApplyForce(new Vec2f(-1, -1) * ThrustStrength);
-                else if (Game.ImputManager.W.IsPressed) ApplyForce(new Vec2f(0, 1) * ThrustStrength);
-                else if (Game.ImputManager.A.IsPressed) ApplyForce(new Vec2f(-1, 0) * ThrustStrength);
-                else if (Game.ImputManager.S.IsPressed) ApplyForce(new Vec2f(0, -1) * ThrustStrength);
-                else if (Game.ImputManager.D.IsPressed) ApplyForce(new Vec2f(1, 0) * ThrustStrength);
+                if (Game.InputManager.W.IsPressed && Game.InputManager.D.IsPressed) ApplyForce(new Vec2f(1, 1) * ThrustStrength);
+                else if (Game.InputManager.W.IsPressed && Game.InputManager.A.IsPressed) ApplyForce(new Vec2f(-1, 1) * ThrustStrength);
+                else if (Game.InputManager.S.IsPressed && Game.InputManager.D.IsPressed) ApplyForce(new Vec2f(1, -1) * ThrustStrength);
+                else if (Game.InputManager.S.IsPressed && Game.InputManager.A.IsPressed) ApplyForce(new Vec2f(-1, -1) * ThrustStrength);
+                else if (Game.InputManager.W.IsPressed) ApplyForce(new Vec2f(0, 1) * ThrustStrength);
+                else if (Game.InputManager.A.IsPressed) ApplyForce(new Vec2f(-1, 0) * ThrustStrength);
+                else if (Game.InputManager.S.IsPressed) ApplyForce(new Vec2f(0, -1) * ThrustStrength);
+                else if (Game.InputManager.D.IsPressed) ApplyForce(new Vec2f(1, 0) * ThrustStrength);
 
                 Game.playerMovedInThisFrame = true;
-                Game.milisecondsSinceLastPlayerMove = 0;
+                Game.millisecondsSinceLastPlayerMove = 0;
             }
             else
             {
                 Game.playerMovedInThisFrame = false;
-                Game.milisecondsSinceLastPlayerMove += Game.deltaTime;
+                Game.millisecondsSinceLastPlayerMove += Game.deltaTime;
             }
         }
 
@@ -82,18 +82,18 @@ namespace SpaceGame
                 }
             }
 
-            var begginX = chunkX - Game.chunkLoadRadius + 1;
-            var begginY = chunkY - Game.chunkLoadRadius + 1;
-            if (begginX < 0) begginX = 0;
-            if (begginY < 0) begginY = 0;
+            var beginX = chunkX - Game.chunkLoadRadius + 1;
+            var beginY = chunkY - Game.chunkLoadRadius + 1;
+            if (beginX < 0) beginX = 0;
+            if (beginY < 0) beginY = 0;
             var endX = chunkX + Game.chunkLoadRadius - 1;
             var endY = chunkY + Game.chunkLoadRadius - 1;
             if (endX >= Game.chunks.GetLength(0)) endX = 0;
             if (endY >= Game.chunks.GetLength(1)) endY = 0;
 
-            for (var y = begginY; y <= endY; y++)
+            for (var y = beginY; y <= endY; y++)
             {
-                for (var x = begginX; x <= endX; x++)
+                for (var x = beginX; x <= endX; x++)
                 {
                     if (Game.ChunkManager.IsChunkLoaded(x, y))
                     {

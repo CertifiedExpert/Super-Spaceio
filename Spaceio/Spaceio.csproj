@@ -59,7 +59,7 @@
     <Compile Include="Engine\Imput\Button.cs" />
     <Compile Include="Engine\Graphics\Camera.cs" />
     <Compile Include="Engine\Core\Engine.cs" />
-    <Compile Include="Engine\Imput\ImputManager.cs" />
+    <Compile Include="Engine\Imput\InputManager.cs" />
     <Compile Include="Engine\Misc\Util.cs" />
     <Compile Include="Engine\Misc\ResourceManager.cs" />
     <Compile Include="Engine\Graphics\Sprite.cs" />

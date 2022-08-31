@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
 using System.IO;
-using System.Reflection;
 
 namespace Spaceio.Engine
 {
@@ -15,24 +14,13 @@ namespace Spaceio.Engine
 
         // Systems
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
-        [DataMember] public Renderer Renderer { get; set; } // The current renderer of the game.
-        [DataMember] public ImputManager ImputManager { get; private set; } // The current imput renderer of the game.
-        [DataMember] public Serializer Serializer { get; private set; } // The current serializer of the game.
-        [DataMember] public ChunkManager ChunkManager { get; private set; }
-        [DataMember] public GameObjectManager GameObjectManager { get; private set; }
+        [DataMember] public Renderer Renderer { get; set; } // The renderer of the game.
+        [DataMember] public InputManager InputManager { get; private set; } // The input renderer of the game.
+        [DataMember] public Serializer Serializer { get; private set; } // The serializer of the game.
+        [DataMember] public ChunkManager ChunkManager { get; private set; } // The chunk manager of the game.
+        [DataMember] public GameObjectManager GameObjectManager { get; private set; } // The game object manager of the game.
+        [DataMember] public Camera Camera { get; private set; } // The camera used in the engine. 
 
-        private Camera _camera;
-
-        [DataMember]
-        public Camera Camera // The camera used in the engine. Each time the camera is changed and its size is different from the current camera create a new renderer. (Renderer is critically dependent on the cammera size because it uses it as a viewport.)
-        {
-            get { return _camera; } //TODO: remove this. Changing settings will come later on
-            private set
-            {
-                if (_camera != null && _camera.Size.X == value.Size.X && _camera.Size.Y == value.Size.Y) Renderer = new Renderer(this); // Only changes the Render if _camera is different from null because if it is null it means that the engine was just created and is being initialised, meaning that the Renderer wil be added later.
-                _camera = value;
-            }
-        }
         
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
         [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // TODO: make private and deserialize through reflection. A temporary variable used to save a 2d array of GameObject which needs to be added to a chunk after it gets loaded. (The position in the array corresponds to the chunk)
@@ -55,7 +43,6 @@ namespace Spaceio.Engine
         private DateTime lastFrame; // The time of last frame.
 
         // Debug
-        public readonly bool allowDebug = true;
         public readonly int debugLinesCount = 10;
         public readonly int debugLinesLength = 40;
         public string[] debugLines = new string[10];
@@ -66,8 +53,8 @@ namespace Spaceio.Engine
 
         #endregion
 
-        // Applicaton loop
-        public Engine()
+        // Application loop
+        protected Engine()
         {
             // Loading 
             OnEngineLoad();
@@ -95,13 +82,12 @@ namespace Spaceio.Engine
             }
 
             SaveGame();
-            GameObjectManager = new GameObjectManager(this);
         }
 
         // Called once on engine load. Initializes the engine.
         private void OnEngineLoad()
         {
-            pathRootFolder = GetAssemblyDirectory();
+            pathRootFolder = Util.GetAssemblyDirectory();
             pathSavesFolder = $"{pathRootFolder}\\Saves";
 
             SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
@@ -118,8 +104,8 @@ namespace Spaceio.Engine
         // Called once every frame
         private void EngineUpdate()
         {
-            // Registers imput.
-            ImputManager.UpdateImput(this);
+            // Registers input.
+            InputManager.UpdateInput(this);
 
             GameObjectManager.Update();
 
@@ -139,7 +125,7 @@ namespace Spaceio.Engine
                 
 
         #region FILES/LOADING/UNLOADING
-        // Saves the currnet state of the game including chunks and settings.
+        // Saves the current state of the game including chunks and settings.
         protected virtual void SaveGame()
         {
             Serializer.SaveKnownTypes($"{pathCurrentLoadedSave}\\knownTypes");
@@ -186,7 +172,7 @@ namespace Spaceio.Engine
             Settings = data.Settings;
             Renderer = data.Renderer;
             Renderer.CompleteDataAfterDeserialization(this);
-            ImputManager = data.ImputManager;
+            InputManager = data.InputManager;
             data.Serializer.knownTypes = Serializer.knownTypes;
             Serializer = data.Serializer;
             Camera = data.Camera;
@@ -199,7 +185,7 @@ namespace Spaceio.Engine
             // Initiate all necessary variables other than those depending on deserialization.
             SetupAllVariablesNotRelyingOnSerialization();
 
-            // Initialte variables depending on deserialization.
+            // Initiate variables depending on deserialization.
             unloadedChunkTransitionAddGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionAddGameObjects_serialize);
             unloadedChunkTransitionRemoveGameObjects = Util.UnJaggedize2dArray(data.unloadedChunkTransitionRemoveGameObject_serialize);
             var wasChunkLoadedMap2d = Util.UnJaggedize2dArray(data.wasChunkLoadedMap_serialize);
@@ -224,7 +210,7 @@ namespace Spaceio.Engine
             Settings = Serializer.FromFile<Settings>(settingsFilePath);
             Camera = new Camera(Settings.CameraStartPosition, new Vec2i(Settings.CameraSizeX, Settings.CameraSizeY));
             Renderer = new Renderer(this);
-            ImputManager = new ImputManager();
+            InputManager = new InputManager();
             ResourceManager.Init();
             ChunkManager = new ChunkManager(this);
             GameObjectManager = new GameObjectManager(this);
@@ -302,15 +288,6 @@ namespace Spaceio.Engine
                     chunks[x, y] = null;
                 }
             }
-        }
-
-        // Gets the assembly directory of the executable
-        public string GetAssemblyDirectory()
-        {
-            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
-            string path = Uri.UnescapeDataString(uri.Path);
-            return Path.GetDirectoryName(path);
         }
         #endregion
 

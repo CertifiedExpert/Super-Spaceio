@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 
 namespace Spaceio.Engine
 {
@@ -33,7 +35,7 @@ namespace Spaceio.Engine
             return output;
         }
 
-        // Converts an equal sized jagged array of T instances into a corresponiding 2d-array of T instances.
+        // Converts an equal sized jagged array of T instances into a corresponding 2d-array of T instances.
         public static T[,] UnJaggedize2dArray<T>(T[][] instance)
         {
             var output = new T[instance.Length, instance[0].Length];
@@ -48,6 +50,13 @@ namespace Spaceio.Engine
             return output;
         }
 
-        
+        // Gets the assembly directory of the executable
+        public static string GetAssemblyDirectory()
+        {
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            return Path.GetDirectoryName(path);
+        }
     }
 }

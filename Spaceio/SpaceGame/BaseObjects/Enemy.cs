@@ -17,10 +17,5 @@ namespace SpaceGame
             for (var i = 0; i < movementSprites.Length; i++) movementSprites[i] = new Sprite(ResourceManager.enemyDefault);
             ThrustStrength = 1;
         }
-
-        public override void Update()
-        {
-            base.Update();
-        }
     }
 }

@@ -19,7 +19,7 @@
         public static void Init()
         {
             #region FighterSprites
-            var fighter1UpSize = new Vec2i(9, 9);
+
             var fighter1UpBitmap = new char[9, 9]
             {
                 {' ',' ', ' ', ' ', '%',' ', ' ', ' ', ' '},
@@ -34,7 +34,6 @@
             };
             fighter1Up = new Bitmap(PrepareData(fighter1UpBitmap));
 
-            var fighter1DownSize = new Vec2i(9, 9);
             var fighter1DownBitmap = new char[9, 9]
             {
                 {' ',' ', '/', '#', ' ','#', '\\', ' ', ' '},
@@ -49,7 +48,6 @@
             };
             fighter1Down = new Bitmap(PrepareData(fighter1DownBitmap));
 
-            var fighter1RightSize = new Vec2i(9, 9);
             var fighter1RightBitmap = new char[9, 9]
             {
                 {' ','@', '―', '-', ' ',' ', ' ', ' ', ' '},
@@ -63,9 +61,8 @@
                 {' ','@', '―', '-', ' ',' ', ' ', ' ', ' '},
             };
             fighter1Right = new Bitmap(PrepareData(fighter1RightBitmap));
-            
 
-            var fighter1LeftSize = new Vec2i(9, 9);
+
             var fighter1LeftBitmap = new char[9, 9]
             {
                 {' ',' ', ' ', ' ', ' ','-', '―', '@', ' '},
@@ -79,9 +76,8 @@
                 {' ',' ', ' ', ' ', ' ','-', '―', '@', ' '},
             };
             fighter1Left = new Bitmap(PrepareData(fighter1LeftBitmap));
-            
 
-            var fighter1UpLeftSize = new Vec2i(9, 9);
+
             var fighter1UpLeftBitmap = new char[9, 9]
             {
                 {'%','%', '%', ' ', ' ',' ', '\\', ' ', ' '},
@@ -96,7 +92,6 @@
             };
             fighter1UpLeft = new Bitmap(PrepareData(fighter1UpLeftBitmap));
 
-            var fighter1UpRightSize = new Vec2i(9, 9);
             var fighter1UpRightBitmap = new char[9, 9]
             {
                 {' ',' ', '/', ' ', ' ',' ', '%', '%', '%'},
@@ -111,7 +106,6 @@
             };
             fighter1UpRight = new Bitmap(PrepareData(fighter1UpRightBitmap));
 
-            var fighter1DownLeftSize = new Vec2i(9, 9);
             var fighter1DownLeftBitmap = new char[9, 9]
             {
                 {' ',' ', '@', ' ', ' ',' ', ' ', ' ', ' '},
@@ -126,7 +120,6 @@
             };
             fighter1DownLeft = new Bitmap(PrepareData(fighter1DownLeftBitmap));
 
-            var fighter1DownRightSize = new Vec2i(9, 9);
             var fighter1DownRightBitmap = new char[9, 9]
             {
                 {' ',' ', ' ', ' ', ' ',' ', '@', ' ', ' '},
@@ -143,7 +136,7 @@
             #endregion
 
             #region EnemyDefaults
-            var enemyDefaultSize = new Vec2i(3, 4);
+
             var enemyDefaultBitmap = new char[4, 3]
             {
                 {' ', '#', ' '},
@@ -153,7 +146,6 @@
             };
             enemyDefault = new Bitmap(PrepareData(enemyDefaultBitmap));
 
-            var enemyDefault2Size = new Vec2i(3, 4);
             var enemyDefault2Bitmap = new char[4, 3]
             {
                 {' ', '#', ' '},
@@ -164,8 +156,7 @@
             enemyDefault2 = new Bitmap(PrepareData(enemyDefault2Bitmap));
             #endregion
 
-            var asteroidSize = new Vec2i(18, 18);
-            var asteroidBitamp = new char[18, 18]
+            var asteroidBitmap = new char[18, 18]
             {
                 {' ', ' ', ' ', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                 {' ', ' ', ' ', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
@@ -187,7 +178,7 @@
                 {' ', ' ', ' ', ' ', ' ', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛', '⬛'},
             };
 
-            asteroid = new Bitmap(PrepareData(asteroidBitamp));
+            asteroid = new Bitmap(PrepareData(asteroidBitmap));
         }
 
 
