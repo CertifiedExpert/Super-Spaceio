@@ -64,6 +64,8 @@
     <Compile Include="Engine\Misc\ResourceManager.cs" />
     <Compile Include="Engine\Graphics\Sprite.cs" />
     <Compile Include="Engine\Math\Vec2f.cs" />
+    <Compile Include="Engine\UI\UIComponent.cs" />
+    <Compile Include="Engine\UI\UIPanel.cs" />
     <Compile Include="SpaceGame\BaseObjects\Asteroid.cs" />
     <Compile Include="SpaceGame\BaseObjects\BaseObject.cs" />
     <Compile Include="SpaceGame\BaseObjects\Enemy.cs" />
