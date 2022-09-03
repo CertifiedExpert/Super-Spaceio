@@ -104,7 +104,7 @@ namespace Spaceio.Engine
             Console.WriteLine(finalString);
         }
 
-        // Writes the GameObject's Sprites into the screenBuffer. //TODO: might wanna check if the transparency is preserved because it seems like it is not.
+        // Writes the GameObject's Sprites into the screenBuffer. //TODO: might wanna check if the transparency is preserved because it seems like it is not + set a universal transparency color in Settings.cs for the entire engine
         private void WriteGameObjectSpritesToScreenBuffer(GameObject gameObject) 
         {
             foreach (var sprite in gameObject.Sprites)
@@ -132,15 +132,15 @@ namespace Spaceio.Engine
                 } 
             }
         }
-        // Renders the Sprite of the provided parent UIPanel to the screenBuffer.
+        // Renders the Sprite of the provided parent UIPanel to the screenBuffer. 
         private void WriteParentPanelToScreenBuffer(UIPanel uiPanel)
         {
-            var sprite = uiPanel.GetDrawnPanelSprite();
+            var sprite = uiPanel.GetParentPanelSprite();
             for (var x = 0; x < sprite.Bitmap.Size.X; x++)
             {
                 for (var y = 0; y < sprite.Bitmap.Size.Y; y++)
                 {
-                    if (sprite.Bitmap.Data[x, y] != ' ') screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.Bitmap.Data[x, y];
+                    screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.Bitmap.Data[x, y];
                 }
             }
         }

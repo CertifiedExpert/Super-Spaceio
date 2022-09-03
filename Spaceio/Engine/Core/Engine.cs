@@ -9,7 +9,7 @@ namespace Spaceio.Engine
     [DataContract(IsReference = true)]
     abstract class Engine
     {
-        // Systems.
+        // Systems. TODO: change ObservableCollection to ReadOnlyCollection
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
         [DataMember] public Renderer Renderer { get; set; } // The renderer of the game.
         [DataMember] public InputManager InputManager { get; private set; } // The input renderer of the game.
@@ -101,6 +101,8 @@ namespace Spaceio.Engine
         {
             // Registers input.
             InputManager.UpdateInput(this);
+
+            UIManager.Update();
 
             GameObjectManager.Update();
 

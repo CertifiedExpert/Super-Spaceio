@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
@@ -12,45 +13,85 @@ namespace Spaceio.Engine
 {
     abstract class UIPanel
     {
+        public Engine Engine { get; private set; }
         public Vec2i Position { get; private set; }
         public Vec2i Size { get; private set; }
         public int Priority { get; private set; }
 
         private List<UIComponent> _uiComponents;
-        public ObservableCollection<UIComponent> UIComponents { get; }
+        public ReadOnlyCollection<UIComponent> UIComponents { get; }
         
         
         private List<UIPanel> _uiPanels;
-        public ObservableCollection<UIPanel> UIPanels { get; }
+        public ReadOnlyCollection<UIPanel> UIPanels { get; }
         
-
-        public UIPanel()
+        public UIPanel(Engine engine)
         {
+            Engine = engine;
             _uiComponents = new List<UIComponent>();
-            UIComponents = new ObservableCollection<UIComponent>(_uiComponents);
+            UIComponents = _uiComponents.AsReadOnly();
             _uiPanels = new List<UIPanel>();
-            UIPanels = new ObservableCollection<UIPanel>(_uiPanels);
+            UIPanels = _uiPanels.AsReadOnly();
         }
 
-        public Sprite GetDrawnPanelSprite()
+        public virtual void Update()
+        {
+            foreach (var uiPanel in UIPanels) uiPanel.Update();
+            foreach (var uiComponent in UIComponents) uiComponent.Update();
+        }
+
+        public void AddUIPanel(UIPanel otherUIPanel)
+        {
+            if (IsUIPanelOutsideOfCamera())
+                throw new UIException("The UIPanel being added was partially or fully outside of its parent UIPanel");
+            else _uiPanels.Add(otherUIPanel);
+        }
+        public void RemoveUIPanel(UIPanel otherUIPanel)
+        {
+            _uiPanels.Remove(otherUIPanel);
+        }
+        public void AddUIComponent(UIComponent uiComponent)
+        {
+            if (uiComponent.IsUIComponentOutsideOfPanel(this)) 
+                throw new UIException("The UIComponent being added was partially or fully outside of its parent UIPanel");
+            else _uiComponents.Add(uiComponent);
+        }
+        public void RemoveUIComponent(UIComponent uiComponent)
+        {
+            _uiComponents.Remove(uiComponent);
+        }
+
+        public bool IsUIPanelOutsideOfCamera()
+        {
+            if (Position.X < 0 ||
+                Position.X + Size.X > Engine.Settings.CameraSizeX ||
+                Position.Y < 0 ||
+                Position.Y + Size.Y > Engine.Settings.CameraSizeY)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public Sprite GetParentPanelSprite()
         {
             var bitmap = new Bitmap(new char[Size.X, Size.Y]);
 
+            // Creates a non-transparent background.
+            bitmap.FillWith(' ');
+            
             // Draw the parent
-            AdditionalDrawPanelToBitmapInstructions(bitmap);
-            foreach (var uiComponent in UIComponents) uiComponent.DrawComponentToBitmap(bitmap);
+            DrawPanelToBitmap(bitmap);
             
             // Draw the children (starting with minimal priority)
             var sortedPanels = SortChildrenUIPanelsByPriority(this);
-            foreach (var panel in sortedPanels)
-            {
-                panel.AdditionalDrawPanelToBitmapInstructions(bitmap);
-                foreach (var uiComponent in panel.UIComponents) uiComponent.DrawComponentToBitmap(bitmap);
-            }
+            foreach (var panel in sortedPanels) panel.DrawPanelToBitmap(bitmap);
 
             return new Sprite(bitmap);
         }
-        protected static IEnumerable<UIPanel> SortChildrenUIPanelsByPriority(UIPanel uiPanel)
+        protected virtual void AdditionalDrawPanelToBitmapInstructions(Bitmap bitmap) { }
+        private static IEnumerable<UIPanel> SortChildrenUIPanelsByPriority(UIPanel uiPanel)
         {
             var allUIPanels = new List<UIPanel>();
 
@@ -74,8 +115,10 @@ namespace Spaceio.Engine
 
             return allUIPanels.OrderByDescending(p => p.Priority);
         }
-
-        protected virtual void AdditionalDrawPanelToBitmapInstructions(Bitmap bitmap) { }
-
+        private void DrawPanelToBitmap(Bitmap bitmap)
+        {
+            AdditionalDrawPanelToBitmapInstructions(bitmap);
+            foreach (var uiComponent in UIComponents) uiComponent.DrawComponentToBitmap(bitmap);
+        }
     }
 }

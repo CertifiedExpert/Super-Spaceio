@@ -1,4 +1,7 @@
-﻿namespace Spaceio.Engine
+﻿using System;
+using System.Configuration;
+
+namespace Spaceio.Engine
 {
     class Bitmap
     {
@@ -22,6 +25,17 @@
             }
 
             return bitmap;
+        }
+
+        public void FillWith(char fillChar)
+        {
+            for (var x = 0; x < Size.X; x++)
+            {
+                for (var y = 0; y < Size.Y; y++)
+                {
+                    Data[x, y] = fillChar;
+                }
+            }
         }
     }
 }
