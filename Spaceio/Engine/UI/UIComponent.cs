@@ -8,12 +8,14 @@ namespace Spaceio.Engine.UI
 {
     abstract class UIComponent
     {
-        public ReadOnlyVec2i _position;
         public Vec2i Position { get; private set; }
+        public Vec2i Size { get; }
 
         public UIComponent()
         {
-            _position = new ReadOnlyVec2i(Position);
+            
         }
+
+        public abstract void DrawComponentToBitmap(Bitmap bitmap);
     }
 }

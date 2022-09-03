@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Spaceio.Engine
 {
@@ -28,6 +30,7 @@ namespace Spaceio.Engine
 
             DrawGameObjectsToFrameBuffer();
             DrawDebugLines();
+            DrawUI();
 
             Draw();
         }
@@ -53,7 +56,7 @@ namespace Spaceio.Engine
                 {
                     foreach (var gameObject in chunk.gameObjectRenderLists[level])
                     {
-                        WriteSpritesToScreenBuffer(gameObject);
+                        WriteGameObjectSpritesToScreenBuffer(gameObject);
                     }
                 }
             }
@@ -70,6 +73,14 @@ namespace Spaceio.Engine
                         Engine.Camera.Size.Y - i * 2 - 1] = Engine.debugLines[i][x];
                 }
             }
+        }
+        // Draws the UI of the engine
+        private void DrawUI()
+        {
+            // Order parentUIPanels by descending priority.
+            var orderedPanels = Engine.UIManager.ParentUIPanels.OrderByDescending(p => p.Priority);
+
+            foreach (var panel in orderedPanels) WriteParentPanelToScreenBuffer(panel);
         }
 
         // Draws the contents of the screenBuffer to the console with pixelSpacingCharacters in between them to account for the unequal ration of height and width of unicode characters.
@@ -93,8 +104,8 @@ namespace Spaceio.Engine
             Console.WriteLine(finalString);
         }
 
-        // Writes the GameObject's Sprites into the screenBuffer.
-        public void WriteSpritesToScreenBuffer(GameObject gameObject) 
+        // Writes the GameObject's Sprites into the screenBuffer. //TODO: might wanna check if the transparency is preserved because it seems like it is not.
+        private void WriteGameObjectSpritesToScreenBuffer(GameObject gameObject) 
         {
             foreach (var sprite in gameObject.Sprites)
             {
@@ -119,6 +130,18 @@ namespace Spaceio.Engine
                         }
                     }
                 } 
+            }
+        }
+        // Renders the Sprite of the provided parent UIPanel to the screenBuffer.
+        private void WriteParentPanelToScreenBuffer(UIPanel uiPanel)
+        {
+            var sprite = uiPanel.GetDrawnPanelSprite();
+            for (var x = 0; x < sprite.Bitmap.Size.X; x++)
+            {
+                for (var y = 0; y < sprite.Bitmap.Size.Y; y++)
+                {
+                    if (sprite.Bitmap.Data[x, y] != ' ') screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.Bitmap.Data[x, y];
+                }
             }
         }
 
