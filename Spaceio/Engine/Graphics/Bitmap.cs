@@ -29,9 +29,26 @@ namespace Spaceio.Engine
 
         public void FillWith(char fillChar)
         {
-            for (var x = 0; x < Size.X; x++)
+            DrawFilledSquare(new Vec2i(0, 0), Size, fillChar);
+        }
+        public void DrawLine(Vec2i startPoint, Vec2i endPoint, char fillChar)
+        {
+
+        }
+        public void DrawSquareOutline(Vec2i bottomLeftCorner, Vec2i size, char fillChar)
+        {
+            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y), fillChar);
+            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y), fillChar);
+            DrawLine(new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y), new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y + size.Y), fillChar);
+            DrawLine(new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y), new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y + size.Y), fillChar);
+        }
+        public void DrawFilledSquare(Vec2i bottomLeftCorner, Vec2i size, char fillChar)
+        {
+            var endX = bottomLeftCorner.X + size.X;
+            var endY = bottomLeftCorner.Y + size.Y;
+            for (var x = bottomLeftCorner.X; x < endX; x++)
             {
-                for (var y = 0; y < Size.Y; y++)
+                for (var y = bottomLeftCorner.Y; y < endY; y++)
                 {
                     Data[x, y] = fillChar;
                 }

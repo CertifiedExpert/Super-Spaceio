@@ -5,16 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Spaceio.Engine.UI
+namespace Spaceio.Engine
 {
     abstract class UIComponent
     {
         public Vec2i Position { get; private set; }
-        public Vec2i Size { get; }
+        public Vec2i Size { get; private set; }
 
         public abstract void Update();
         public abstract void DrawComponentToBitmap(Bitmap bitmap);
 
+        public UIComponent(Vec2i position, Vec2i size)
+        {
+            Position = position;
+            Size = size;
+        }
+
+        public void Validate(UIPanel parent)
+        {
+            if (IsUIComponentOutsideOfPanel(parent))
+                throw new UIException("The UIComponent being added was partially or fully outside of its parent UIPanel");
+        }
         public bool IsUIComponentOutsideOfPanel(UIPanel uiPanel)
         {
             if (Position.X < uiPanel.Position.X ||

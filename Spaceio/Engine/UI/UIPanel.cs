@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using Spaceio.Engine.UI;
 
 namespace Spaceio.Engine
 {
@@ -17,6 +16,7 @@ namespace Spaceio.Engine
         public Vec2i Position { get; private set; }
         public Vec2i Size { get; private set; }
         public int Priority { get; private set; }
+        public char Background { get; set; }
 
         private List<UIComponent> _uiComponents;
         public ReadOnlyCollection<UIComponent> UIComponents { get; }
@@ -25,13 +25,17 @@ namespace Spaceio.Engine
         private List<UIPanel> _uiPanels;
         public ReadOnlyCollection<UIPanel> UIPanels { get; }
         
-        public UIPanel(Engine engine)
+        public UIPanel(Vec2i position, Vec2i size, int priority, Engine engine)
         {
             Engine = engine;
             _uiComponents = new List<UIComponent>();
             UIComponents = _uiComponents.AsReadOnly();
             _uiPanels = new List<UIPanel>();
             UIPanels = _uiPanels.AsReadOnly();
+
+            Position = position;
+            Size = size;
+            Priority = priority;
         }
 
         public virtual void Update()
@@ -40,27 +44,36 @@ namespace Spaceio.Engine
             foreach (var uiComponent in UIComponents) uiComponent.Update();
         }
 
-        public void AddUIPanel(UIPanel otherUIPanel)
+        public void AddUIPanel(UIPanel childUIPanel)
         {
-            if (IsUIPanelOutsideOfCamera())
-                throw new UIException("The UIPanel being added was partially or fully outside of its parent UIPanel");
-            else _uiPanels.Add(otherUIPanel);
+            childUIPanel.Validate(this);
+            _uiPanels.Add(childUIPanel);
         }
-        public void RemoveUIPanel(UIPanel otherUIPanel)
+        public void RemoveUIPanel(UIPanel childUIPanel)
         {
-            _uiPanels.Remove(otherUIPanel);
+            _uiPanels.Remove(childUIPanel);
         }
         public void AddUIComponent(UIComponent uiComponent)
         {
-            if (uiComponent.IsUIComponentOutsideOfPanel(this)) 
-                throw new UIException("The UIComponent being added was partially or fully outside of its parent UIPanel");
-            else _uiComponents.Add(uiComponent);
+            uiComponent.Validate(this);
+            _uiComponents.Add(uiComponent);
         }
         public void RemoveUIComponent(UIComponent uiComponent)
         {
             _uiComponents.Remove(uiComponent);
         }
 
+        public void Validate(UIPanel parent = null)
+        {
+            if (IsUIPanelOutsideOfCamera())
+                throw new UIException("The UIPanel being added was partially or fully outside of the engine camera");
+            
+            if (parent != null)
+            {
+                if (IsUIPanelOutsideOfParentPanel(parent))
+                    throw new UIException("The UIPanel being added was partially or fully outside of the parent UIPanel");
+            }
+        }
         public bool IsUIPanelOutsideOfCamera()
         {
             if (Position.X < 0 ||
@@ -73,13 +86,25 @@ namespace Spaceio.Engine
 
             return false;
         }
+        public bool IsUIPanelOutsideOfParentPanel(UIPanel parent)
+        {
+            if (Position.X < parent.Position.X ||
+                Position.X + Size.X > parent.Position.X + parent.Size.X ||
+                Position.Y < parent.Position.X ||
+                Position.Y + Size.Y > parent.Position.Y + parent.Size.Y)
+            {
+                return true;
+            }
+            return false;
+        }
 
+        
         public Sprite GetParentPanelSprite()
         {
             var bitmap = new Bitmap(new char[Size.X, Size.Y]);
 
             // Creates a non-transparent background.
-            bitmap.FillWith(' ');
+            bitmap.FillWith(Background);
             
             // Draw the parent
             DrawPanelToBitmap(bitmap);

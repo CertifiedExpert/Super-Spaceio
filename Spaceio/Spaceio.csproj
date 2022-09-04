@@ -68,6 +68,7 @@
     <Compile Include="Engine\UI\UIComponent.cs" />
     <Compile Include="Engine\UI\UIManager.cs" />
     <Compile Include="Engine\UI\UIPanel.cs" />
+    <Compile Include="Engine\UI\UITextBox.cs" />
     <Compile Include="SpaceGame\BaseObjects\Asteroid.cs" />
     <Compile Include="SpaceGame\BaseObjects\BaseObject.cs" />
     <Compile Include="SpaceGame\BaseObjects\Enemy.cs" />

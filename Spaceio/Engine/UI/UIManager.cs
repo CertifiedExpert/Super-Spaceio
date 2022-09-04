@@ -30,9 +30,8 @@ namespace Spaceio.Engine
 
         public void AddParentUIPanel(UIPanel uiPanel)
         {
-            if (uiPanel.IsUIPanelOutsideOfCamera()) 
-                throw new UIException("The ParentUIPanel being added was partially or fully outside of the engine camera");
-            else _parentUIPanels.Add(uiPanel);
+            uiPanel.Validate();
+            _parentUIPanels.Add(uiPanel);
         }
         public void RemoveParentUIPanel(UIPanel uiPanel)
         {
