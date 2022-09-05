@@ -33,7 +33,7 @@ namespace Spaceio.Engine
         }
         public void DrawLine(Vec2i startPoint, Vec2i endPoint, char fillChar)
         {
-
+            throw new NotImplementedException();
         }
         public void DrawSquareOutline(Vec2i bottomLeftCorner, Vec2i size, char fillChar)
         {
