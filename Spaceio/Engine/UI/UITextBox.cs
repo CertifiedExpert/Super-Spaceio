@@ -15,9 +15,10 @@ namespace Spaceio.Engine
         public char? Outline { get; set; } // Null means no outline.
         public bool SpacedLetters { get; set; }
         public Vec2i TextPosition { get; set; }
-        public UITextBox(Vec2i position, Vec2i size, string text, char? outline = null, bool? spacedLetters = null) : base(position, size)
+        public UITextBox(Vec2i position, Vec2i size, Vec2i textPosition, string text, char? outline = null, bool? spacedLetters = null) : base(position, size)
         {
             Text = text;
+            TextPosition = textPosition;
             Outline = outline;
             SpacedLetters = spacedLetters ?? false;
         }
@@ -29,22 +30,27 @@ namespace Spaceio.Engine
 
         public override void DrawComponentToBitmap(Bitmap bitmap)
         {
+            bitmap.FillWith(Background);
+            
             if (Outline != null)
             {
-                bitmap.FillWith(Background);
-                bitmap.DrawRectangleOutline(Position, Size, Outline.Value);
+                bitmap.DrawRectangleOutline(Position, Size - new Vec2i(1, 1), Outline.Value);
             }
 
             if (SpacedLetters)
-            { 
-                for (var i = 0; i < Text.Length; i++)
+            {
+                var limit = (Size.X - TextPosition.X + 1) / 2;
+                limit = Math.Min(limit, Text.Length);
+                for (var i = 0; i < limit; i++)
                 {
                     bitmap.Data[TextPosition.X + 2 * i, TextPosition.Y] = Text[i];
                 }
             }
             else
             {
-                for (var i = 0; i < Text.Length; i++)
+                var limit = Size.X - TextPosition.X;
+                limit = Math.Min(limit, Text.Length);
+                for (var i = 0; i < limit; i++)
                 {
                     bitmap.Data[TextPosition.X + i, TextPosition.Y] = Text[i];
                 }

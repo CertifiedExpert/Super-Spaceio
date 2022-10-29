@@ -75,10 +75,10 @@ namespace Spaceio.Engine
         }
         public void DrawRectangleOutline(Vec2i bottomLeftCorner, Vec2i size, char fillChar)
         {
-            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y), fillChar);
-            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y), fillChar);
-            DrawLine(new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y), new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y + size.Y), fillChar);
-            DrawLine(new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y), new Vec2i(bottomLeftCorner.X + size.X, bottomLeftCorner.Y + size.Y), fillChar);
+            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y - 1), fillChar);
+            DrawLine(bottomLeftCorner, new Vec2i(bottomLeftCorner.X + size.X - 1, bottomLeftCorner.Y), fillChar);
+            DrawLine(new Vec2i(bottomLeftCorner.X, bottomLeftCorner.Y + size.Y - 1), new Vec2i(bottomLeftCorner.X + size.X - 1, bottomLeftCorner.Y + size.Y - 1), fillChar);
+            DrawLine(new Vec2i(bottomLeftCorner.X + size.X - 1, bottomLeftCorner.Y), new Vec2i(bottomLeftCorner.X + size.X - 1, bottomLeftCorner.Y + size.Y - 1), fillChar);
         }
         public void DrawFilledRectangle(Vec2i bottomLeftCorner, Vec2i size, char fillChar)
         {

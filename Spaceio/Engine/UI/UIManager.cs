@@ -6,13 +6,14 @@ using System.Runtime.Serialization;
 
 namespace Spaceio.Engine
 {
-    //TODO: serialization
+    //TODO: serialization (if necessary)
+    //TODO: exception and error handling
     [DataContract]
     class UIManager 
     {
         public Engine Engine { get; private set; }
 
-        [DataMember]
+        //[DataMember]
         List<UIPanel> _parentUIPanels;
         public ReadOnlyCollection<UIPanel> ParentUIPanels { get; private set; }
 
@@ -41,7 +42,7 @@ namespace Spaceio.Engine
         public void CompleteDataAfterDeserialization(Engine engine)
         {
             Engine = engine;
-            ParentUIPanels = _parentUIPanels.AsReadOnly();
+            //ParentUIPanels = _parentUIPanels.AsReadOnly();
         }
     }
 }

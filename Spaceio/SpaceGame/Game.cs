@@ -17,28 +17,33 @@ namespace SpaceGame
         public bool playerMovedInThisFrame = false;
         protected override void OnLoad()
         {
-            //AddNewSaveFiles("test");
-            //SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
-            //FillCurrentSaveWithEmptyChunks();
-            //
-            //Serializer.knownTypes.Add(typeof(Game));
-            //Serializer.knownTypes.Add(typeof(BaseObject));
-            //Serializer.knownTypes.Add(typeof(Asteroid));
-            //Serializer.knownTypes.Add(typeof(Ship));
-            //Serializer.knownTypes.Add(typeof(PlayerShip));
-            //Serializer.knownTypes.Add(typeof(Enemy));
-            //
-            //var enm = new Enemy(new Vec2i(5, 5), 1, this);
-            //AddBaseObject(enm);
-            //enemy = new GoBind(enm, "enemy", this);
-            //
-            //var p = new PlayerShip(new Vec2i(40, 40), 1, this);
-            //AddBaseObject(p);
-            //playerShip = new GoBind(p, "playerShip", this);
-            //
-            //LoadLevel();
+            AddNewSaveFiles("test");
+            SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
+            FillCurrentSaveWithEmptyChunks();
             
-            LoadSavedData("test");
+            Serializer.knownTypes.Add(typeof(Game));
+            Serializer.knownTypes.Add(typeof(BaseObject));
+            Serializer.knownTypes.Add(typeof(Asteroid));
+            Serializer.knownTypes.Add(typeof(Ship));
+            Serializer.knownTypes.Add(typeof(PlayerShip));
+            Serializer.knownTypes.Add(typeof(Enemy));
+            
+            var enm = new Enemy(new Vec2i(5, 5), 1, this);
+            AddBaseObject(enm);
+            enemy = new GoBind(enm, "enemy", this);
+            
+            var p = new PlayerShip(new Vec2i(40, 40), 1, this);
+            AddBaseObject(p);
+            playerShip = new GoBind(p, "playerShip", this);
+            
+            LoadLevel();
+            
+            //LoadSavedData("test");
+
+            var parentPanel = new UIPanel(new Vec2i(0, 0), new Vec2i(40, 20), 1, this);
+            UIManager.AddParentUIPanel(parentPanel);
+            var txtbox = new UITextBox(new Vec2i(0, 0), new Vec2i(5, 5), new Vec2i(0, 0), "abcdefgh", null, true);
+            parentPanel.AddUIComponent(txtbox);
         }
 
         protected override void Update()

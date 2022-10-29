@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
 namespace Spaceio.Engine
 {
-    abstract class UIPanel
+    class UIPanel
     {
         public Engine Engine { get; private set; }
         public Vec2i Position { get; private set; }
