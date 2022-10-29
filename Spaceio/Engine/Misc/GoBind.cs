@@ -6,8 +6,8 @@ namespace Spaceio.Engine
     /// GoBind is a way for tracking specific GameObject instances in the engine. Due to the serializer returning new identical 
     /// instances of GameObjects instead of returning references to previous GameObjects after deserialization, the GameObject 
     /// fields stored are not bound to their GameObject instances in the engine. Without using GoBind, after deserialization, an example
-    /// field "private GameObject gameObject = ..." would hold the reference to an identical, separate instance of GameObject 
-    /// than the one which is stored in the engine, causing any changes to the "gameObject" not to be reflected in the engine. 
+    /// field "private GameObject gameObject = ..." would hold the reference to an identical instance of GameObject 
+    /// separate from the one which is stored in the engine, causing any changes to the "gameObject" not to be reflected in the engine. 
     /// Instead, what can be done is to create a GoBind field ex. "private GoBind gameObject = ..." and access its "Val" property
     /// to get the always correct GameObject reference.
     /// 

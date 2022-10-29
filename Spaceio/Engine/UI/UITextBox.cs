@@ -12,11 +12,14 @@ namespace Spaceio.Engine
     {
         public string Text { get; set; }
         public char Background { get; set; }
-        public char Outline { get; set; }
+        public char? Outline { get; set; } // Null means no outline.
+        public bool SpacedLetters { get; set; }
         public Vec2i TextPosition { get; set; }
-        public UITextBox(Vec2i position, Vec2i size, string text) : base(position, size)
+        public UITextBox(Vec2i position, Vec2i size, string text, char? outline = null, bool? spacedLetters = null) : base(position, size)
         {
             Text = text;
+            Outline = outline;
+            SpacedLetters = spacedLetters ?? false;
         }
         
         public override void Update()
@@ -26,15 +29,25 @@ namespace Spaceio.Engine
 
         public override void DrawComponentToBitmap(Bitmap bitmap)
         {
-            bitmap.FillWith(Background);
-            bitmap.DrawLine(Position, new Vec2i(Position.X + Size.X, Position.Y), Outline);
-            bitmap.DrawLine(Position, new Vec2i(Position.X, Position.Y + Size.Y), Outline);
-            bitmap.DrawLine(new Vec2i(Position.X, Position.Y + Size.Y), new Vec2i(Position.X + Size.X, Position.Y + Size.Y), Outline);
-            bitmap.DrawLine(new Vec2i(Position.X + Size.X, Position.Y), new Vec2i(Position.X + Size.X, Position.Y + Size.Y), Outline);
-
-            for (var i = 0; i < Text.Length; i++)
+            if (Outline != null)
             {
-                bitmap.Data[TextPosition.X + i, TextPosition.Y] = Text[i];
+                bitmap.FillWith(Background);
+                bitmap.DrawRectangleOutline(Position, Size, Outline.Value);
+            }
+
+            if (SpacedLetters)
+            { 
+                for (var i = 0; i < Text.Length; i++)
+                {
+                    bitmap.Data[TextPosition.X + 2 * i, TextPosition.Y] = Text[i];
+                }
+            }
+            else
+            {
+                for (var i = 0; i < Text.Length; i++)
+                {
+                    bitmap.Data[TextPosition.X + i, TextPosition.Y] = Text[i];
+                }
             }
         }
     }
