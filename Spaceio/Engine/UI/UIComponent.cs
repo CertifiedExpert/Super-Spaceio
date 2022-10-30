@@ -11,9 +11,14 @@ namespace Spaceio.Engine
     {
         public Vec2i Position { get; private set; }
         public Vec2i Size { get; private set; }
+        public char Background { get; set; }
 
         public abstract void Update();
-        public abstract void DrawComponentToBitmap(Bitmap bitmap);
+
+        public virtual void DrawComponentToBitmap(Bitmap bitmap)
+        {
+            bitmap.FillWith(Background);
+        }
 
         public UIComponent(Vec2i position, Vec2i size)
         {

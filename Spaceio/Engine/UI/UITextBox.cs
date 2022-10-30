@@ -11,7 +11,6 @@ namespace Spaceio.Engine
     class UITextBox : UIComponent
     {
         public string Text { get; set; }
-        public char Background { get; set; }
         public char? Outline { get; set; } // Null means no outline.
         public bool SpacedLetters { get; set; }
         public Vec2i TextPosition { get; set; }
@@ -30,7 +29,7 @@ namespace Spaceio.Engine
 
         public override void DrawComponentToBitmap(Bitmap bitmap)
         {
-            bitmap.FillWith(Background);
+            base.DrawComponentToBitmap(bitmap);
             
             if (Outline != null)
             {
