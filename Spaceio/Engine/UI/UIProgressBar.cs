@@ -13,7 +13,7 @@ namespace Spaceio.Engine
         public Vec2i BarSize { get; set; }
         public char BarBackground { get; set; }
 
-        private float _progress;
+        private float _progress = 0f;
         public float Progress
         {
             get => _progress;
@@ -27,11 +27,12 @@ namespace Spaceio.Engine
             }
         } // 0.0f to 1.0f
         
-        public UIProgressBar(Vec2i position, Vec2i size, Vec2i barPosition, Vec2i barSize, char barBackground) : base(position, size)
+        public UIProgressBar(Vec2i position, Vec2i size, Vec2i barPosition, Vec2i barSize, char barBackground, char? outline = null) : base(position, size)
         {
             BarPosition = barPosition;
             BarSize = barSize;
             BarBackground = barBackground;
+            Outline = outline;
         }
 
         public override void Update()
@@ -48,8 +49,8 @@ namespace Spaceio.Engine
                 bitmap.DrawRectangleOutline(Position, Size - new Vec2i(1, 1), Outline.Value);
             }
 
-            var topRightProgressCorner = BarPosition + new Vec2i((int)(BarSize.X * Progress), BarSize.Y);
-            bitmap.DrawFilledRectangle(BarPosition, topRightProgressCorner, BarBackground);
+            var size = new Vec2i((int)(BarSize.X * Progress), (int)(BarSize.Y * Progress)); //TODO: round this not cast
+            bitmap.DrawFilledRectangle(Position + BarPosition, size, BarBackground);
         }
     }
 }

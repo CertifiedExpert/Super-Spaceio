@@ -17,7 +17,7 @@ namespace Spaceio.Engine
 
         public virtual void DrawComponentToBitmap(Bitmap bitmap)
         {
-            bitmap.FillWith(Background);
+            bitmap.DrawFilledRectangle(Position, Size, Background);
         }
 
         public UIComponent(Vec2i position, Vec2i size)

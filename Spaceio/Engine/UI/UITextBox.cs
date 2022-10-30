@@ -33,7 +33,7 @@ namespace Spaceio.Engine
             
             if (Outline != null)
             {
-                bitmap.DrawRectangleOutline(Position, Size - new Vec2i(1, 1), Outline.Value);
+                bitmap.DrawRectangleOutline(Position, Size, Outline.Value);
             }
 
             if (SpacedLetters)

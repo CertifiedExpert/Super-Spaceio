@@ -42,8 +42,17 @@ namespace SpaceGame
 
             var parentPanel = new UIPanel(new Vec2i(0, 0), new Vec2i(40, 20), 1, this);
             UIManager.AddParentUIPanel(parentPanel);
-            var txtbox = new UITextBox(new Vec2i(0, 0), new Vec2i(5, 5), new Vec2i(0, 0), "abcdefgh", null, true);
+
+            var txtbox = new UITextBox(new Vec2i(0, 0), new Vec2i(5, 5), new Vec2i(0, 0), "abcdefgh", 'L', true);
             parentPanel.AddUIComponent(txtbox);
+
+            var pbar = new UIProgressBar(new Vec2i(0, 6), new Vec2i(20, 5), new Vec2i(1, 1), new Vec2i(18, 3), '#', 'o');
+            pbar.Progress = 0.75f;
+            parentPanel.AddUIComponent(pbar);
+
+            var imgbox = new UIImageBox(new Vec2i(22, 0), new Vec2i(3, 4));
+            imgbox.SetImage(ResourceManager.enemyDefault, new Vec2i(0, 0));
+            parentPanel.AddUIComponent(imgbox);
         }
 
         protected override void Update()

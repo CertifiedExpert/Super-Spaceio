@@ -98,8 +98,27 @@ namespace Spaceio.Engine
             var endX = position.X + bitmap.Size.X;
             var endY = position.Y + bitmap.Size.Y;
             if (endX > Size.X) endX = Size.X;
-            else if (endY > Size.Y) endY = Size.Y;
+            if (endY > Size.Y) endY = Size.Y;
             
+            for (var x = position.X; x < endX; x++)
+            {
+                for (var y = position.Y; y < endY; y++)
+                {
+                    Data[x, y] = bitmap.Data[x - position.X, y - position.Y];
+                }
+            }
+        }
+
+        // drawableSize is the size of the drawable area. If the bitmap is larger than the drawable area, it will be cropped. If the bitmap is smaller than the drawable area, it will be drawn anchored to the bottom left corner.
+        public void DrawBitmap(Bitmap bitmap, Vec2i position, Vec2i drawableSize)
+        {
+            var endX = position.X + drawableSize.X;
+            var endY = position.Y + drawableSize.Y;
+            if (endX > Size.X) endX = Size.X;
+            if (endY > Size.Y) endY = Size.Y;
+            if (endX > position.X + bitmap.Size.X) endX = position.X + bitmap.Size.X;
+            if (endY > position.Y + bitmap.Size.Y) endY = position.Y + bitmap.Size.Y;
+
             for (var x = position.X; x < endX; x++)
             {
                 for (var y = position.Y; y < endY; y++)
