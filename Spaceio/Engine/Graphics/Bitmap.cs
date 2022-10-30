@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.SqlTypes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Spaceio.Engine
 {
@@ -89,6 +90,47 @@ namespace Spaceio.Engine
                 for (var y = bottomLeftCorner.Y; y < endY; y++)
                 {
                     Data[x, y] = fillChar;
+                }
+            }
+        }
+        public void DrawBitmap(Bitmap bitmap, Vec2i position)
+        {
+            var endX = position.X + bitmap.Size.X;
+            var endY = position.Y + bitmap.Size.Y;
+            if (endX > Size.X) endX = Size.X;
+            else if (endY > Size.Y) endY = Size.Y;
+            
+            for (var x = position.X; x < endX; x++)
+            {
+                for (var y = position.Y; y < endY; y++)
+                {
+                    Data[x, y] = bitmap.Data[x - position.X, y - position.Y];
+                }
+            }
+        }
+
+        public void DrawText(string text, Vec2i position, string spacingCharacters = null)
+        {
+            if (spacingCharacters != null)
+            {
+                float fLimit = (Size.X - position.X) / (spacingCharacters.Length + 1);
+                int limit;
+                if (fLimit > (int)fLimit) limit = (int)fLimit + 1;
+                else limit = (int)fLimit;
+
+                limit = Math.Min(limit, text.Length);
+
+                for (var i = 0; i < limit; i++)
+                {
+                    Data[position.X + i * (spacingCharacters.Length + 1), position.Y] = text[i];
+                }
+            }
+            else
+            {
+                var limit = Math.Min(text.Length, Size.X - position.X);
+                for (var i = 0; i < limit; i++)
+                {
+                    Data[position.X + i, position.Y] = text[i];
                 }
             }
         }
