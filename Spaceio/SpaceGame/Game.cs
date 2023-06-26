@@ -40,6 +40,11 @@ namespace SpaceGame
             
             //LoadSavedData("test");
 
+
+            
+
+            
+            /*
             var parentPanel = new UIPanel(new Vec2i(0, 0), new Vec2i(40, 20), 1, this);
             UIManager.AddParentUIPanel(parentPanel);
 
@@ -53,6 +58,7 @@ namespace SpaceGame
             var imgbox = new UIImageBox(new Vec2i(22, 0), new Vec2i(3, 4));
             imgbox.SetImage(ResourceManager.enemyDefault, new Vec2i(0, 0));
             parentPanel.AddUIComponent(imgbox);
+            */
         }
 
         protected override void Update()

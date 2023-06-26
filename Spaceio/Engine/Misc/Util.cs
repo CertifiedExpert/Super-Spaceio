@@ -4,20 +4,10 @@ using System.Reflection;
 
 namespace Spaceio.Engine
 {
-    class Util
+    static class Util
     {
         // A global Random.
         public static Random random = new Random();
-        public static float RadToDeg(float rad)
-        {
-            return (float)(rad * 180 / Math.PI);
-        }
-
-        // Converts radians to degrees.
-        public static float DegToRad(float deg)
-        {
-            return (float)(deg / 180 * Math.PI);
-        }
 
         // Converts a 2d-array of T instances into a corresponding jagged array of T instances.
         public static T[][] Jaggedize2dArray<T>(T[,] instance)

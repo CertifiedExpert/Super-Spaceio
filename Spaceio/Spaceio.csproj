@@ -51,6 +51,7 @@
     <Compile Include="Engine\CunksAndEntities\Chunk.cs" />
     <Compile Include="Engine\Core\Settings.cs" />
     <Compile Include="Engine\Exceptions\UIException.cs" />
+    <Compile Include="Engine\Math\EMath.cs" />
     <Compile Include="Engine\Physics\Collider.cs" />
     <Compile Include="Engine\Misc\GoBind.cs" />
     <Compile Include="Engine\Math\ReadOnlyVec2i.cs" />

@@ -73,7 +73,7 @@ namespace Spaceio.Engine
         }
         public float AngleBetween(Vec2f a)
         {
-            return Util.RadToDeg((float)Math.Atan2(X * a.Y - Y * a.X, X * a.X + Y * a.Y));
+            return EMath.RadToDeg((float)Math.Atan2(X * a.Y - Y * a.X, X * a.X + Y * a.Y));
         }
     }
 }
