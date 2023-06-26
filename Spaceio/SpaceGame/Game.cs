@@ -10,8 +10,8 @@ namespace SpaceGame
         public int millisecondsPerPlayerMove = 50;
         public const int chunkLoadRadius = 3;
 
-        public GoBind playerShip;
-        public GoBind enemy;
+        public PlayerShip playerShip;
+        public Enemy enemy;
 
         public int millisecondsSinceLastPlayerMove = 0;
         public bool playerMovedInThisFrame = false;
