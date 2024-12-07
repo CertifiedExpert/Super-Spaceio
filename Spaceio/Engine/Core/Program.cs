@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Media;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     class Program
     {

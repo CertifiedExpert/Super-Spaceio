@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Spaceio.Engine;
+using SuperSpaceio.Engine;
 
 namespace SpaceGame
 {

@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     [DataContract]
     class ChunkManager

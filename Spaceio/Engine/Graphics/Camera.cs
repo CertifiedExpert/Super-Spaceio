@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
     class Camera

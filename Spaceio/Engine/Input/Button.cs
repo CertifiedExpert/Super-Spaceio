@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     [DataContract]
     class Button

@@ -1,4 +1,4 @@
-﻿using Spaceio.Engine;
+﻿using SuperSpaceio.Engine;
 using System.Runtime.Serialization;
 
 namespace SpaceGame

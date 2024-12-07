@@ -1,4 +1,4 @@
-﻿namespace Spaceio.Engine
+﻿namespace SuperSpaceio.Engine
 {
     static class ResourceManager
     {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     class UIPanel
     {

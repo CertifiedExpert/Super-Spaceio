@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.IO;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
     abstract class Engine

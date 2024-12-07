@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Windows.Input;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
     class InputManager

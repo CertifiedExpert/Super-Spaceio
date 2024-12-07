@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     class UITextBox : UIComponent
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     static class Util
     {

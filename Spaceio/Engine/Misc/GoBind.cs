@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     /// <summary>
     /// GoBind is a way for tracking specific GameObject instances in the engine. Due to the serializer returning new identical 

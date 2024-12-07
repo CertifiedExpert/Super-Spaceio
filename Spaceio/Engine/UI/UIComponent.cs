@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     abstract class UIComponent
     {

@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Data.SqlTypes;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Spaceio.Engine
+namespace SuperSpaceio.Engine
 {
     class Bitmap
     {
