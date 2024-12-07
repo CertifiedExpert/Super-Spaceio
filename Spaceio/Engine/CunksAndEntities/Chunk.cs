@@ -50,7 +50,7 @@ namespace SuperSpaceio.Engine
 
         }
         // Gets called when the chunk gets unloaded.
-        public void OnChunkUnLoaded()
+        public void OnChunkUnloaded()
         {
             lastUnloaded = DateTime.Now;
         }
