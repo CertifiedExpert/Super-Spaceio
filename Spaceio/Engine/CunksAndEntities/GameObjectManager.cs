@@ -3,6 +3,8 @@ using System.Runtime.Serialization;
 using System;
 using System.Collections.Generic;
 using SpaceGame;
+using System.Xml;
+using Microsoft.Win32;
 
 namespace SuperSpaceio.Engine
 {
@@ -11,13 +13,21 @@ namespace SuperSpaceio.Engine
     {
         private Engine Engine { get; set; }
 
-        private List<Tuple<Vec2i, GameObject>> gameObjectsToRemove = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores from which chunk the gameObject should be removed
-        private List<Tuple<Vec2i, GameObject>> gameObjectsToAdd = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores to which chunk the gameObject should be added
+        private List<Tuple<Vec2i, GameObject>> gameObjectsToRemoveSchedule = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores from which chunk the gameObject should be removed
+        private List<Tuple<Vec2i, GameObject>> gameObjectsToAddSchedule = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores to which chunk the gameObject should be added
+        private Dictionary<Vec2i, List<GameObject>> unloadedChunkGOsToAdd = new Dictionary<Vec2i, List<GameObject>>();
 
         public GameObjectManager(Engine engine)
         {
             Engine = engine;
         }
+
+        /// <summary>
+        /// NEW IDEA. DISREGARD CHUNK MOVEMENT DURING UPDATE LOOPS OF GAME OBJECTS. ONLY AFTER IT ENDED CHECK THE POSITIONS. 
+        /// (YOU CAN OPTIMIZE BY DOING CHECKING DURING UPDATE LOOPS AND LISTING SUSPECTS. THEN GO OVER THEM AND CHECK POSITIONS, MOVE)
+        /// 
+        /// THE SAME THING GOES FOR REMOVDING AND ADDING ENTITIES. LIST ADD/REMOVECALLS, LET UPDATE LOOP GO AS NORMAL. ADD AFTER)
+        /// </summary>
         
         public void Update()
         {
@@ -26,14 +36,14 @@ namespace SuperSpaceio.Engine
                 foreach (var go in chunk.gameObjects.Values) go.Update();
             }
 
-            foreach (var tpl in gameObjectsToAdd)
+            foreach (var tpl in gameObjectsToAddSchedule) 
             {
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjects.Add(tpl.Item2.UID, tpl.Item2);
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjectRenderLists[tpl.Item2.SpriteLevel].Add(tpl.Item2);
             }
-            gameObjectsToAdd.Clear();
+            gameObjectsToAddSchedule.Clear();
 
-            foreach (var tpl in gameObjectsToRemove)
+            foreach (var tpl in gameObjectsToRemoveSchedule) // TODO: Check and remove duplicate calls
             {
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjects.Remove(tpl.Item2.UID);
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjectRenderLists[tpl.Item2.SpriteLevel].Remove(tpl.Item2);
@@ -41,20 +51,22 @@ namespace SuperSpaceio.Engine
                 // Retires the UID of the gameObject from the engine
                 Engine.UIDManager.RetireUID(tpl.Item2.UID);
             }
-            gameObjectsToRemove.Clear();
+            gameObjectsToRemoveSchedule.Clear();
         }
 
         public void MoveGameObjectToChunk(GameObject go, int x, int y)
         {
-            gameObjectsToRemove.Add(new Tuple<Vec2i, GameObject>(go.Chunk, go));
+            gameObjectsToRemoveSchedule.Add(new Tuple<Vec2i, GameObject>(go.Chunk, go));
             go.Chunk = new Vec2i(x, y);
 
             if (Engine.ChunkManager.IsChunkLoaded(x, y))
             {
-                gameObjectsToAdd.Add(new Tuple<Vec2i, GameObject>(new Vec2i(x, y), go));
+                gameObjectsToAddSchedule.Add(new Tuple<Vec2i, GameObject>(new Vec2i(x, y), go));
             }
             else
             {
+                unloadedChunkGOsToAdd.Add()
+
                 Engine.unloadedChunkTransitionAddGameObjects[newChunkX, newChunkY].Add(this); //TODO: handle this
             }
         }
@@ -69,21 +81,54 @@ namespace SuperSpaceio.Engine
 
             gameObject.Chunk = new Vec2i(chunkX, chunkY);
             if (Engine.ChunkManager.IsChunkLoaded(chunkX, chunkY))
-                gameObjectsToAdd.Add(new Tuple<Vec2i, GameObject>(new Vec2i(chunkX, chunkY), gameObject));
+                gameObjectsToAddSchedule.Add(new Tuple<Vec2i, GameObject>(new Vec2i(chunkX, chunkY), gameObject));
             else
                 Engine.unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject); //TODO: handle this
 
             return UID;
         }
 
-        public void RemoveGameObject(GameObject gameObject)
+        public void RemoveGameObject(UID uID)
         {
-            if (Engine.ChunkManager.IsChunkLoaded(gameObject.Chunk)) 
-                gameObjectsToRemove.Add(new Tuple<Vec2i, GameObject>(gameObject.Chunk, gameObject));
-            else
-                Engine.unloadedChunkTransitionRemoveGameObjects[gameObject.Chunk.Index.X, gameObject.Chunk.Index.Y].Add(gameObject); //TODO: handle this
+            var go = Engine.Find(uID);
+            if (go != null)
+            {
+                // prevent double deletion
 
-            // The UID of the gameObject is retired the frame when it actually is destroyed, not here during scheduling, to prevent duplication
+                // if GO went entered an unloaded or inexistent chunk, still delete this GO and prevent it from being added to the chunk
+
+                if (Engine.ChunkManager.IsChunkLoaded(go.Chunk))
+                    gameObjectsToRemoveSchedule.Add(new Tuple<Vec2i, GameObject>(go.Chunk, go));
+                else
+                {
+
+                }
+                // The UID of the gameObject is retired the frame when it actually is destroyed, not here during scheduling, to prevent duplication
+            }
+        }
+
+        public void FinishInit() // TODO: when the Engine has created instances of all subsystems, call this function to finish init
+        {
+            Engine.ChunkManager.ChunkLoaded += ChunkManager_ChunkLoaded;
+            Engine.ChunkManager.ChunkLoadingEnded += ChunkManager_ChunkLoadingEnded;
+        }
+
+        private void ChunkManager_ChunkLoadingEnded(object sender, EventArgs e)
+        {
+            unloadedChunkGOsToAdd.Clear();
+        }
+
+        // Triggers when ChunkManager raises a ChunkLoaded event.
+        private void ChunkManager_ChunkLoaded(Vec2i chunkIndex)
+        {
+            if (unloadedChunkGOsToAdd.ContainsKey(chunkIndex))
+            {
+                foreach (var go in unloadedChunkGOsToAdd[chunkIndex])
+                {
+                    Engine.ChunkManager.chunks[chunkIndex].gameObjects.Add(go.UID, go);
+                    Engine.ChunkManager.chunks[chunkIndex].gameObjectRenderLists[go.SpriteLevel].Add(go);
+                }
+            }
         }
 
         public void CompleteDataAfterDeserialization(Engine engine)

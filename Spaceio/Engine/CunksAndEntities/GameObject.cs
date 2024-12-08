@@ -57,6 +57,9 @@ namespace SuperSpaceio.Engine
         // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
         public virtual bool MoveGameObject(int x, int y)
         {
+            // Prevents the bug when a GO was already moved to an unloaded or not existing chunk during this frame and is tried to be moved because the reference is still active
+            if (!Engine.ChunkManager.chunks.ContainsKey(Chunk) || Engine.ChunkManager.chunks[Chunk] == null) return false;  
+
             // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite.
             if (Position.X + x < Engine.worldSize.X && 
                 Position.X + x >= 0 &&

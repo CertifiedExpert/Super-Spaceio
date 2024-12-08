@@ -120,7 +120,17 @@ namespace SuperSpaceio.Engine
         {
             GameObjectManager.RemoveGameObject(gameObject);
         }
-                
+        
+        // Returns null if GO cannot be found or is unloaded
+        public GameObject Find(UID uID)
+        {
+            foreach (var c in ChunkManager.loadedChunks)
+            {
+                if (c.gameObjects.ContainsKey(uID)) return c.gameObjects[uID];
+            }
+
+            return null;
+        }
 
         #region FILES/LOADING/UNLOADING
         // Saves the current state of the game including settings and chunks in their own folder.

@@ -14,12 +14,14 @@ namespace SuperSpaceio.Engine
         public Dictionary<UID, GameObject> gameObjects = new Dictionary<UID, GameObject>();
 
         [DataMember]
-        public DateTime lastUnloaded = DateTime.MinValue;
+        public DateTime lastUnloaded { get; private set; }
         public Vec2i Index { get; set; }
         public Engine Engine { get; set; }
         public Chunk(Vec2i index, Engine engine)
         {
             Engine = engine;
+
+            lastUnloaded = DateTime.MinValue;
 
             gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
             for (var i = 0; i < gameObjectRenderLists.Length; i++)
@@ -49,7 +51,7 @@ namespace SuperSpaceio.Engine
 
         }
         // Gets called when the chunk gets unloaded.
-        public void OnChunkUnloaded()
+        public void ChunkWasUnloaded()
         {
             lastUnloaded = DateTime.Now;
         }

@@ -20,6 +20,9 @@ namespace SuperSpaceio.Engine
         private List<Vec2i> chunksToBeUnloaded = new List<Vec2i>(); // List of chunks which have been scheduled to be unloaded.
         private List<Vec2i> chunksToBeLoaded = new List<Vec2i>();
 
+        public delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
+        public event ChunkLoadedEventHandler ChunkLoaded; // TODO: add this to LoadChunk() function
+        public event EventHandler ChunkLoadingEnded; 
         public ChunkManager(Engine engine)
         {
             Engine = engine;
@@ -37,6 +40,8 @@ namespace SuperSpaceio.Engine
             chunksToBeAddedToLoadedChunks.Clear();
             foreach (var v in chunksToBeRemovedFromLoadedChunks) _loadedChunks.Remove(chunks[v]);
             chunksToBeRemovedFromLoadedChunks.Clear();
+
+            ChunkLoadingEnded?.Invoke(this, EventArgs.Empty);
         }
 
         public virtual void GenerateEmptyChunk(int x, int y)
@@ -90,7 +95,7 @@ namespace SuperSpaceio.Engine
         private void UnloadChunk(int x, int y)
         {
             var c = chunks[new Vec2i(x, y)];
-            c.OnChunkUnloaded();
+            c.ChunkWasUnloaded();
 
 
             // TODO: CHANGE THIS CODE. IMPLEMENT SERIALIZATION!!
