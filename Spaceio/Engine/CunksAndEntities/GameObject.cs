@@ -80,18 +80,7 @@ namespace SuperSpaceio.Engine
                     }
                 }
 
-                /*
-                // Chunk traverse detection.
-                var newChunkX = Position.X / Engine.Settings.chunkSize;
-                var newChunkY = Position.Y / Engine.Settings.chunkSize;
-                if (Chunk != new Vec2i(newChunkX, newChunkY))
-                {
-                    Engine.GameObjectManager.MoveGameObjectToChunk(this, newChunkX, newChunkY);
-                    OnChunkTraverse(newChunkX, newChunkY);
-                }
-                */
-
-                Engine.GameObjectManager.AddGameObject(this);
+                Engine.GameObjectManager.AddToMovedGameObjects(this);
 
                 return true;
             }

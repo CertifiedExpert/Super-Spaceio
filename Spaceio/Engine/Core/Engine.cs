@@ -111,14 +111,14 @@ namespace SuperSpaceio.Engine
         }
 
         // Adds GameObject to the engine.
-        public void AddGameObject(GameObject gameObject)
+        public UID AddGameObject(GameObject gameObject)
         {
-            GameObjectManager.AddGameObject(gameObject);
+            return GameObjectManager.AddGameObject(gameObject);
         }
         // Removes GameObject from the engine.
-        public void RemoveGameObject(GameObject gameObject)
+        public void RemoveGameObject(UID uID)
         {
-            GameObjectManager.RemoveGameObject(gameObject);
+            GameObjectManager.RemoveGameObject(uID);
         }
         
         // Returns null if GO cannot be found or is unloaded

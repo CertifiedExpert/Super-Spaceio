@@ -32,7 +32,7 @@ namespace SuperSpaceio.Engine
         
         public void Update()
         {
-            // The sequence of foreach loops is vital.
+            // The sequence of each foreach loop is vital.
 
             foreach (var chunk in Engine.ChunkManager.loadedChunks)
             {
