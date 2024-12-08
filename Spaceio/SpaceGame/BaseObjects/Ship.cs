@@ -34,7 +34,7 @@ namespace SpaceGame
         
         public void ApplyForce(Vec2f force)
         {
-            Velocity += force.Copy() / Mass;
+            Velocity += force / Mass;
         }
 
         private void UpdateSprite()

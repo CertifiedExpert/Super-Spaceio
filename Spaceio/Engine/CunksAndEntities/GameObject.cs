@@ -9,7 +9,7 @@ namespace SuperSpaceio.Engine
     abstract class GameObject
     {
         public Engine Engine { get; private set; }
-        public Tuple<int, int> Chunk { get; set; }
+        public Vec2i Chunk { get; set; }
 
         public UID UID { get; private set; }
         [DataMember]
@@ -42,7 +42,7 @@ namespace SuperSpaceio.Engine
             // Initialize UID as invalid, untill the GameObject is added to the engine and GameObjectManager assigns a UID.
             UID = UID.InvalidUID();
 
-            _position = position.Copy();
+            _position = position;
             Position = new ReadOnlyVec2i(_position);
             Engine = engine;
             Collidable = true;
@@ -83,21 +83,10 @@ namespace SuperSpaceio.Engine
                 // Chunk traverse detection.
                 var newChunkX = Position.X / Engine.Settings.chunkSize;
                 var newChunkY = Position.Y / Engine.Settings.chunkSize;
-                if (Chunk != Engine.chunks[newChunkX, newChunkY])
+                if (Chunk != new Vec2i(newChunkX, newChunkY))
                 {
-                    Chunk.gameObjectsToRemove.Add(this);
-                    Chunk = Engine.chunks[newChunkX, newChunkY];
-
-                    if (Engine.ChunkManager.IsChunkLoaded(newChunkX, newChunkY))
-                    {
-                        Chunk.gameObjectsToAdd.Add(this);
-                        OnChunkTraverse(newChunkX, newChunkY); 
-                    }
-                    else
-                    {
-                        Engine.unloadedChunkTransitionAddGameObjects[newChunkX, newChunkY].Add(this);
-                    }
-                    
+                    Engine.GameObjectManager.MoveGameObjectToChunk(this, newChunkX, newChunkY);
+                    OnChunkTraverse(newChunkX, newChunkY);
                 }
 
                 return true;

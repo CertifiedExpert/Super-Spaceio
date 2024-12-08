@@ -13,8 +13,8 @@ namespace SuperSpaceio.Engine
 
         public Camera(Vec2i position, Vec2i size)
         {
-            Position = position.Copy();
-            Size = size.Copy();
+            Position = position;
+            Size = size;
         }
     }
 }

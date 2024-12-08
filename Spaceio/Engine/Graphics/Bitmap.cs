@@ -42,8 +42,8 @@ namespace SuperSpaceio.Engine
             Vec2f step = new Vec2f((float)line.X / stepCount, (float)line.Y / stepCount);
 
             var leftover = new Vec2f(0, 0);
-            var lastMove = startPoint.Copy();
-            var currentMove = startPoint.Copy();
+            var lastMove = startPoint;
+            var currentMove = startPoint;
 
             for (var i = 0; i < stepCount; i++)
             {
@@ -71,7 +71,7 @@ namespace SuperSpaceio.Engine
 
                 Data[lastMove.X, lastMove.Y] = fillChar;
 
-                lastMove = currentMove.Copy();
+                lastMove = currentMove;
             }
         }
         public void DrawRectangleOutline(Vec2i bottomLeftCorner, Vec2i size, char fillChar)

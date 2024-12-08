@@ -11,14 +11,14 @@ namespace SuperSpaceio.Engine
     {
         private Engine Engine { get; set; }
 
-        public Dictionary<Tuple<int, int>, Chunk> chunks = new Dictionary<Tuple<int, int>, Chunk>(); //TODO: change to private and write access functions
+        public Dictionary<Vec2i, Chunk> chunks = new Dictionary<Vec2i, Chunk>(); //TODO: change to private and write access functions
 
         private List<Chunk> _loadedChunks = new List<Chunk>();
         public ReadOnlyCollection<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunk dictionary during interaction for the convenience of not checking if the chunk is loaded.
-        private List<Tuple<int, int>> chunksToBeAddedToLoadedChunks = new List<Tuple<int, int>>();
-        private List<Tuple<int, int>> chunksToBeRemovedFromLoadedChunks = new List<Tuple<int, int>>();
-        private List<Tuple<int, int>> chunksToBeUnloaded = new List<Tuple<int, int>>(); // List of chunks which have been scheduled to be unloaded.
-        private List<Tuple<int, int>> chunksToBeLoaded = new List<Tuple<int, int>>();
+        private List<Vec2i> chunksToBeAddedToLoadedChunks = new List<Vec2i>();
+        private List<Vec2i> chunksToBeRemovedFromLoadedChunks = new List<Vec2i>();
+        private List<Vec2i> chunksToBeUnloaded = new List<Vec2i>(); // List of chunks which have been scheduled to be unloaded.
+        private List<Vec2i> chunksToBeLoaded = new List<Vec2i>();
 
         public ChunkManager(Engine engine)
         {
@@ -27,15 +27,15 @@ namespace SuperSpaceio.Engine
         }
         public void Update()
         {
-            foreach (var index in chunksToBeUnloaded) UnloadChunk(index.Item1, index.Item2);
+            foreach (var v in chunksToBeUnloaded) UnloadChunk(v.X, v.Y);
             chunksToBeUnloaded.Clear();
 
-            foreach (var index in chunksToBeLoaded) LoadChunk(index.Item1, index.Item2);
+            foreach (var v in chunksToBeLoaded) LoadChunk(v.X, v.Y);
             chunksToBeLoaded.Clear();
 
-            foreach (var index in chunksToBeAddedToLoadedChunks) _loadedChunks.Add(chunks[index]);
+            foreach (var v in chunksToBeAddedToLoadedChunks) _loadedChunks.Add(chunks[v]);
             chunksToBeAddedToLoadedChunks.Clear();
-            foreach (var index in chunksToBeRemovedFromLoadedChunks) _loadedChunks.Remove(chunks[index]);
+            foreach (var v in chunksToBeRemovedFromLoadedChunks) _loadedChunks.Remove(chunks[v]);
             chunksToBeRemovedFromLoadedChunks.Clear();
         }
 
@@ -44,7 +44,7 @@ namespace SuperSpaceio.Engine
             if (!WasChunkCreated(x, y))
             {
                 var c = new Chunk(new Vec2i(x, y), Engine);
-                chunks.Add(new Tuple<int, int>(x,y), c);
+                chunks.Add(new Vec2i(x, y), c);
             }
             else
             {
@@ -89,7 +89,7 @@ namespace SuperSpaceio.Engine
 
         private void UnloadChunk(int x, int y)
         {
-            var c = chunks[new Tuple<int, int>(x, y)];
+            var c = chunks[new Vec2i(x, y)];
             c.OnChunkUnloaded();
 
 
@@ -109,20 +109,23 @@ namespace SuperSpaceio.Engine
 
         public void ScheduleUnloadChunk(int x, int y)
         {
-            if (IsChunkLoaded(x, y) && !chunksToBeUnloaded.Contains(new Tuple<int, int>(x, y)))
+            if (IsChunkLoaded(x, y) && !chunksToBeUnloaded.Contains(new Vec2i(x, y)))
             {
-                chunksToBeUnloaded.Add(new Tuple<int, int>(x, y));
-                chunksToBeRemovedFromLoadedChunks.Add(new Tuple<int, int>(x, y));
+                chunksToBeUnloaded.Add(new Vec2i(x, y));
+                chunksToBeRemovedFromLoadedChunks.Add(new Vec2i(x, y));
             }
         }
+        public void ScheduleUnloadChunk(Vec2i v) => ScheduleUnloadChunk(v.X , v.Y);
+
         public void ScheduleLoadChunk(int x, int y)
         {
             if (WasChunkCreated(x, y) && !IsChunkLoaded(x, y))
             {
-                chunksToBeLoaded.Add(new Tuple<int, int>(x, y));
-                chunksToBeAddedToLoadedChunks.Add(new Tuple<int, int>(x, y));
+                chunksToBeLoaded.Add(new Vec2i(x, y));
+                chunksToBeAddedToLoadedChunks.Add(new Vec2i(x, y));
             }
         }
+        public void ScheduleLoadChunk(Vec2i v) => ScheduleLoadChunk(v.X , v.Y);
 
         public void ForceUnloadChunk(int x, int y)
         {
@@ -132,14 +135,17 @@ namespace SuperSpaceio.Engine
         // Checks if the chunk is loaded and returns the result as a bool.
         public bool IsChunkLoaded(int x, int y)
         {
-            if (WasChunkCreated(x, y) && chunks[new Tuple<int, int>(x, y)] != null) return true;
+            if (WasChunkCreated(x, y) && chunks[new Vec2i(x, y)] != null) return true;
             return false; //TODO: decide what to do when the chunks has never been created
         }
+        public bool IsChunkLoaded(Vec2i v) => IsChunkLoaded(v.X, v.Y);
+
         public bool WasChunkCreated(int x, int y)
         { 
-            if (chunks.ContainsKey(new Tuple<int, int>(x, y))) return true;
+            if (chunks.ContainsKey(new Vec2i(x, y))) return true;
             return false;
         }
+        public bool WasChunkCreated(Vec2i v) => WasChunkCreated(v.X, v.Y);
 
         public void CompleteDataAfterDeserialization(Engine engine)
         {
@@ -148,10 +154,10 @@ namespace SuperSpaceio.Engine
             _loadedChunks = new List<Chunk>();
             loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
             
-            chunksToBeAddedToLoadedChunks = new List<Tuple<int, int>>();
-            chunksToBeRemovedFromLoadedChunks = new List<Tuple<int, int>>();
-            chunksToBeUnloaded = new List<Tuple<int, int>>();
-            chunksToBeLoaded = new List<Tuple<int, int>>();
+            chunksToBeAddedToLoadedChunks = new List<Vec2i>();
+            chunksToBeRemovedFromLoadedChunks = new List<Vec2i>();
+            chunksToBeUnloaded = new List<Vec2i>();
+            chunksToBeLoaded = new List<Vec2i>();
         }
     }
 }

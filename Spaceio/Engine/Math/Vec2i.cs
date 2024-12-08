@@ -3,7 +3,7 @@
 namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
-    class Vec2i //TODO: make this a struct
+    struct Vec2i 
     {
         [DataMember]
         public int X { get; set; }
@@ -32,9 +32,27 @@ namespace SuperSpaceio.Engine
             return new Vec2i(a.X / b, a.Y / b);
         }
 
-        public Vec2i Copy()
+        
+        public override bool Equals(object obj)
         {
-            return new Vec2i(X, Y);
+            if (obj is Vec2i other)
+            {
+                return this == other;
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ Y.GetHashCode();
+        }
+
+        public static bool operator ==(Vec2i left, Vec2i right)
+        {
+            return left.X == right.X && left.Y == right.Y;
+        }
+        public static bool operator !=(Vec2i left, Vec2i right)
+        {
+            return !(left == right);
         }
     }
 }
