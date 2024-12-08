@@ -21,7 +21,7 @@ namespace SuperSpaceio.Engine
         [DataMember]
         public List<Collider> Colliders { get; private set; }
         [DataMember]
-        public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects. 
+        public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects. //TODO: remove this. It can be deduced by checking if there are any colliders
         [DataMember]
         public List<GoBind> Binds { get; private set; } // A list of GoBinds referring to this GameObject.
         [DataMember]
@@ -100,25 +100,20 @@ namespace SuperSpaceio.Engine
         private bool CollisionDetection()
         {
             var isColliding = false;
-            for (int x = 0; x < Engine.chunks.GetLength(0); x++)
+             
+            foreach (var c in Engine.ChunkManager.loadedChunks)
             {
-                for (int y = 0; y < Engine.chunks.GetLength(1); y++)
+                foreach (var other in c.gameObjects.Values)
                 {
-                    if (Engine.ChunkManager.IsChunkLoaded(x, y))
+                    if (this != other && other.Colliders.Count > 0)
                     {
-                        foreach (var gameObject in Engine.chunks[x, y].gameObjects)
+                        if (IsCollidingWith(other))
                         {
-                            if (this != gameObject && gameObject.Collidable)
-                            {
-                                if (IsCollidingWith(gameObject))
-                                {
-                                    isColliding = true;
+                            isColliding = true;
 
-                                    // Collision detected
-                                    OnCollision(gameObject);
-                                    gameObject.OnCollision(this);
-                                }
-                            }
+                            // Collision detected
+                            OnCollision(other);
+                            other.OnCollision(this);
                         }
                     }
                 }
@@ -127,7 +122,7 @@ namespace SuperSpaceio.Engine
             return isColliding;
         }
         // Checks if this GameObject is colliding with a GameObject specified in the parameter. Return the result as a bool.
-        public bool IsCollidingWith(GameObject other)
+        public bool IsCollidingWith(GameObject other) // TODO: add a return struct CollissionInfo
         {
             foreach (var col in Colliders)
             {
@@ -157,7 +152,7 @@ namespace SuperSpaceio.Engine
             }
         }
         // Is called when a Chunk to which the GameObject started belonging during it being unloaded is finally loaded. Calls OnChunkTraverse and sets GameObject.Chunk because when a GameObject is added to an unloaded Chunk is it automatically treated as if it was unloaded itself, so the OnChunkTraverse() or GameObject.Chunk.set() is not called as that would be calling a method on an unloaded GameObject meaning the GameObject must be processed after the chunk awakens to have all data.
-        public void OnUnloadedChunkAwake(int chunkX, int chunkY)
+        public void OnUnloadedChunkAwake(int chunkX, int chunkY) //TODO: update this when you get around to writinng save/load system
         {
             Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
