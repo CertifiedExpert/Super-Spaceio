@@ -12,7 +12,7 @@ namespace Spaceio
     {
         public readonly uint ID;
         public readonly uint Generation;
-        public UID(uint ID, uint generation)
+        public UID(uint ID = uint.MaxValue, uint generation = uint.MaxValue)
         {
             this.ID = ID;
             Generation = generation;
@@ -23,5 +23,7 @@ namespace Spaceio
         public static bool operator ==(UID left, UID right) => left.Equals(right);
         public static bool operator !=(UID left, UID right) => !left.Equals(right); 
         public override int GetHashCode() => HashCode.Combine(ID, Generation);
+
+        public static UID InvalidUID() => new UID(uint.MaxValue, uint.MaxValue);
     }
 }

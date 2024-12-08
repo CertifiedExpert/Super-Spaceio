@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spaceio;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -10,10 +11,8 @@ namespace SuperSpaceio.Engine
         [DataMember]
         public List<GameObject>[] gameObjectRenderLists;
         [DataMember]
-        public List<GameObject> gameObjects = new List<GameObject>();
+        public Dictionary<UID, GameObject> gameObjects = new Dictionary<UID, GameObject>();
 
-        public List<GameObject> gameObjectsToRemove = new List<GameObject>();
-        public List<GameObject> gameObjectsToAdd = new List<GameObject>();
         [DataMember]
         public DateTime lastUnloaded = DateTime.MinValue;
         public Vec2i Index { get; set; }

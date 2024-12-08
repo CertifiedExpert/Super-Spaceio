@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Spaceio;
+using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace SuperSpaceio.Engine
@@ -7,8 +9,9 @@ namespace SuperSpaceio.Engine
     abstract class GameObject
     {
         public Engine Engine { get; private set; }
-        public Chunk Chunk { get; set; }
+        public Tuple<int, int> Chunk { get; set; }
 
+        public UID UID { get; private set; }
         [DataMember]
         private Vec2i _position;
         public ReadOnlyVec2i Position { get; private set; }
@@ -36,6 +39,9 @@ namespace SuperSpaceio.Engine
 
         protected GameObject(Vec2i position, Engine engine)
         {
+            // Initialize UID as invalid, untill the GameObject is added to the engine and GameObjectManager assigns a UID.
+            UID = UID.InvalidUID();
+
             _position = position.Copy();
             Position = new ReadOnlyVec2i(_position);
             Engine = engine;
@@ -45,6 +51,8 @@ namespace SuperSpaceio.Engine
             Colliders = new List<Collider>();
             Binds = new List<GoBind>();
         }
+
+        public void SetUID (UID uid) => UID = uid;
 
         // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
         public virtual bool MoveGameObject(int x, int y)

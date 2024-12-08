@@ -7,11 +7,11 @@ using System.Runtime.Serialization;
 namespace SuperSpaceio.Engine
 {
     [DataContract]
-    class ChunkManager
+    class ChunkManager //TODO: replace Tuple<int, int> with Vec2i. It should be more readable. Do so also in GameObject class for the Chunk field
     {
         private Engine Engine { get; set; }
 
-        private Dictionary<Tuple<int, int>, Chunk> chunks = new Dictionary<Tuple<int, int>, Chunk>(); //TODO: change to private and write access functions
+        public Dictionary<Tuple<int, int>, Chunk> chunks = new Dictionary<Tuple<int, int>, Chunk>(); //TODO: change to private and write access functions
 
         private List<Chunk> _loadedChunks = new List<Chunk>();
         public ReadOnlyCollection<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunk dictionary during interaction for the convenience of not checking if the chunk is loaded.

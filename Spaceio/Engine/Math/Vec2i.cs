@@ -3,7 +3,7 @@
 namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
-    class Vec2i
+    class Vec2i //TODO: make this a struct
     {
         [DataMember]
         public int X { get; set; }

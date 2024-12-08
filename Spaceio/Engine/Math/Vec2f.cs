@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace SuperSpaceio.Engine
 {
     [DataContract(IsReference = true)]
-    class Vec2f
+    class Vec2f //TODO: make this a struct
     {
         [DataMember]
         public float X { get; set; }

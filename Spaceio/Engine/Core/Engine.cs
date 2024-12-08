@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
 using System.IO;
+using Spaceio;
 
 namespace SuperSpaceio.Engine
 {
@@ -18,6 +19,7 @@ namespace SuperSpaceio.Engine
         [DataMember] public GameObjectManager GameObjectManager { get; private set; } // The game object manager of the game.
         [DataMember] public Camera Camera { get; private set; } // The camera used in the engine. 
         [DataMember] public UIManager UIManager { get; private set; } // The ui manager used in the engine.
+        [DataMember] public UIDManager UIDManager { get; private set; }
 
 
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
