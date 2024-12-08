@@ -13,9 +13,10 @@ namespace SuperSpaceio.Engine
     {
         private Engine Engine { get; set; }
 
-        private List<Tuple<Vec2i, GameObject>> gameObjectsToRemoveSchedule = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores from which chunk the gameObject should be removed
         private List<Tuple<Vec2i, GameObject>> gameObjectsToAddSchedule = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores to which chunk the gameObject should be added
+        private List<GameObject> gameObjectsToRemoveSchedule = new List<GameObject>(); 
         private Dictionary<Vec2i, List<GameObject>> unloadedChunkGOsToAdd = new Dictionary<Vec2i, List<GameObject>>();
+        private List<GameObject> movedGameObjects = new List<GameObject>();
 
         public GameObjectManager(Engine engine)
         {
@@ -31,45 +32,53 @@ namespace SuperSpaceio.Engine
         
         public void Update()
         {
+            // The sequence of foreach loops is vital.
+
             foreach (var chunk in Engine.ChunkManager.loadedChunks)
             {
                 foreach (var go in chunk.gameObjects.Values) go.Update();
             }
 
+            foreach (var go in movedGameObjects)
+            {
+                var newChunkX = go.Position.X / Engine.Settings.chunkSize;
+                var newChunkY = go.Position.Y / Engine.Settings.chunkSize;
+                if (go.Chunk != new Vec2i(newChunkX, newChunkY))
+                {
+                    Engine.ChunkManager.chunks[go.Chunk].gameObjects.Remove(go.UID);
+                    Engine.ChunkManager.chunks[go.Chunk].gameObjectRenderLists[go.SpriteLevel].Remove(go);
+
+                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)].gameObjects.Add(go.UID, go);
+                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)].gameObjectRenderLists[go.SpriteLevel].Add(go);
+
+                    go.OnChunkTraverse();
+                }
+            }
+            movedGameObjects.Clear();
+
+            foreach (var go in gameObjectsToRemoveSchedule) // Works deespite duplicate calls
+            {
+                var goExisted = Engine.ChunkManager.chunks[go.Chunk].gameObjects.Remove(go.UID);
+                Engine.ChunkManager.chunks[go.Chunk].gameObjectRenderLists[go.SpriteLevel].Remove(go);
+
+                // Retires the UID of the gameObject but ignores duplicate retire calls.
+                if (goExisted) Engine.UIDManager.RetireUID(go.UID);
+            }
+            gameObjectsToRemoveSchedule.Clear();
+
             foreach (var tpl in gameObjectsToAddSchedule) 
             {
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjects.Add(tpl.Item2.UID, tpl.Item2);
                 Engine.ChunkManager.chunks[tpl.Item1].gameObjectRenderLists[tpl.Item2.SpriteLevel].Add(tpl.Item2);
+
+                // Updates the Chunk field for objects which were not just added to the engine but moved from other chunks
+                tpl.Item2.Chunk = tpl.Item1;
             }
             gameObjectsToAddSchedule.Clear();
-
-            foreach (var tpl in gameObjectsToRemoveSchedule) // TODO: Check and remove duplicate calls
-            {
-                Engine.ChunkManager.chunks[tpl.Item1].gameObjects.Remove(tpl.Item2.UID);
-                Engine.ChunkManager.chunks[tpl.Item1].gameObjectRenderLists[tpl.Item2.SpriteLevel].Remove(tpl.Item2);
-
-                // Retires the UID of the gameObject from the engine
-                Engine.UIDManager.RetireUID(tpl.Item2.UID);
-            }
-            gameObjectsToRemoveSchedule.Clear();
         }
 
-        public void MoveGameObjectToChunk(GameObject go, int x, int y)
-        {
-            gameObjectsToRemoveSchedule.Add(new Tuple<Vec2i, GameObject>(go.Chunk, go));
-            go.Chunk = new Vec2i(x, y);
+        public void AddToMovedGameObjects(GameObject gameObject) => movedGameObjects.Add(gameObject);
 
-            if (Engine.ChunkManager.IsChunkLoaded(x, y))
-            {
-                gameObjectsToAddSchedule.Add(new Tuple<Vec2i, GameObject>(new Vec2i(x, y), go));
-            }
-            else
-            {
-                unloadedChunkGOsToAdd.Add()
-
-                Engine.unloadedChunkTransitionAddGameObjects[newChunkX, newChunkY].Add(this); //TODO: handle this
-            }
-        }
         public UID AddGameObject(GameObject gameObject)
         {
             // Generates UID for the gameObject and returns it for use. It is done here during scheduling so that UID can be returned
@@ -83,7 +92,12 @@ namespace SuperSpaceio.Engine
             if (Engine.ChunkManager.IsChunkLoaded(chunkX, chunkY))
                 gameObjectsToAddSchedule.Add(new Tuple<Vec2i, GameObject>(new Vec2i(chunkX, chunkY), gameObject));
             else
-                Engine.unloadedChunkTransitionAddGameObjects[chunkX, chunkY].Add(gameObject); //TODO: handle this
+            {
+                if (unloadedChunkGOsToAdd.ContainsKey(new Vec2i(chunkX, chunkY))) 
+                    unloadedChunkGOsToAdd[new Vec2i(chunkX, chunkY)].Add(gameObject); 
+                else
+                    unloadedChunkGOsToAdd.Add(new Vec2i(chunkX, chunkY), new List<GameObject> { gameObject });
+            }
 
             return UID;
         }
@@ -93,16 +107,8 @@ namespace SuperSpaceio.Engine
             var go = Engine.Find(uID);
             if (go != null)
             {
-                // prevent double deletion
-
-                // if GO went entered an unloaded or inexistent chunk, still delete this GO and prevent it from being added to the chunk
-
-                if (Engine.ChunkManager.IsChunkLoaded(go.Chunk))
-                    gameObjectsToRemoveSchedule.Add(new Tuple<Vec2i, GameObject>(go.Chunk, go));
-                else
-                {
-
-                }
+                gameObjectsToRemoveSchedule.Add(go);
+                
                 // The UID of the gameObject is retired the frame when it actually is destroyed, not here during scheduling, to prevent duplication
             }
         }

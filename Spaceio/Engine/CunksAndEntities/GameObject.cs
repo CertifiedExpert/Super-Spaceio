@@ -57,9 +57,6 @@ namespace SuperSpaceio.Engine
         // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
         public virtual bool MoveGameObject(int x, int y)
         {
-            // Prevents the bug when a GO was already moved to an unloaded or not existing chunk during this frame and is tried to be moved because the reference is still active
-            if (!Engine.ChunkManager.chunks.ContainsKey(Chunk) || Engine.ChunkManager.chunks[Chunk] == null) return false;  
-
             // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite.
             if (Position.X + x < Engine.worldSize.X && 
                 Position.X + x >= 0 &&
@@ -83,6 +80,7 @@ namespace SuperSpaceio.Engine
                     }
                 }
 
+                /*
                 // Chunk traverse detection.
                 var newChunkX = Position.X / Engine.Settings.chunkSize;
                 var newChunkY = Position.Y / Engine.Settings.chunkSize;
@@ -91,13 +89,16 @@ namespace SuperSpaceio.Engine
                     Engine.GameObjectManager.MoveGameObjectToChunk(this, newChunkX, newChunkY);
                     OnChunkTraverse(newChunkX, newChunkY);
                 }
+                */
+
+                Engine.GameObjectManager.AddGameObject(this);
 
                 return true;
             }
             else return false;
         }
         // Is called when a chunk was traversed by the GameObject.
-        protected virtual void OnChunkTraverse(int chunkX, int chunkY) { }
+        public virtual void OnChunkTraverse() { }
 
         // Returns a boolean to indicate whether a collision was detected. If a collision was detected, it calls OnCollision in both GameObjects.
         private bool CollisionDetection()
