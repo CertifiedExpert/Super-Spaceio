@@ -76,7 +76,9 @@
     <Compile Include="Physics\Collider.cs" />
     <Compile Include="Misc\GoBind.cs" />
     <Compile Include="Math\ReadOnlyVec2i.cs" />
-    <Compile Include="Misc\Serializer.cs" />
+    <Compile Include="Save\SaveData\GameObjectSaveData.cs" />
+    <Compile Include="Save\SaveManager.cs" />
+    <Compile Include="Save\Serializer.cs" />
     <Compile Include="Graphics\Bitmap.cs" />
     <Compile Include="Graphics\Animator.cs" />
     <Compile Include="Input\Button.cs" />

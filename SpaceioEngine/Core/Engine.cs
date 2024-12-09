@@ -31,8 +31,6 @@ namespace ConsoleEngine
 
         private Vec2i _worldSize; // TODO: the behavior or ReadOnlyVec2i changed. Reimplement this or delete this
         public ReadOnlyVec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
-        public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
-        public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
 
 
         // Debug.
@@ -50,7 +48,10 @@ namespace ConsoleEngine
         // " " <and> font 10 | width 189 | height 99
         
         // Application loop.
-        protected Engine()
+        protected Engine(
+            Settings _settings, Renderer _renderer, InputManager _inputManager, Serializer _serializer,
+            ChunkManager _chunkManager, GameObjectManager _gameObjectManager,
+            Camera _camera, UIManager _uIManager, UIDManager _uIDManager)
         {
             // Loading. 
             OnEngineLoad();

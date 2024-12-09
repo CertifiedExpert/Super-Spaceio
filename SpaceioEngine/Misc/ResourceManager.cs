@@ -1,6 +1,6 @@
 ﻿namespace ConsoleEngine
 {
-    public static class ResourceManager
+    public class ResourceManager
     {
         public static Bitmap fighter1Up;
         public static Bitmap fighter1Down;

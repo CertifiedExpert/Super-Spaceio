@@ -6,15 +6,14 @@ using System.IO;
 
 namespace ConsoleEngine
 {
-    [DataContract(IsReference = true)]
     public class Serializer
     {
         // List of types recognized by the Serializer.
+        /// ADD ALL TYPE USED BY THE ENGINE HERE
         public List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
+        
 
-        [DataMember] private List<string> knownTypesStrings_serialize;
-        
-        
+
         // Saves an instance of T to the specified file.
         public void ToFile<T>(T instance, string path)
         {

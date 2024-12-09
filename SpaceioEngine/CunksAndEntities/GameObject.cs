@@ -136,6 +136,14 @@ namespace ConsoleEngine
                 sprite?.Animator?.Update();
             }
         }
+
+        internal virtual GameObjectSaveData GetSaveData()
+        {
+
+        }
+
+
+
         // Is called when a Chunk to which the GameObject started belonging during it being unloaded is finally loaded. Calls OnChunkTraverse and sets GameObject.Chunk because when a GameObject is added to an unloaded Chunk is it automatically treated as if it was unloaded itself, so the OnChunkTraverse() or GameObject.Chunk.set() is not called as that would be calling a method on an unloaded GameObject meaning the GameObject must be processed after the chunk awakens to have all data.
         public void OnUnloadedChunkAwake(int chunkX, int chunkY) //TODO: update this when you get around to writinng save/load system
         {

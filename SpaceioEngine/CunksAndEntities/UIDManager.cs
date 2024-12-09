@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
-    public class UIDManager
+    internal class UIDManager
     {
         private List<UID> freeUIDs = new List<UID>();
         private uint totalUIDcount = 50;
 
-        public UID GenerateUID()
+        internal UID GenerateUID()
         {
             if (freeUIDs.Count == 0) 
             {

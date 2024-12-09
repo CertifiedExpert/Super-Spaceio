@@ -10,7 +10,7 @@ namespace ConsoleEngine
     {
         private Engine Engine { get; set; }
         
-        private char[,] screenBuffer;
+        private char[,] screenBuffer; // TODO: need to eventually convert this to 1-dimensional array :(
 
         public Renderer(Engine engine)
         {
