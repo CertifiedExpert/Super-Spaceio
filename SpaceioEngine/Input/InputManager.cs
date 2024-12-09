@@ -100,7 +100,7 @@ namespace ConsoleEngine
         }
 
         // Updates inputs with the currently held buttons + deactivates those released
-        public void UpdateInput(Engine engine)
+        internal void UpdateInput(Engine engine)
         {
             UpdateButton(Key.D1, D1);
             UpdateButton(Key.D2, D2);
@@ -145,7 +145,7 @@ namespace ConsoleEngine
         }
 
         // Updates the state machine Buttons.
-        public void UpdateButton(Key key, Button button)
+        private void UpdateButton(Key key, Button button)
         {
             if (Keyboard.IsKeyDown(key))
             {

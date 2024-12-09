@@ -11,7 +11,7 @@ namespace ConsoleEngine
     {
         // Systems. TODO: change ObservableCollection to ReadOnlyCollection
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
-        [DataMember] public Renderer Renderer { get; set; } // The renderer of the game.
+        [DataMember] public Renderer Renderer { get; private set; } // The renderer of the game.
         [DataMember] public InputManager InputManager { get; private set; } // The input renderer of the game.
         [DataMember] public Serializer Serializer { get; private set; } // The serializer of the game.
         [DataMember] public ChunkManager ChunkManager { get; private set; } // The chunk manager of the game.
@@ -25,14 +25,15 @@ namespace ConsoleEngine
         [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionAddGameObjects.
         [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionRemoveGameObjects.
 
-        public bool gameShouldClose = false; // Flag whether the game is set to close.
-        public int deltaTime = 0; // Milliseconds which passed since last frame.
-        private Vec2i _worldSize;
+        private bool gameShouldClose = false; // Flag whether the game is set to close.
+        public int deltaTime { get; private set; } // Milliseconds which passed since last frame.
+        private DateTime lastFrame; // The time of last frame.
+
+        private Vec2i _worldSize; // TODO: the behavior or ReadOnlyVec2i changed. Reimplement this or delete this
         public ReadOnlyVec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
         public List<GameObject>[,] unloadedChunkTransitionAddGameObjects { get; private set; }  // A 2d-array of lists of GameObject which need to be added to the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is added to an unloaded chunk.)
         public List<GameObject>[,] unloadedChunkTransitionRemoveGameObjects { get; private set; } // A 2d-array of lists of GameObject which need to be removed from the chunk with index corresponding to the position in the array after the chunk gets loaded. (It may be added to this when a GameObject is removed from an unload chunk.)
 
-        private DateTime lastFrame; // The time of last frame.
 
         // Debug.
         public readonly int debugLinesCount = 10;
@@ -85,6 +86,7 @@ namespace ConsoleEngine
             pathRootFolder = Util.GetAssemblyDirectory();
             pathSavesFolder = $"{pathRootFolder}\\Saves";
 
+            deltaTime = 0;
             SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
 
             // Console settings
@@ -130,6 +132,8 @@ namespace ConsoleEngine
 
             return null;
         }
+
+        public void CloseEngine() => gameShouldClose = true;
 
         #region FILES/LOADING/UNLOADING
         // Saves the current state of the game including settings and chunks in their own folder.

@@ -11,24 +11,27 @@ namespace ConsoleEngine
     {
         private Engine Engine { get; set; }
 
-        public Dictionary<Vec2i, Chunk> chunks = new Dictionary<Vec2i, Chunk>(); //TODO: change to private and write access functions
+        private Dictionary<Vec2i, Chunk> _chunks = new Dictionary<Vec2i, Chunk>();
+        public ReadOnlyDictionary<Vec2i, Chunk> chunks { get; private set; } //TODO: change to private and write access functions
 
         private List<Chunk> _loadedChunks = new List<Chunk>();
         public ReadOnlyCollection<Chunk> loadedChunks { get; private set; } // A list of all chunks which are loaded. Can be used instead of chunk dictionary during interaction for the convenience of not checking if the chunk is loaded.
+        
         private List<Vec2i> chunksToBeAddedToLoadedChunks = new List<Vec2i>();
         private List<Vec2i> chunksToBeRemovedFromLoadedChunks = new List<Vec2i>();
         private List<Vec2i> chunksToBeUnloaded = new List<Vec2i>(); // List of chunks which have been scheduled to be unloaded.
         private List<Vec2i> chunksToBeLoaded = new List<Vec2i>();
 
-        public delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
-        public event ChunkLoadedEventHandler ChunkLoaded; // TODO: add this to LoadChunk() function
-        public event EventHandler ChunkLoadingEnded; 
+        internal delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
+        internal event ChunkLoadedEventHandler ChunkLoaded; // TODO: add this to LoadChunk() function
+        internal event EventHandler ChunkLoadingEnded; 
         public ChunkManager(Engine engine)
         {
             Engine = engine;
             loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
+            chunks = new ReadOnlyDictionary<Vec2i, Chunk>(_chunks);
         }
-        public void Update()
+        internal void Update()
         {
             foreach (var v in chunksToBeUnloaded) UnloadChunk(v.X, v.Y);
             chunksToBeUnloaded.Clear();
@@ -49,7 +52,7 @@ namespace ConsoleEngine
             if (!WasChunkCreated(x, y))
             {
                 var c = new Chunk(new Vec2i(x, y), Engine);
-                chunks.Add(new Vec2i(x, y), c);
+                _chunks.Add(new Vec2i(x, y), c);
             }
             else
             {
@@ -132,7 +135,7 @@ namespace ConsoleEngine
         }
         public void ScheduleLoadChunk(Vec2i v) => ScheduleLoadChunk(v.X , v.Y);
 
-        public void ForceUnloadChunk(int x, int y)
+        internal void ForceUnloadChunk(int x, int y)
         {
             UnloadChunk(x, y);
         }

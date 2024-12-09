@@ -64,7 +64,7 @@ namespace Spaceio
         protected override void Update()
         {
             if (Util.random.Next(0, 30) == 5 && enemy?.IsActive == true) enemy.Val.MoveGameObject(1, 0);
-            if (InputManager.Escape.IsPressed) gameShouldClose = true;
+            if (InputManager.Escape.IsPressed) CloseEngine();
 
             UpdateCamera();
 

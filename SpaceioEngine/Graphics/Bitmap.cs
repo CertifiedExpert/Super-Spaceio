@@ -7,11 +7,11 @@ namespace ConsoleEngine
 {
     public class Bitmap
     {
-        public Vec2i Size { get; set; }
-        public char[,] Data { get; set; }
+        public ReadOnlyVec2i Size { get; private set; }
+        public char[,] Data { get; set; } // TODO: consider changing this to a 1-dimensional array. Then you can make it read only.
         public Bitmap(char[,] data)
         {
-            Size = new Vec2i(data.GetLength(0), data.GetLength(1));
+            Size = new ReadOnlyVec2i(data.GetLength(0), data.GetLength(1));
             Data = data;
         }
 

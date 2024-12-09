@@ -22,7 +22,7 @@ namespace ConsoleEngine
             freeUIDs.RemoveAt(0);
             return uid;
         }
-        public void RetireUID(UID uid) => freeUIDs.Add(new UID(uid.ID, uid.Generation + 1));
+        internal void RetireUID(UID uid) => freeUIDs.Add(new UID(uid.ID, uid.Generation + 1));
         private void FillUIDPool(uint from, uint to) 
         {
             for (var i = from; i < to; i++) 

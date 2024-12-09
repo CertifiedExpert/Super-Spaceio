@@ -10,9 +10,14 @@ namespace ConsoleEngine
         [DataMember]
         public Vec2i Size { get; set; }
 
-        public Collider(Vec2i size, Vec2i attachmentPos = null)
+        public Collider(Vec2i size)
         {
-            AttachmentPos = attachmentPos ?? new Vec2i(0, 0);
+            AttachmentPos = new Vec2i(0, 0);
+            Size = size;
+        }
+        public Collider(Vec2i size, Vec2i attachmentPos)
+        {
+            AttachmentPos = attachmentPos;
             Size = size;
         }
     }

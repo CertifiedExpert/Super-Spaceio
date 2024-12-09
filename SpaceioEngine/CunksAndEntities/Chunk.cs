@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace ConsoleEngine
@@ -7,26 +8,32 @@ namespace ConsoleEngine
     [DataContract(IsReference = true)]
     public class Chunk
     {
+
         [DataMember]
-        public List<GameObject>[] gameObjectRenderLists;
+        internal Dictionary<UID, GameObject> _gameObjects = new Dictionary<UID, GameObject>();
+        public ReadOnlyDictionary<UID, GameObject> gameObjects { get; private set; }
+
         [DataMember]
-        public Dictionary<UID, GameObject> gameObjects = new Dictionary<UID, GameObject>();
+        internal List<GameObject>[] _gameObjectRenderLists;
+        public ReadOnlyCollection<ReadOnlyCollection<GameObject>> gameObjectRenderLists { get; private set; }
 
         [DataMember]
         public DateTime lastUnloaded { get; private set; }
-        public Vec2i Index { get; set; }
-        public Engine Engine { get; set; }
+        public Vec2i Index { get; private set; }
+        public Engine Engine { get; private set; }
         public Chunk(Vec2i index, Engine engine)
         {
             Engine = engine;
 
+            gameObjects = new ReadOnlyDictionary<UID, GameObject>(_gameObjects);
+            
             lastUnloaded = DateTime.MinValue;
 
-            gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
-            for (var i = 0; i < gameObjectRenderLists.Length; i++)
-            {
-                gameObjectRenderLists[i] = new List<GameObject>();
-            }
+            _gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
+            for (var i = 0; i < _gameObjectRenderLists.Length; i++) _gameObjectRenderLists[i] = new List<GameObject>();
+
+            gameObjectRenderLists = new ReadOnlyCollection<ReadOnlyCollection<GameObject>>(
+            Array.ConvertAll(_gameObjectRenderLists, list => new ReadOnlyCollection<GameObject>(list)));
 
             Index = index;
         }
@@ -45,12 +52,12 @@ namespace ConsoleEngine
         }
 
         // Gets called when the chunk gets loaded.
-        public void OnChunkLoaded()
+        internal void ChunkWasLoaded()
         {
 
         }
         // Gets called when the chunk gets unloaded.
-        public void ChunkWasUnloaded()
+        internal void ChunkWasUnloaded()
         {
             lastUnloaded = DateTime.Now;
         }

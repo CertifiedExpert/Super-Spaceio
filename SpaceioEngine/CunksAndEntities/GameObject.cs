@@ -8,19 +8,15 @@ namespace ConsoleEngine
     public abstract class GameObject
     {
         public Engine Engine { get; private set; }
-        public Vec2i Chunk { get; set; }
+        public Vec2i Chunk { get; internal set; }
 
         public UID UID { get; private set; }
-        [DataMember]
-        private Vec2i _position;
         public ReadOnlyVec2i Position { get; private set; }
 
         [DataMember]
         public Sprite[] Sprites { get; private set; } 
         [DataMember]
         public List<Collider> Colliders { get; private set; }
-        [DataMember]
-        public bool Collidable { get; set; } // Flag whether the GameObject can collide with other GameObjects. //TODO: remove this. It can be deduced by checking if there are any colliders
         [DataMember]
         public List<GoBind> Binds { get; private set; } // A list of GoBinds referring to this GameObject.
         [DataMember]
@@ -41,17 +37,15 @@ namespace ConsoleEngine
             // Initialize UID as invalid, untill the GameObject is added to the engine and GameObjectManager assigns a UID.
             UID = UID.InvalidUID();
 
-            _position = position;
-            Position = new ReadOnlyVec2i(_position);
+            Position = new ReadOnlyVec2i(position);
             Engine = engine;
-            Collidable = true;
             SpriteLevel = 5;
             Sprites = new Sprite[Engine.Settings.spriteMaxCount];
             Colliders = new List<Collider>();
             Binds = new List<GoBind>();
         }
 
-        public void SetUID (UID uid) => UID = uid;
+        internal void SetUID (UID uid) => UID = uid;
 
         // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
         public virtual bool MoveGameObject(int x, int y)
@@ -63,18 +57,17 @@ namespace ConsoleEngine
                 Position.Y + y >= 0)
             {
                 // Moves the player.
-                _position.X += x;
-                _position.Y += y; 
+                Position = new ReadOnlyVec2i(Position.X + x, Position.Y + y);
 
                 // Collision detection.
-                if (Collidable)
+                if (Colliders.Count > 0)
                 {
                     var isColliding = CollisionDetection();
 
                     if (isColliding)
                     {
-                        _position.X -= x; // Unmove the GameObject because such a movement would result in GameObjects overlapping.
-                        _position.Y -= y;
+                        // Unmove the GameObject because such a movement would result in GameObjects overlapping.
+                        Position = new ReadOnlyVec2i(Position.X - x, Position.Y - y);
                         return false;
                     }
                 }
@@ -86,7 +79,7 @@ namespace ConsoleEngine
             else return false;
         }
         // Is called when a chunk was traversed by the GameObject.
-        public virtual void OnChunkTraverse() { }
+        internal virtual void OnChunkTraverse() { }
 
         // Returns a boolean to indicate whether a collision was detected. If a collision was detected, it calls OnCollision in both GameObjects.
         private bool CollisionDetection()
@@ -133,7 +126,7 @@ namespace ConsoleEngine
             return false;
         }
         // Gets called when a collision has been detected. Passes the GameObject which it collided with.
-        public abstract void OnCollision(GameObject collidingObject);
+        internal virtual void OnCollision(GameObject collidingObject) { }
         
         // Is called each frame and updates the GameObject. Updated all Animators of GameObject if it has any (if it doesn't, Animation property is null and is ignored).
         public virtual void Update()

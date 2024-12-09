@@ -32,7 +32,7 @@ namespace ConsoleEngine
 
         
         // Gets called every frame by the engine. Updates the animator
-        public void Update()
+        internal void Update()
         {
             if ((DateTime.Now - lastFrameUpdate).TotalMilliseconds >= millisecondsForFrameStep)
             {

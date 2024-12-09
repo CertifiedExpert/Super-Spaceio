@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
-    public abstract class UIComponent
+    public abstract class UIComponent // TODO: clean up access modifyers if needed
     {
         public Vec2i Position { get; private set; }
         public Vec2i Size { get; private set; }

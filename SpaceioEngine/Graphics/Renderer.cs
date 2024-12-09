@@ -24,7 +24,7 @@ namespace ConsoleEngine
         }
 
         // Writes all GameObjects to the frame buffer and then draws the frame buffer.
-        public void Render()
+        internal void Render()
         {
             ClearBuffer(screenBuffer);
 

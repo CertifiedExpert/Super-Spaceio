@@ -20,15 +20,8 @@ namespace ConsoleEngine
         {
             Engine = engine;
         }
-
-        /// <summary>
-        /// NEW IDEA. DISREGARD CHUNK MOVEMENT DURING UPDATE LOOPS OF GAME OBJECTS. ONLY AFTER IT ENDED CHECK THE POSITIONS. 
-        /// (YOU CAN OPTIMIZE BY DOING CHECKING DURING UPDATE LOOPS AND LISTING SUSPECTS. THEN GO OVER THEM AND CHECK POSITIONS, MOVE)
-        /// 
-        /// THE SAME THING GOES FOR REMOVDING AND ADDING ENTITIES. LIST ADD/REMOVECALLS, LET UPDATE LOOP GO AS NORMAL. ADD AFTER)
-        /// </summary>
         
-        public void Update()
+        internal void Update()
         {
             // The sequence of each foreach loop is vital.
 
@@ -43,11 +36,11 @@ namespace ConsoleEngine
                 var newChunkY = go.Position.Y / Engine.Settings.chunkSize;
                 if (go.Chunk != new Vec2i(newChunkX, newChunkY))
                 {
-                    Engine.ChunkManager.chunks[go.Chunk].gameObjects.Remove(go.UID);
-                    Engine.ChunkManager.chunks[go.Chunk].gameObjectRenderLists[go.SpriteLevel].Remove(go);
+                    Engine.ChunkManager.chunks[go.Chunk]._gameObjects.Remove(go.UID);
+                    Engine.ChunkManager.chunks[go.Chunk]._gameObjectRenderLists[go.SpriteLevel].Remove(go);
 
-                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)].gameObjects.Add(go.UID, go);
-                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)].gameObjectRenderLists[go.SpriteLevel].Add(go);
+                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)]._gameObjects.Add(go.UID, go);
+                    Engine.ChunkManager.chunks[new Vec2i(newChunkX, newChunkY)]._gameObjectRenderLists[go.SpriteLevel].Add(go);
 
                     go.OnChunkTraverse();
                 }
@@ -56,8 +49,8 @@ namespace ConsoleEngine
 
             foreach (var go in gameObjectsToRemoveSchedule) // Works deespite duplicate calls
             {
-                var goExisted = Engine.ChunkManager.chunks[go.Chunk].gameObjects.Remove(go.UID);
-                Engine.ChunkManager.chunks[go.Chunk].gameObjectRenderLists[go.SpriteLevel].Remove(go);
+                var goExisted = Engine.ChunkManager.chunks[go.Chunk]._gameObjects.Remove(go.UID);
+                Engine.ChunkManager.chunks[go.Chunk]._gameObjectRenderLists[go.SpriteLevel].Remove(go);
 
                 // Retires the UID of the gameObject but ignores duplicate retire calls.
                 if (goExisted) Engine.UIDManager.RetireUID(go.UID);
@@ -66,8 +59,8 @@ namespace ConsoleEngine
 
             foreach (var tpl in gameObjectsToAddSchedule) 
             {
-                Engine.ChunkManager.chunks[tpl.Item1].gameObjects.Add(tpl.Item2.UID, tpl.Item2);
-                Engine.ChunkManager.chunks[tpl.Item1].gameObjectRenderLists[tpl.Item2.SpriteLevel].Add(tpl.Item2);
+                Engine.ChunkManager.chunks[tpl.Item1]._gameObjects.Add(tpl.Item2.UID, tpl.Item2);
+                Engine.ChunkManager.chunks[tpl.Item1]._gameObjectRenderLists[tpl.Item2.SpriteLevel].Add(tpl.Item2);
 
                 // Updates the Chunk field for objects which were not just added to the engine but moved from other chunks
                 tpl.Item2.Chunk = tpl.Item1;
@@ -75,9 +68,9 @@ namespace ConsoleEngine
             gameObjectsToAddSchedule.Clear();
         }
 
-        public void AddToMovedGameObjects(GameObject gameObject) => movedGameObjects.Add(gameObject);
+        internal void AddToMovedGameObjects(GameObject gameObject) => movedGameObjects.Add(gameObject);
 
-        public UID AddGameObject(GameObject gameObject)
+        internal UID AddGameObject(GameObject gameObject)
         {
             // Generates UID for the gameObject and returns it for use. It is done here during scheduling so that UID can be returned
             var UID = Engine.UIDManager.GenerateUID();
@@ -100,7 +93,7 @@ namespace ConsoleEngine
             return UID;
         }
 
-        public void RemoveGameObject(UID uID)
+        internal void RemoveGameObject(UID uID)
         {
             var go = Engine.Find(uID);
             if (go != null)
@@ -111,7 +104,7 @@ namespace ConsoleEngine
             }
         }
 
-        public void FinishInit() // TODO: when the Engine has created instances of all subsystems, call this function to finish init
+        internal void FinishInit() // TODO: when the Engine has created instances of all subsystems, call this function to finish init
         {
             Engine.ChunkManager.ChunkLoaded += ChunkManager_ChunkLoaded;
             Engine.ChunkManager.ChunkLoadingEnded += ChunkManager_ChunkLoadingEnded;
@@ -129,8 +122,8 @@ namespace ConsoleEngine
             {
                 foreach (var go in unloadedChunkGOsToAdd[chunkIndex])
                 {
-                    Engine.ChunkManager.chunks[chunkIndex].gameObjects.Add(go.UID, go);
-                    Engine.ChunkManager.chunks[chunkIndex].gameObjectRenderLists[go.SpriteLevel].Add(go);
+                    Engine.ChunkManager.chunks[chunkIndex]._gameObjects.Add(go.UID, go);
+                    Engine.ChunkManager.chunks[chunkIndex]._gameObjectRenderLists[go.SpriteLevel].Add(go);
                 }
             }
         }
