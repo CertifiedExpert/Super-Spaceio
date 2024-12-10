@@ -14,7 +14,7 @@ namespace ConsoleEngine
         public ReadOnlyVec2i Position { get; private set; }
 
         [DataMember]
-        public Sprite[] Sprites { get; private set; } 
+        public List<Sprite> Sprites { get; private set; } 
         [DataMember]
         public List<Collider> Colliders { get; private set; }
         [DataMember]
@@ -40,7 +40,7 @@ namespace ConsoleEngine
             Position = new ReadOnlyVec2i(position);
             Engine = engine;
             SpriteLevel = 5;
-            Sprites = new Sprite[Engine.Settings.spriteMaxCount];
+            Sprites = new List<Sprite>();
             Colliders = new List<Collider>();
             Binds = new List<GoBind>();
         }

@@ -18,7 +18,7 @@ namespace ConsoleEngine
         [DataMember] public GameObjectManager GameObjectManager { get; private set; } // The game object manager of the game.
         [DataMember] public Camera Camera { get; private set; } // The camera used in the engine. 
         [DataMember] public UIManager UIManager { get; private set; } // The ui manager used in the engine.
-        [DataMember] public UIDManager UIDManager { get; private set; }
+        public ResourceManager ResourceManager { get; private set; }
 
 
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
@@ -51,7 +51,7 @@ namespace ConsoleEngine
         protected Engine(
             Settings _settings, Renderer _renderer, InputManager _inputManager, Serializer _serializer,
             ChunkManager _chunkManager, GameObjectManager _gameObjectManager,
-            Camera _camera, UIManager _uIManager, UIDManager _uIDManager)
+            Camera _camera, UIManager _uIManager, ResourceManager _resourceManager)
         {
             // Loading. 
             OnEngineLoad();

@@ -5,6 +5,11 @@ namespace ConsoleEngine
     [DataContract]
     public class Sprite
     {//TODO: derive a NormalSprite and a StaticFillSprite from this to save memory (can constitute to over 50% total memory usage)
+
+        /// <summary>
+        /// Upgrade Sprite class. There should be static sprites, animated sprites, shader sprites. All derived from abstract Sprite.
+        /// Static has a bitmap. Animated has a bitmap and animator. Shader has a delegate.
+        /// </summary>
         public Bitmap Bitmap { get; set; }
         [DataMember]
         public Vec2i AttachmentPos { get; set; }

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AD6E2CBA-063B-4972-B67F-6CA2A84BEB2D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Spaceio</RootNamespace>
+    <RootNamespace>ConsoleEngine</RootNamespace>
     <AssemblyName>SpaceioEngine</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -76,6 +76,8 @@
     <Compile Include="Physics\Collider.cs" />
     <Compile Include="Misc\GoBind.cs" />
     <Compile Include="Math\ReadOnlyVec2i.cs" />
+    <Compile Include="Resources\ResID.cs" />
+    <Compile Include="Resources\ResIDManager.cs" />
     <Compile Include="Save\SaveData\GameObjectSaveData.cs" />
     <Compile Include="Save\SaveManager.cs" />
     <Compile Include="Save\Serializer.cs" />
@@ -86,7 +88,7 @@
     <Compile Include="Core\Engine.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Misc\Util.cs" />
-    <Compile Include="Misc\ResourceManager.cs" />
+    <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Math\Vec2f.cs" />
     <Compile Include="UI\UIComponent.cs" />

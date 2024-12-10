@@ -1,7 +1,31 @@
-﻿namespace ConsoleEngine
+﻿using System.Collections.Generic;
+
+namespace ConsoleEngine
 {
     public class ResourceManager
     {
+        private Engine Engine { get; set; }
+        private ResIDManager ResIDManager { get; set; }
+
+        public string resFolderPath; // TODO: plan file architecture
+
+        public ResourceManager(Engine engine)
+        {
+            Engine = engine;
+            ResIDManager = new ResIDManager();
+        }
+
+        private Dictionary<ResID, string> resourcesAndPaths = new Dictionary<ResID, string>(); // Even needed?
+        private Dictionary<ResID, Bitmap> bitmaps = new Dictionary<ResID, Bitmap>();
+
+        /// <summary>
+        /// Replace Bitmap in Sprite class with ResID. Unmodified Bitmaps should be loaded from file. Modified Bitmaps
+        /// sould be able to be added to 'bitmaps' pool. Optionally modified Bitmaps should be able to be saved to file in resources folder.
+        /// </summary>
+        
+        /// Upgrade Sprite class (more info there)
+        
+
         public static Bitmap fighter1Up;
         public static Bitmap fighter1Down;
         public static Bitmap fighter1Right;

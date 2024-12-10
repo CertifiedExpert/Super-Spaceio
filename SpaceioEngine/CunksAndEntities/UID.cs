@@ -10,19 +10,19 @@ namespace ConsoleEngine
 {
     public readonly struct UID : IEquatable<UID>
     {
-        public readonly uint ID;
+        public readonly uint BaseID;
         public readonly uint Generation;
-        public UID(uint ID = uint.MaxValue, uint generation = uint.MaxValue)
+        internal UID(uint ID = uint.MaxValue, uint generation = uint.MaxValue)    
         {
-            this.ID = ID;
+            BaseID = ID;
             Generation = generation;
         }
-        public bool Equals(UID other) => ID == other.ID && Generation == other.Generation;
-        public override string ToString() => $"{ID}-{Generation}";
+        public bool Equals(UID other) => BaseID == other.BaseID && Generation == other.Generation;
+        public override string ToString() => $"{BaseID}-{Generation}";
         public override bool Equals(object obj) => obj is UID other && Equals(other);
         public static bool operator ==(UID left, UID right) => left.Equals(right);
         public static bool operator !=(UID left, UID right) => !left.Equals(right); 
-        public override int GetHashCode() => HashCode.Combine(ID, Generation);
+        public override int GetHashCode() => HashCode.Combine(BaseID, Generation);
 
         public static UID InvalidUID() => new UID(uint.MaxValue, uint.MaxValue);
     }

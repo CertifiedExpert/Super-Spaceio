@@ -10,6 +10,7 @@ namespace ConsoleEngine
     public class GameObjectManager
     {
         private Engine Engine { get; set; }
+        private UIDManager UIDManager { get; set; }
 
         private List<Tuple<Vec2i, GameObject>> gameObjectsToAddSchedule = new List<Tuple<Vec2i, GameObject>>(); // Vec2i stores to which chunk the gameObject should be added
         private List<GameObject> gameObjectsToRemoveSchedule = new List<GameObject>(); 
@@ -19,6 +20,7 @@ namespace ConsoleEngine
         public GameObjectManager(Engine engine)
         {
             Engine = engine;
+            UIDManager = new UIDManager();
         }
         
         internal void Update()
@@ -53,7 +55,7 @@ namespace ConsoleEngine
                 Engine.ChunkManager.chunks[go.Chunk]._gameObjectRenderLists[go.SpriteLevel].Remove(go);
 
                 // Retires the UID of the gameObject but ignores duplicate retire calls.
-                if (goExisted) Engine.UIDManager.RetireUID(go.UID);
+                if (goExisted) UIDManager.RetireUID(go.UID);
             }
             gameObjectsToRemoveSchedule.Clear();
 
@@ -73,7 +75,7 @@ namespace ConsoleEngine
         internal UID AddGameObject(GameObject gameObject)
         {
             // Generates UID for the gameObject and returns it for use. It is done here during scheduling so that UID can be returned
-            var UID = Engine.UIDManager.GenerateUID();
+            var UID = UIDManager.GenerateUID();
             gameObject.SetUID(UID);
 
             var chunkX = gameObject.Position.X / Engine.Settings.chunkSize; //TODO: make it so that the player at <0,0> starts in the middle of a start chunk, not between 4 chunks
