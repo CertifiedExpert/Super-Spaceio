@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace ConsoleEngine
 {
-    public abstract class GameObject
+    public class GameObject
     {
         public Engine Engine { get; private set; }
         public Vec2i Chunk { get; internal set; }
@@ -168,6 +168,8 @@ namespace ConsoleEngine
                 var colliderSD = collider.GetSaveData();
                 sd.Colliders.Add(colliderSD);
             }
+
+            return sd;
         }
 
 

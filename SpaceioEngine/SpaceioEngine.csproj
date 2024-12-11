@@ -79,8 +79,12 @@
     <Compile Include="Math\ReadOnlyVec2i.cs" />
     <Compile Include="Resources\ResID.cs" />
     <Compile Include="Resources\ResIDManager.cs" />
+    <Compile Include="Save\SaveData\AnimatorSaveData.cs" />
     <Compile Include="Save\SaveData\ChunkSaveData.cs" />
+    <Compile Include="Save\SaveData\ColliderSaveData.cs" />
     <Compile Include="Save\SaveData\GameObjectSaveData.cs" />
+    <Compile Include="Save\SaveData\ShaderSaveData.cs" />
+    <Compile Include="Save\SaveData\SpriteSaveData.cs" />
     <Compile Include="Save\Serializer.cs" />
     <Compile Include="Graphics\Bitmap.cs" />
     <Compile Include="Graphics\Animator.cs" />

@@ -21,10 +21,10 @@ namespace ConsoleEngine
             AttachmentPos = new Vec2i (0, 0);
             Shader = new Shader(DefaultShader, null);
         }
-        public Sprite(ResID bitmap, Vec2i attachmentInfo, Shader shader, Animator animator = null)
+        public Sprite(ResID bitmapID, Vec2i attachmentInfo, Shader shader, Animator animator = null)
         {
             AttachmentPos = attachmentInfo;
-            BitmapID = bitmap;
+            BitmapID = bitmapID;
             Shader = shader;
             Animator = animator;
             Shader = shader;
@@ -32,23 +32,25 @@ namespace ConsoleEngine
 
         internal Sprite(SpriteSaveData saveData)
         {
-            ResID = saveData.ResID;
-            AttachmentPos = saveDataAttachmentPos;
-            Animator = new Animator(saveData.Animator);
+            BitmapID = saveData.BitmapID;
+            AttachmentPos = saveData.AttachmentPos;
+            Animator = new Animator(this, saveData.Animator);
             Shader = new Shader(saveData.Shader);
         }
 
         internal SpriteSaveData GetSaveData()
         {
             var sd = new SpriteSaveData();
-            sd.ResID = ResID;
+            sd.BitmapID = BitmapID;
             sd.AttachmentPos = AttachmentPos;
-            sd.Animated = Animator.GetSaveData();
+            sd.Animator = Animator.GetSaveData();
             sd.Shader = Shader.GetSaveData();
             return sd;
         }
 
         public static char DefaultShader(int x, int y, Bitmap bitmap, object[] args) => bitmap.Data[x, y];
+
+
 
         // Prepares the sprite for deserialization (serializer does not allow for 2d-arrays but allows jagged arrays)
         public void PrepareForDeserialization()

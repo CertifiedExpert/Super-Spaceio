@@ -26,7 +26,7 @@ namespace ConsoleEngine
         
         internal Animator(Sprite sprite, AnimatorSaveData animatorSaveData)
         {
-            sprite = animatorSaveData.sprite;
+            this.sprite = sprite;
             frames = animatorSaveData.frames;
             millisecondsForFrameStep = animatorSaveData.millisecondsForFrameStep;
             loopable = animatorSaveData.loopable;

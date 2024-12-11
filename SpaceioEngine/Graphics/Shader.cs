@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace ConsoleEngine
         {
             var targetType = Type.GetType(saveData.TargetType);
             var method = targetType.GetMethod(saveData.MethodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            ShaderMethod = Delegate.CreateDelegate(typeof(GetPixel), method);
+            ShaderMethod = (GetPixel)Delegate.CreateDelegate(typeof(GetPixel), method);
 
             Args = saveData.Args;
         }
