@@ -9,7 +9,7 @@ namespace ConsoleEngine
     {
         private Sprite sprite;
         [DataMember]
-        private List<Bitmap> frames;
+        private List<ResID> frames;
         [DataMember]
         private int millisecondsForFrameStep;
         [DataMember]
@@ -19,7 +19,7 @@ namespace ConsoleEngine
         private int currentFrame = 0;
         [DataMember]
         private DateTime lastFrameUpdate = DateTime.Now;
-        public Animator(List<Bitmap> frames, int millisecondsForFrameStep, bool loopable, Sprite sprite,
+        public Animator(List<ResID> frames, int millisecondsForFrameStep, bool loopable, Sprite sprite,
                         bool randomizeStartFrame = false)
         {
             this.frames = frames;

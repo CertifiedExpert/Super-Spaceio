@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace ConsoleEngine
 {
@@ -14,20 +16,67 @@ namespace ConsoleEngine
         {
             Engine = engine;
             ResIDManager = new ResIDManager();
-            Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(_bitmaps);
+            Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(bitmaps);
         }
 
-        private Dictionary<ResID, string> resourcesAndPaths = new Dictionary<ResID, string>(); // Even needed?
-        private Dictionary<ResID, Bitmap> _bitmaps = new Dictionary<ResID, Bitmap>();
+        private Dictionary<string, ResID> namesAndResIDs = new Dictionary<string, ResID>(); 
+        private Dictionary<ResID, Bitmap> bitmaps = new Dictionary<ResID, Bitmap>();
         public ReadOnlyDictionary<ResID, Bitmap> Bitmaps { get; }
+
+        internal void LoadAllBitmapsFromFolder(string path)
+        {
+            try
+            {
+                var filesPaths = Directory.GetFiles(path);
+
+                foreach (var p in filesPaths)
+                {
+                    var tuple = LoadBitmapFromPath(p);
+
+                    if (bitmaps.ContainsKey(tuple.Item1)) bitmaps[tuple.Item1] = tuple.Item2;
+                    else
+                    {
+                        var resID = AddBitmap(tuple.Item2);
+                        namesAndResIDs.Add(Path.GetFileNameWithoutExtension(p), resID);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        // Returns ResIDManager.InvalidResID if no resourche with this name exists
+        public ResID GetResID(string name)
+        {
+            if (namesAndResIDs.ContainsKey(name)) return namesAndResIDs[name];
+            else return ResIDManager.InvalidResID;
+        }
+
+        public ResID AddBitmap(Bitmap bitmap)
+        {
+            var resID = ResIDManager.GenerateResID();
+            bitmaps.Add(resID, bitmap);
+            return resID;
+        }
+
+        public void RemoveBitmap(ResID resId)
+        {
+            bitmaps.Remove(resId);
+            ResIDManager.RetireResID(resId);
+        }
+
+        private Tuple<ResID, Bitmap> LoadBitmapFromPath(string p)
+        {
+
+        }
+
 
         /// <summary>
         /// Replace Bitmap in Sprite class with ResID. Unmodified Bitmaps should be loaded from file. Modified Bitmaps
         /// sould be able to be added to 'bitmaps' pool. Optionally modified Bitmaps should be able to be saved to file in resources folder.
         /// </summary>
-        
+
         /// Upgrade Sprite class (more info there)
-        
+
 
         public static Bitmap fighter1Up;
         public static Bitmap fighter1Down;

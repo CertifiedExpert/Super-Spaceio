@@ -22,7 +22,7 @@ namespace ConsoleEngine
             freeResIDs.RemoveAt(0);
             return resID;
         }
-        internal void RetireResID(UID uid) => freeResIDs.Add(new ResID(uid.BaseID, uid.Generation + 1));
+        internal void RetireResID(ResID resID) => freeResIDs.Add(new ResID(resID.BaseID, resID.Generation + 1));
         private void FillUIDPool(uint from, uint to)
         {
             for (var i = from; i < to; i++)
@@ -30,5 +30,7 @@ namespace ConsoleEngine
                 freeResIDs.Add(new ResID(i, 0));
             }
         }
+
+        public static ResID InvalidResID => new ResID(uint.MaxValue, uint.MaxValue);
     }
 }

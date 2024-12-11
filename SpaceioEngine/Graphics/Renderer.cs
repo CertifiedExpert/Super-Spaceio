@@ -50,7 +50,7 @@ namespace ConsoleEngine
         // Draws all GameObjects to the screenBuffer.
         private void DrawGameObjectsToFrameBuffer() 
         {
-            foreach (var chunk in Engine.ChunkManager.loadedChunks)
+            foreach (var chunk in Engine.ChunkManager.loadedChunks) // TODO: check if the chunk is even visible
             {
                 for (var level = Engine.Settings.spriteLevelCount - 1; level >= 0; level--)
                 {
