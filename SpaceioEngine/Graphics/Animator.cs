@@ -48,7 +48,7 @@ namespace ConsoleEngine
                     }
                 }
 
-                sprite.Bitmap = frames[currentFrame];
+                sprite.BitmapID = frames[currentFrame];
 
                 lastFrameUpdate = DateTime.Now;
             }

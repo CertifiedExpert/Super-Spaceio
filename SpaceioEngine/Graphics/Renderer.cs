@@ -111,22 +111,24 @@ namespace ConsoleEngine
             {
                 if (sprite != null)
                 {
+                    var bitmap = Engine.ResourceManager.Bitmaps[sprite.BitmapID]; // TODO: check if the bitmap was retrieved succesfully
                     var realPosX = gameObject.Position.X + sprite.AttachmentPos.X - Engine.Camera.Position.X; 
                     var realPosY = gameObject.Position.Y + sprite.AttachmentPos.Y - Engine.Camera.Position.Y;
 
                     var beginX = (realPosX >= 0) ? 0 : -realPosX; 
-                    var endX = (realPosX + sprite.Bitmap.Size.X <= Engine.Camera.Size.X) 
-                        ? sprite.Bitmap.Size.X - beginX : Engine.Camera.Size.X - realPosX;
+                    var endX = (realPosX + bitmap.Size.X <= Engine.Camera.Size.X) 
+                        ? bitmap.Size.X - beginX : Engine.Camera.Size.X - realPosX;
 
                     var beginY = (realPosY >= 0) ? 0 : -realPosY;
-                    var endY = (realPosY + sprite.Bitmap.Size.Y <= Engine.Camera.Size.Y)
-                        ? sprite.Bitmap.Size.Y - beginY : Engine.Camera.Size.Y - realPosY;
+                    var endY = (realPosY + bitmap.Size.Y <= Engine.Camera.Size.Y)
+                        ? bitmap.Size.Y - beginY : Engine.Camera.Size.Y - realPosY;
 
                     for (var x = 0; x < endX; x++)
                     {
                         for (var y = 0; y < endY; y++)
                         {
-                            screenBuffer[realPosX + beginX + x, realPosY + beginY + y] = sprite.Bitmap.Data[beginX + x, beginY + y];  
+                            screenBuffer[realPosX + beginX + x, realPosY + beginY + y] = 
+                                sprite.Shader.ShaderMethod(beginX + x, beginY + y, bitmap, sprite.Shader.Args);
                         }
                     }
                 } 
@@ -136,11 +138,11 @@ namespace ConsoleEngine
         private void WriteParentPanelToScreenBuffer(UIPanel uiPanel)
         {
             var sprite = uiPanel.GetParentPanelSprite();
-            for (var x = 0; x < sprite.Bitmap.Size.X; x++)
+            for (var x = 0; x < sprite.BitmapID.Size.X; x++)
             {
-                for (var y = 0; y < sprite.Bitmap.Size.Y; y++)
+                for (var y = 0; y < sprite.BitmapID.Size.Y; y++)
                 {
-                    screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.Bitmap.Data[x, y];
+                    screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.BitmapID.Data[x, y];
                 }
             }
         }

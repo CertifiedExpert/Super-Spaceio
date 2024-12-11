@@ -72,6 +72,7 @@
     <Compile Include="CunksAndEntities\Chunk.cs" />
     <Compile Include="Core\Settings.cs" />
     <Compile Include="Exceptions\UIException.cs" />
+    <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Math\EMath.cs" />
     <Compile Include="Physics\Collider.cs" />
     <Compile Include="Misc\GoBind.cs" />

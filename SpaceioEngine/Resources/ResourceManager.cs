@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ConsoleEngine
 {
@@ -13,10 +14,12 @@ namespace ConsoleEngine
         {
             Engine = engine;
             ResIDManager = new ResIDManager();
+            Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(_bitmaps);
         }
 
         private Dictionary<ResID, string> resourcesAndPaths = new Dictionary<ResID, string>(); // Even needed?
-        private Dictionary<ResID, Bitmap> bitmaps = new Dictionary<ResID, Bitmap>();
+        private Dictionary<ResID, Bitmap> _bitmaps = new Dictionary<ResID, Bitmap>();
+        public ReadOnlyDictionary<ResID, Bitmap> Bitmaps { get; }
 
         /// <summary>
         /// Replace Bitmap in Sprite class with ResID. Unmodified Bitmaps should be loaded from file. Modified Bitmaps
