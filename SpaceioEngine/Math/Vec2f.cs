@@ -3,13 +3,11 @@ using System.Runtime.Serialization;
 
 namespace ConsoleEngine
 {
-    [DataContract(IsReference = true)]
+    [DataContract]
     public struct Vec2f 
     {
-        [DataMember]
-        public float X { get; set; }
-        [DataMember]
-        public float Y { get; set; }
+        [DataMember] public float X { get; set; }
+        [DataMember] public float Y { get; set; }
         public float Length => (float)Math.Sqrt(X * X + Y * Y);
 
         public Vec2f(float x, float y)

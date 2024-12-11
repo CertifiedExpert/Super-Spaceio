@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
+    [DataContract]
     public readonly struct ResID : IEquatable<ResID>
     {
-        public readonly uint BaseID;
-        public readonly uint Generation;
+        [DataMember] public readonly uint BaseID;
+        [DataMember] public readonly uint Generation;
         internal ResID(uint ID = uint.MaxValue, uint generation = uint.MaxValue)
         {
             BaseID = ID;

@@ -2,7 +2,6 @@
 
 namespace ConsoleEngine
 {
-    [DataContract]
     public class Sprite
     {//TODO: derive a NormalSprite and a StaticFillSprite from this to save memory (can constitute to over 50% total memory usage)
 
@@ -11,13 +10,10 @@ namespace ConsoleEngine
         /// Static has a bitmap. Animated has a bitmap and animator. Shader has a delegate.
         /// </summary>
         public ResID BitmapID { get; set; }
-        [DataMember]
         public Vec2i AttachmentPos { get; set; }
-        [DataMember]
         public Animator Animator { get; set; }
         public Shader Shader { get; set; }
 
-        [DataMember]
         private char[][] jaggedizedBitmapData_serialize;
         public Sprite (ResID bitmap)
         {
@@ -34,7 +30,25 @@ namespace ConsoleEngine
             Shader = shader;
         }
 
-        public char DefaultShader(int x, int y, Bitmap bitmap, object[] args) => bitmap.Data[x, y];
+        internal Sprite(SpriteSaveData saveData)
+        {
+            ResID = saveData.ResID;
+            AttachmentPos = saveDataAttachmentPos;
+            Animator = new Animator(saveData.Animator);
+            Shader = new Shader(saveData.Shader);
+        }
+
+        internal SpriteSaveData GetSaveData()
+        {
+            var sd = new SpriteSaveData();
+            sd.ResID = ResID;
+            sd.AttachmentPos = AttachmentPos;
+            sd.Animated = Animator.GetSaveData();
+            sd.Shader = Shader.GetSaveData();
+            return sd;
+        }
+
+        public static char DefaultShader(int x, int y, Bitmap bitmap, object[] args) => bitmap.Data[x, y];
 
         // Prepares the sprite for deserialization (serializer does not allow for 2d-arrays but allows jagged arrays)
         public void PrepareForDeserialization()

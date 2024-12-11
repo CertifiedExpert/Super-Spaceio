@@ -17,14 +17,14 @@ namespace ConsoleEngine
         public ReadOnlyCollection<ReadOnlyCollection<GameObject>> gameObjectRenderLists { get; private set; }
 
 
-        public DateTime lastUnloaded { get; internal set; }
+        public DateTime LastUnloaded { get; internal set; }
         public Chunk(Vec2i index, Engine engine)
         {
             Engine = engine;
 
             gameObjects = new ReadOnlyDictionary<UID, GameObject>(_gameObjects);
             
-            lastUnloaded = DateTime.MinValue;
+            LastUnloaded = DateTime.MinValue;
 
             _gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
             for (var i = 0; i < _gameObjectRenderLists.Length; i++) _gameObjectRenderLists[i] = new List<GameObject>();
@@ -37,13 +37,28 @@ namespace ConsoleEngine
 
         internal Chunk(Engine engine, Vec2i index, ChunkSaveData saveData)
         {
+            Engine = engine;
+            Index = index;
 
+            _gameObjectRenderLists = new List<GameObject>[Engine.Settings.spriteLevelCount];
+            for (var i = 0; i < _gameObjectRenderLists.Length; i++) _gameObjectRenderLists[i] = new List<GameObject>();
+            gameObjects = new ReadOnlyDictionary<UID, GameObject>(_gameObjects);
+            gameObjectRenderLists = new ReadOnlyCollection<ReadOnlyCollection<GameObject>>(
+            Array.ConvertAll(_gameObjectRenderLists, list => new ReadOnlyCollection<GameObject>(list)));
+
+            LastUnloaded = saveData.lastUnloaded;
+            foreach (var gameObjectSaveData in saveData.gameObjects)
+            {
+                var go = new GameObject(gameObjectSaveData);
+                _gameObjects.Add(go.UID, go);
+                gameObjectRenderLists[go.SpriteLevel].Add(go);
+            }
         }
 
-        internal ChunkSaveData GenerateChunkSaveData()
+        internal ChunkSaveData GetSaveData()
         {
             var sd = new ChunkSaveData();
-            sd.lastUnloaded = lastUnloaded;
+            sd.lastUnloaded = LastUnloaded;
 
             foreach (var go in _gameObjects.Values)
             {

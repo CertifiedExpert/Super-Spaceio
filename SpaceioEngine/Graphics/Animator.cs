@@ -4,20 +4,14 @@ using System.Runtime.Serialization;
 
 namespace ConsoleEngine
 {
-    [DataContract]
     public class Animator
     {
         private Sprite sprite;
-        [DataMember]
         private List<ResID> frames;
-        [DataMember]
         private int millisecondsForFrameStep;
-        [DataMember]
         private bool loopable;
 
-        [DataMember]
         private int currentFrame = 0;
-        [DataMember]
         private DateTime lastFrameUpdate = DateTime.Now;
         public Animator(List<ResID> frames, int millisecondsForFrameStep, bool loopable, Sprite sprite,
                         bool randomizeStartFrame = false)
@@ -29,8 +23,15 @@ namespace ConsoleEngine
 
             if (randomizeStartFrame) currentFrame = Util.random.Next(0, frames.Count);
         }
-
         
+        internal Animator(Sprite sprite, AnimatorSaveData animatorSaveData)
+        {
+            sprite = animatorSaveData.sprite;
+            frames = animatorSaveData.frames;
+            millisecondsForFrameStep = animatorSaveData.millisecondsForFrameStep;
+            loopable = animatorSaveData.loopable;
+        }
+
         // Gets called every frame by the engine. Updates the animator
         internal void Update()
         {
@@ -52,6 +53,15 @@ namespace ConsoleEngine
 
                 lastFrameUpdate = DateTime.Now;
             }
+        }
+
+        internal AnimatorSaveData GetSaveData()
+        {
+            var sd = new AnimatorSaveData();
+            sd.frames = frames;
+            sd.millisecondsForFrameStep = millisecondsForFrameStep;
+            sd.loopable = loopable;
+            return sd;
         }
     }
 }

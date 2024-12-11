@@ -2,13 +2,11 @@
 
 namespace ConsoleEngine
 {
-    [DataContract(IsReference = true)]
+    [DataContract]
     public struct Vec2i 
     {
-        [DataMember]
-        public int X { get; set; }
-        [DataMember]
-        public int Y { get; set; }
+        [DataMember] public int X { get; set; }
+        [DataMember] public int Y { get; set; }
         public Vec2i(int x, int y)
         {
             X = x;

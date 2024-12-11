@@ -10,7 +10,10 @@ namespace ConsoleEngine
     [DataContract]
     public class GameObjectSaveData
     {
-        public UID UID;
-        public Vec2i Position;
+        [DataMember] public UID UID;
+        [DataMember] public Vec2i Position;
+        [DataMember] public int SpriteLevel;
+        [DataMember] public List<SpriteSaveData> Sprites;
+        [DataMember] public List<ColliderSaveData> Colliders;
     }
 }

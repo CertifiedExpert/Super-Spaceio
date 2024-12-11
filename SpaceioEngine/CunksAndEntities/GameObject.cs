@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 
 namespace ConsoleEngine
 {
-    [DataContract(IsReference = true)]
     public abstract class GameObject
     {
         public Engine Engine { get; private set; }
@@ -12,14 +11,9 @@ namespace ConsoleEngine
 
         public UID UID { get; private set; }
         public ReadOnlyVec2i Position { get; private set; }
-
-        [DataMember]
         public List<Sprite> Sprites { get; private set; } 
-        [DataMember]
         public List<Collider> Colliders { get; private set; }
-        [DataMember]
-        public List<GoBind> Binds { get; private set; } // A list of GoBinds referring to this GameObject.
-        [DataMember]
+        
         private int _spriteLevel;
         public int SpriteLevel 
         {
@@ -42,7 +36,28 @@ namespace ConsoleEngine
             SpriteLevel = 5;
             Sprites = new List<Sprite>();
             Colliders = new List<Collider>();
-            Binds = new List<GoBind>();
+        }
+
+        internal GameObject(Engine engine, Vec2i chunk, GameObjectSaveData saveData)
+        {
+            Engine = engine;
+            Chunk = chunk;
+
+            Sprites = new List<Sprite>();
+            Colliders = new List<Collider>();
+
+            UID = saveData.UID;
+            SpriteLevel = saveData.SpriteLevel;
+            foreach (var spriteSD in saveData.Sprites) 
+            {
+                var sprite = new Sprite(spriteSD);
+                Sprites.Add(sprite);
+            }
+            foreach (var colliderSD in saveData.Colliders)
+            {
+                var collider = new Collider(colliderSD);
+                Colliders.Add(collider);
+            }
         }
 
         internal void SetUID (UID uid) => UID = uid;
@@ -139,7 +154,20 @@ namespace ConsoleEngine
 
         internal virtual GameObjectSaveData GetSaveData()
         {
-
+            var sd = new GameObjectSaveData();
+            sd.UID = UID;
+            sd.Position = new Vec2i(Position.X, Position.Y);
+            sd.SpriteLevel = SpriteLevel;
+            foreach (var sprite in Sprites) 
+            {
+                var spriteSD = sprite.GetSaveData();
+                sd.Sprites.Add(spriteSD);
+            }
+            foreach (var collider in Colliders) 
+            {
+                var colliderSD = collider.GetSaveData();
+                sd.Colliders.Add(colliderSD);
+            }
         }
 
 

@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
+    [DataMember]
     public readonly struct UID : IEquatable<UID>
     {
-        public readonly uint BaseID;
-        public readonly uint Generation;
+        [DataMember] public readonly uint BaseID;
+        [DataMember] public readonly uint Generation;
         internal UID(uint ID = uint.MaxValue, uint generation = uint.MaxValue)    
         {
             BaseID = ID;

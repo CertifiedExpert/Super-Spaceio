@@ -17,5 +17,23 @@ namespace ConsoleEngine
             ShaderMethod = shaderMethod;
             Args = args;
         }
+
+        internal Shader(ShaderSaveData saveData)
+        {
+            var targetType = Type.GetType(saveData.TargetType);
+            var method = targetType.GetMethod(saveData.MethodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            ShaderMethod = Delegate.CreateDelegate(typeof(GetPixel), method);
+
+            Args = saveData.Args;
+        }
+
+        internal ShaderSaveData GetSaveData()
+        {
+            var sd = new ShaderSaveData();
+            sd.MethodName = ShaderMethod.Method.Name;
+            sd.TargetType = ShaderMethod.Method.DeclaringType.AssemblyQualifiedName;
+            sd.Args = Args;
+            return sd;
+        }
     }
 }
