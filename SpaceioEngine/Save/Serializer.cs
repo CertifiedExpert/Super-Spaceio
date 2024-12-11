@@ -47,7 +47,7 @@ namespace ConsoleEngine
         }
 
         // Returns an instance of T from the specified string of xml data.
-        public T FromXmlString<T>(string xml, T instance)
+        public T FromXmlString<T>(string xml)
         {
             using (Stream stream = new MemoryStream())
             {
@@ -58,7 +58,7 @@ namespace ConsoleEngine
                 return (T)deserializer.ReadObject(stream);
             }
         }
-
+        
         public void SaveKnownTypes(string knownTypesFilePath)
         {
             knownTypesStrings_serialize = new List<string>();

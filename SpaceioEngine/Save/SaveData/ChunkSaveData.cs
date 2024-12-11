@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -8,9 +9,12 @@ using System.Threading.Tasks;
 namespace ConsoleEngine
 {
     [DataContract]
-    public class GameObjectSaveData
+    internal class ChunkSaveData
     {
-        public UID UID;
-        public Vec2i Position;
+        [DataMember]
+        public List<GameObjectSaveData> gameObjects;
+
+        [DataMember]
+        public DateTime lastUnloaded;
     }
 }

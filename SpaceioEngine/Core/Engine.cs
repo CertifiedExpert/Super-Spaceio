@@ -140,6 +140,18 @@ namespace ConsoleEngine
         // Saves the current state of the game including settings and chunks in their own folder.
         protected virtual void SaveGame()
         {
+            // Unload all chunks
+
+            // Save engine state
+
+            // Save managers
+
+
+
+
+
+
+
             Serializer.SaveKnownTypes($"{pathCurrentLoadedSave}\\knownTypes");
 
             var wasChunkLoadedMap2d = new bool[Settings.chunkCountX, Settings.chunkCountY];

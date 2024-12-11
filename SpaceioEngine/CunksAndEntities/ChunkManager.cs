@@ -23,7 +23,7 @@ namespace ConsoleEngine
         private List<Vec2i> chunksToBeLoaded = new List<Vec2i>();
 
         internal delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
-        internal event ChunkLoadedEventHandler ChunkLoaded; // TODO: add this to LoadChunk() function
+        internal event ChunkLoadedEventHandler ChunkLoaded; 
         internal event EventHandler ChunkLoadingEnded; 
         public ChunkManager(Engine engine)
         {
@@ -63,56 +63,28 @@ namespace ConsoleEngine
         // Loads the Chunk at specified index from file into the engine.
         private void LoadChunk(int x, int y)
         {
-            /*
-            Engine.chunks[x, y] = Engine.Serializer.FromFile<Chunk>($"{Engine.pathCurrentLoadedSave}\\Chunks\\chunk{x}_{y}");
-            
-            // Fill missing data
-            Engine.chunks[x, y].CompleteDataAfterSerialization(Engine, new Vec2i(x, y));
+            // TODO: Calculate place of chunk data in file
+            var xml = "";
 
-            chunksToBeAddedToLoadedChunks.Add(Engine.chunks[x, y]);
-            Engine.chunks[x, y].OnChunkLoaded();
+            var saveData = Engine.Serializer.FromXmlString<ChunkSaveData>(xml);
+            var chunk = new Chunk(Engine, new Vec2i(x, y), saveData);
 
-            // Integrate traverse GameObjects into the chunk and inform them of the newly loaded state (or delete them)
-            foreach (var gameObject in Engine.unloadedChunkTransitionRemoveGameObjects[x, y])
-            {
-                Engine.chunks[x, y].gameObjectsToRemove.Add(gameObject);
-            }
-            foreach (var gameObject in Engine.unloadedChunkTransitionAddGameObjects[x, y])
-            {
-                Engine.chunks[x, y].gameObjectsToAdd.Add(gameObject);
-            }
-            foreach (var gameObject in Engine.unloadedChunkTransitionAddGameObjects[x, y])
-            {
-                gameObject.OnUnloadedChunkAwake(x, y);
-            }
-            Engine.unloadedChunkTransitionRemoveGameObjects[x, y].Clear();
-            Engine.unloadedChunkTransitionAddGameObjects[x, y].Clear();
+            _chunks[new Vec2i(x, y)] = chunk;
+            _loadedChunks.Add(chunk);
 
-            chunks[new Tuple<int, int>(x, y)].OnChunkLoaded();
-            */
-
-            //TODO: IMPLEMENT THIS
-            throw new NotImplementedException();
+            ChunkLoaded?.Invoke(new Vec2i(x, y));
         }
 
         private void UnloadChunk(int x, int y)
         {
-            var c = chunks[new Vec2i(x, y)];
-            c.ChunkWasUnloaded();
+            var chunk = chunks[new Vec2i(x, y)];
+            chunk.lastUnloaded = DateTime.Now;
 
+            var saveData = chunk.GenerateChunkSaveData();
 
-            // TODO: CHANGE THIS CODE. IMPLEMENT SERIALIZATION!!
-            throw new NotImplementedException();
+            var xmlString = Engine.Serializer.ToXmlString(saveData);
 
-            /*
-            foreach (var gameObject in Engine.chunks[x, y].gameObjects)
-            {
-                gameObject.PrepareForSerialization();
-            }
-
-            Engine.Serializer.ToFile(Engine.chunks[x, y], $"{Engine.pathCurrentLoadedSave}\\Chunks\\chunk{Engine.chunks[x, y].Index.X}_{Engine.chunks[x, y].Index.Y}");
-            Engine.chunks[Engine.chunks[x, y].Index.X, Engine.chunks[x, y].Index.Y] = null;
-            */
+            // TODO: Calculate the place in save file and write the saved XML
         }
 
         public void ScheduleUnloadChunk(int x, int y)

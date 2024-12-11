@@ -150,33 +150,14 @@ namespace ConsoleEngine
             Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
-        // Completes data after the GameObject has been serialized and calls OnDeserialized on its GoBinds so that they can bind to their properties as the GameObject is finally existent.
         
-        public virtual void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
+        public GameObjectSaveData GenerateGameObjectSaveData()
         {
-            Engine = engine;
-            Chunk = engine.chunks[index.X, index.Y];
-            Position = new ReadOnlyVec2i(_position);
+            var sd = new GameObjectSaveData();
 
-            foreach (var sprite in Sprites)
-            {
-                if (sprite != null) sprite.OnDeserialization();
-            }
+            throw new NotImplementedException();
 
-            foreach (var bind in Binds) bind.OnDeserialized(this);
-        }
-        // Prepares the GameObject for deserialization. (Deactivates its binds as the GameObject is about to be deserialized.)
-        public virtual void PrepareForSerialization()
-        {
-            foreach (var sprite in Sprites)
-            {
-                if (sprite != null) sprite.PrepareForDeserialization();
-            }
-
-            foreach (var bind in Binds)
-            {
-                bind.IsActive = false;
-            }
+            return sd;
         }
     }
 }
