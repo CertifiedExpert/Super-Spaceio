@@ -66,7 +66,7 @@ namespace ConsoleEngine
 
         private Tuple<ResID, Bitmap> LoadBitmapFromPath(string p)
         {
-
+            throw new NotImplementedException(); //TODO: write this
         }
 
 

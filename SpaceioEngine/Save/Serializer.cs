@@ -9,9 +9,8 @@ namespace ConsoleEngine
     public class Serializer
     {
         // List of types recognized by the Serializer.
-        /// ADD ALL TYPE USED BY THE ENGINE HERE
-        public List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
-        
+        private List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
+        public void AddKnownType(Type type) => knownTypes.Add(type);
 
 
         // Saves an instance of T to the specified file.
@@ -37,7 +36,7 @@ namespace ConsoleEngine
         public string ToXmlString<T>(T instance)
         {
             using (MemoryStream memoryStream = new MemoryStream())
-            using (StreamReader reader = new StreamReader(memoryStream))
+            using (StreamReader reader = new StreamReader(memoryStream, Encoding.UTF8))
             {
                 DataContractSerializer serializer = new DataContractSerializer(instance.GetType(), knownTypes);
                 serializer.WriteObject(memoryStream, instance);

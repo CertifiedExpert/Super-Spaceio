@@ -19,6 +19,7 @@ namespace ConsoleEngine
         [DataMember] public Camera Camera { get; private set; } // The camera used in the engine. 
         [DataMember] public UIManager UIManager { get; private set; } // The ui manager used in the engine.
         public ResourceManager ResourceManager { get; private set; }
+        public SaveFileManager SaveFileManager { get; private set; }
 
 
         [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.

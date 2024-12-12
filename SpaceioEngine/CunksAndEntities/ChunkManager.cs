@@ -33,10 +33,10 @@ namespace ConsoleEngine
         }
         internal void Update()
         {
-            foreach (var v in chunksToBeUnloaded) UnloadChunk(v.X, v.Y);
+            foreach (var v in chunksToBeUnloaded) UnloadChunk(v);
             chunksToBeUnloaded.Clear();
 
-            foreach (var v in chunksToBeLoaded) LoadChunk(v.X, v.Y);
+            foreach (var v in chunksToBeLoaded) LoadChunk(v);
             chunksToBeLoaded.Clear();
 
             foreach (var v in chunksToBeAddedToLoadedChunks) _loadedChunks.Add(chunks[v]);
@@ -61,30 +61,28 @@ namespace ConsoleEngine
         }
 
         // Loads the Chunk at specified index from file into the engine.
-        private void LoadChunk(int x, int y)
+        private void LoadChunk(Vec2i index)
         {
-            // TODO: Calculate place of chunk data in file
-            var xml = "";
+            var xml = Engine.SaveFileManager.LoadChunkXML(index);
 
             var saveData = Engine.Serializer.FromXmlString<ChunkSaveData>(xml);
-            var chunk = new Chunk(Engine, new Vec2i(x, y), saveData);
+            var chunk = new Chunk(Engine, index, saveData);
 
-            _chunks[new Vec2i(x, y)] = chunk;
+            _chunks[index] = chunk;
             _loadedChunks.Add(chunk);
 
-            ChunkLoaded?.Invoke(new Vec2i(x, y));
+            ChunkLoaded?.Invoke(index);
         }
 
-        private void UnloadChunk(int x, int y)
+        private void UnloadChunk(Vec2i index)
         {
-            var chunk = chunks[new Vec2i(x, y)];
-            chunk.lastUnloaded = DateTime.Now;
+            var chunk = chunks[index];
+            chunk.LastUnloaded = DateTime.Now;
 
-            var saveData = chunk.GenerateChunkSaveData();
+            var saveData = chunk.GetSaveData();
 
             var xmlString = Engine.Serializer.ToXmlString(saveData);
-
-            // TODO: Calculate the place in save file and write the saved XML
+            Engine.SaveFileManager.SaveChunkXML(xmlString, index);
         }
 
         public void ScheduleUnloadChunk(int x, int y)
@@ -109,7 +107,7 @@ namespace ConsoleEngine
 
         internal void ForceUnloadChunk(int x, int y)
         {
-            UnloadChunk(x, y);
+            UnloadChunk(new Vec2i(x, y));
         }
 
         // Checks if the chunk is loaded and returns the result as a bool.

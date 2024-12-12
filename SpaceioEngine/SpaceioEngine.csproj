@@ -83,8 +83,10 @@
     <Compile Include="Save\SaveData\ChunkSaveData.cs" />
     <Compile Include="Save\SaveData\ColliderSaveData.cs" />
     <Compile Include="Save\SaveData\GameObjectSaveData.cs" />
+    <Compile Include="Save\SaveData\HeaderEntry.cs" />
     <Compile Include="Save\SaveData\ShaderSaveData.cs" />
     <Compile Include="Save\SaveData\SpriteSaveData.cs" />
+    <Compile Include="Save\SaveFileManager.cs" />
     <Compile Include="Save\Serializer.cs" />
     <Compile Include="Graphics\Bitmap.cs" />
     <Compile Include="Graphics\Animator.cs" />
