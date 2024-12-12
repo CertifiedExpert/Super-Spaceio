@@ -63,9 +63,9 @@ namespace ConsoleEngine
         // Loads the Chunk at specified index from file into the engine.
         private void LoadChunk(Vec2i index)
         {
-            var xml = Engine.SaveFileManager.LoadChunkXML(index);
+            var bytes = Engine.SaveFileManager.LoadChunkBytes(index);
 
-            var saveData = Engine.Serializer.FromXmlString<ChunkSaveData>(xml);
+            var saveData = Engine.Serializer.FromXmlBytes<ChunkSaveData>(bytes);
             var chunk = new Chunk(Engine, index, saveData);
 
             _chunks[index] = chunk;
@@ -81,8 +81,8 @@ namespace ConsoleEngine
 
             var saveData = chunk.GetSaveData();
 
-            var xmlString = Engine.Serializer.ToXmlString(saveData);
-            Engine.SaveFileManager.SaveChunkXML(xmlString, index);
+            var bytes = Engine.Serializer.ToXmlBytes(saveData);
+            Engine.SaveFileManager.SaveChunkBytes(bytes, index);
         }
 
         public void ScheduleUnloadChunk(int x, int y)

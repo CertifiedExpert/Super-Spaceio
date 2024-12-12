@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
 using System.IO;
+using System.Diagnostics;
 
 namespace ConsoleEngine
 {
@@ -12,6 +13,23 @@ namespace ConsoleEngine
         private List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
         public void AddKnownType(Type type) => knownTypes.Add(type);
 
+        public byte[] ToXmlBytes<T>(T instance)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var serializer = new DataContractSerializer(instance.GetType(), knownTypes);
+                serializer.WriteObject(stream, instance);
+                return stream.ToArray();
+            }
+        }
+        public T FromXmlBytes<T>(byte[] bytes)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var serializer = new DataContractSerializer(typeof(T), knownTypes);
+                return (T)serializer.ReadObject(stream);
+            }
+        }
 
         // Saves an instance of T to the specified file.
         public void ToFile<T>(T instance, string path)
