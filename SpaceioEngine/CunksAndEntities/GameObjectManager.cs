@@ -17,10 +17,10 @@ namespace ConsoleEngine
         private Dictionary<Vec2i, List<GameObject>> unloadedChunkGOsToAdd = new Dictionary<Vec2i, List<GameObject>>();
         private List<GameObject> movedGameObjects = new List<GameObject>();
 
-        public GameObjectManager(Engine engine)
+        public GameObjectManager(Engine engine, UIDManager uIDManager)
         {
             Engine = engine;
-            UIDManager = new UIDManager();
+            UIDManager = uIDManager;
         }
         
         internal void Update()

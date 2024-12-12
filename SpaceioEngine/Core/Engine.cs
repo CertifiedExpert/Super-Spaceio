@@ -13,26 +13,17 @@ namespace ConsoleEngine
         [DataMember] public Settings Settings { get; private set; } // The settings of the engine.
         [DataMember] public Renderer Renderer { get; private set; } // The renderer of the game.
         [DataMember] public InputManager InputManager { get; private set; } // The input renderer of the game.
-        [DataMember] public Serializer Serializer { get; private set; } // The serializer of the game.
         [DataMember] public ChunkManager ChunkManager { get; private set; } // The chunk manager of the game.
         [DataMember] public GameObjectManager GameObjectManager { get; private set; } // The game object manager of the game.
         [DataMember] public Camera Camera { get; private set; } // The camera used in the engine. 
-        [DataMember] public UIManager UIManager { get; private set; } // The ui manager used in the engine.
+        [DataMember] public UIManager UIManager { get; private set; } // TODO: in the next branch implement this
         public ResourceManager ResourceManager { get; private set; }
         public SaveFileManager SaveFileManager { get; private set; }
 
 
-        [DataMember] public bool[][] wasChunkLoadedMap_serialize { get; private set; } // A temporary variable used to save a map of chunks which were loaded during the saving of the game.
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionAddGameObjects_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionAddGameObjects.
-        [DataMember] public List<GameObject>[][] unloadedChunkTransitionRemoveGameObject_serialize { get; private set; } // A temporary variable used to serialize unloadedChunkTransitionRemoveGameObjects.
-
         private bool gameShouldClose = false; // Flag whether the game is set to close.
         public int deltaTime { get; private set; } // Milliseconds which passed since last frame.
         private DateTime lastFrame; // The time of last frame.
-
-        private Vec2i _worldSize; // TODO: the behavior or ReadOnlyVec2i changed. Reimplement this or delete this
-        public ReadOnlyVec2i worldSize { get; private set; } // The total size of the world. (Number of chunks * chunk size)
-
 
         // Debug.
         public readonly int debugLinesCount = 10;
@@ -40,22 +31,19 @@ namespace ConsoleEngine
         public string[] debugLines = new string[10];
 
         // Paths.
-        public string pathRootFolder; // The root folder of the executable.
-        public string pathSavesFolder;
-        public string pathCurrentLoadedSave;
+        public string pathRootFolder = Util.GetAssemblyDirectory();
+        public string pathSaveFolder { get; private set; }
+        public string pathWorldFolder { get; private set; }
+        public string pathGameState { get; private set; }
 
         // Possible configurations.
         // "  " <and> font 20 | width 70 | height 48 <or> font 10 | width 126 | height 90 <or> font 5 | width 316 | height 203
         // " " <and> font 10 | width 189 | height 99
-        
+
         // Application loop.
-        protected Engine(
-            Settings _settings, Renderer _renderer, InputManager _inputManager, Serializer _serializer,
-            ChunkManager _chunkManager, GameObjectManager _gameObjectManager,
-            Camera _camera, UIManager _uIManager, ResourceManager _resourceManager)
+        protected Engine() { }
+        public void Run()
         {
-            // Loading. 
-            OnEngineLoad();
             OnLoad();
 
             while (!gameShouldClose)
@@ -79,21 +67,71 @@ namespace ConsoleEngine
                 deltaTime = (int)(DateTime.Now - lastFrame).TotalMilliseconds;
             }
 
-            SaveGame();
+            Save();
+        }
+        public void LoadFromSave(string path)
+        {
+            pathSaveFolder = path;
+            pathWorldFolder = $"{pathSaveFolder}\\World";
+            pathGameState = $"{pathSaveFolder}\\GameState";
+
+            Settings = Serializer.FromFile<Settings>($"{pathGameState}\\Settings.txt");
+            ChunkManager = new ChunkManager(Serializer.FromFile<ChunkManagerSaveData>($"{pathGameState}\\ChunkManager.txt"));
+            GameObjectManager = new GameObjectManager(Serializer.FromFile<GameObjectManagerSaveData>($"{pathGameState}\\GameObjectManager.txt"));
+            Camera = new Camera(Serializer.FromFile<CameraSaveData>("${pathGameState}\\Camera.txt"));
+            ResourceManager = new ResourceManager(Serializer.FromFile<ResourceManagerSaveData>($"{pathGameState}\\ResourceManager.txt"));
+            SaveFileManager = new SaveFileManager(Serializer.FromFile<SaveFileManagerSaveData>($"{pathGameState}\\SaveFileManager.txt"));
+
+            SetUpEngine();
+        }
+
+        // Sequence of creating new subsystems is vital!
+        public void NewSave(string name, Settings settings, Renderer renderer, InputManager inputManager, ChunkManager chunkManager,
+            GameObjectManager gameObjectManager, Camera camera, ResourceManager resourceManager, SaveFileManager saveFileManager)
+        {
+            //TODO: implement this
+            // create folder Saves\\Save_{name}
+            // -World
+            //      -ChunkHeader
+            //      -ChunkData
+            // -GameState
+            //      - files for all subsystems
+
+            // pathSaveFolder = name of created folder
+            pathWorldFolder = $"{pathSaveFolder}\\World";
+            pathGameState = $"{pathSaveFolder}\\GameState";
+
+            Settings = settings;
+            Renderer = renderer;
+            InputManager = inputManager;
+            ChunkManager = chunkManager;
+            GameObjectManager = gameObjectManager;
+            Camera = camera;
+            ResourceManager = resourceManager;
+            SaveFileManager = saveFileManager;
+
+            SetUpEngine();
+        }
+
+        public void Save()
+        {
+            OnSave();
+
+            // Unload all chunks
+
+            // Save engine state (if such even exists)
+
+            // Save managers
         }
 
         // Called once on engine load. Initializes the engine.
-        private void OnEngineLoad()
+        private void SetUpEngine()
         {
-            pathRootFolder = Util.GetAssemblyDirectory();
-            pathSavesFolder = $"{pathRootFolder}\\Saves";
-
             deltaTime = 0;
-            SetupEngineWithSettings($"{pathRootFolder}\\SettingsTemplates\\defaultSettings");
 
             // Console settings
             Console.CursorVisible = false;
-            Console.Title = Settings.title;
+            Console.Title = "Test";
             Console.OutputEncoding = Encoding.Unicode;
 
             for (var i = 0; i < debugLines.Length; i++) debugLines[i] = "";
@@ -137,15 +175,25 @@ namespace ConsoleEngine
 
         public void CloseEngine() => gameShouldClose = true;
 
+        // Called once after engine load. Initializes the derived engine.
+        protected abstract void OnLoad();
+        // Called once every frame after the engine has updated.
+        protected abstract void Update();
+        protected abstract void OnSave();
+
+
+
+
+
+
+
+
+
         #region FILES/LOADING/UNLOADING
         // Saves the current state of the game including settings and chunks in their own folder.
         protected virtual void SaveGame()
         {
-            // Unload all chunks
-
-            // Save engine state
-
-            // Save managers
+            
 
 
 
@@ -320,9 +368,6 @@ namespace ConsoleEngine
         #endregion
 
 
-        // Called once after engine load. Initializes the derived engine.
-        protected abstract void OnLoad();
-        // Called once every frame after the engine has updated.
-        protected abstract void Update();
+        
     }
 }

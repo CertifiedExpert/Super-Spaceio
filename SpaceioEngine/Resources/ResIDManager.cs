@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
-    internal class ResIDManager
+    public class ResIDManager
     {
         private List<ResID> freeResIDs = new List<ResID>();
         private uint totalResIDcount = 50;
@@ -31,6 +31,6 @@ namespace ConsoleEngine
             }
         }
 
-        public static ResID InvalidResID => new ResID(uint.MaxValue, uint.MaxValue);
+        internal static ResID InvalidResID => new ResID(uint.MaxValue, uint.MaxValue);
     }
 }

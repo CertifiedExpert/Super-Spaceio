@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
-    internal class UIDManager
+    public class UIDManager
     {
         private List<UID> freeUIDs = new List<UID>();
         private uint totalUIDcount = 50;

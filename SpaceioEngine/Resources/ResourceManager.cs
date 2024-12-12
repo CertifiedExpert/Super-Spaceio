@@ -10,13 +10,14 @@ namespace ConsoleEngine
         private Engine Engine { get; set; }
         private ResIDManager ResIDManager { get; set; }
 
-        public string resFolderPath; // TODO: plan file architecture
+        public string resFolderPath; 
 
-        public ResourceManager(Engine engine)
+        public ResourceManager(Engine engine, ResIDManager resIDManager)
         {
             Engine = engine;
-            ResIDManager = new ResIDManager();
+            ResIDManager = resIDManager;
             Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(bitmaps);
+            resFolderPath = $"{engine.pathRootFolder}\\Resources";
         }
 
         private Dictionary<string, ResID> namesAndResIDs = new Dictionary<string, ResID>(); 

@@ -65,7 +65,7 @@ namespace ConsoleEngine
         {
             var bytes = Engine.SaveFileManager.LoadChunkBytes(index);
 
-            var saveData = Engine.Serializer.FromXmlBytes<ChunkSaveData>(bytes);
+            var saveData = Serializer.FromXmlBytes<ChunkSaveData>(bytes);
             var chunk = new Chunk(Engine, index, saveData);
 
             _chunks[index] = chunk;
@@ -81,7 +81,7 @@ namespace ConsoleEngine
 
             var saveData = chunk.GetSaveData();
 
-            var bytes = Engine.Serializer.ToXmlBytes(saveData);
+            var bytes = Serializer.ToXmlBytes(saveData);
             Engine.SaveFileManager.SaveChunkBytes(bytes, index);
         }
 

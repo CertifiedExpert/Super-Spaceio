@@ -13,7 +13,7 @@ namespace ConsoleEngine
 {
     public class SaveFileManager // TODO: this REALLY needs to be bug checked...
     {
-        internal readonly string ChunksHeaderPath = ""; // TODO: actually set the path
+        internal readonly string ChunksHeaderPath = "";
         internal readonly string ChunksDataPath = "";
 
         private Dictionary<Vec2i, int> chunkInHeaderIndexes = new Dictionary<Vec2i, int>();
@@ -23,6 +23,12 @@ namespace ConsoleEngine
         private BitArray segmentOccupancy = new BitArray(bittArrayDefaultSize);
 
         private readonly int bytesForSegment = 100;
+
+        public SaveFileManager(Engine engine)
+        {
+            ChunksHeaderPath = $"{engine.pathWorldFolder}\\ChunkHeader";
+            ChunksDataPath = $"{engine.pathWorldFolder}\\ChunkData";
+        }
         internal void SaveChunkBytes(byte[] bytes, Vec2i index)
         {
             var numberOfBytes = bytes.Length;

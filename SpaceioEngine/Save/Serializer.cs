@@ -7,13 +7,13 @@ using System.Diagnostics;
 
 namespace ConsoleEngine
 {
-    public class Serializer
+    public static class Serializer
     {
         // List of types recognized by the Serializer.
-        private List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
-        public void AddKnownType(Type type) => knownTypes.Add(type);
+        private static List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
+        public static void AddKnownType(Type type) => knownTypes.Add(type);
 
-        public byte[] ToXmlBytes<T>(T instance)
+        public static byte[] ToXmlBytes<T>(T instance)
         {
             using (var stream = new MemoryStream())
             {
@@ -22,7 +22,7 @@ namespace ConsoleEngine
                 return stream.ToArray();
             }
         }
-        public T FromXmlBytes<T>(byte[] bytes)
+        public static T FromXmlBytes<T>(byte[] bytes)
         {
             using (var stream = new MemoryStream())
             {
@@ -32,7 +32,7 @@ namespace ConsoleEngine
         }
 
         // Saves an instance of T to the specified file.
-        public void ToFile<T>(T instance, string path)
+        public static void ToFile<T>(T instance, string path)
         {
             using (var fs = new FileStream(path, FileMode.Create))
             {
@@ -41,7 +41,7 @@ namespace ConsoleEngine
             } 
         }
         // Returns an instance of T from a specified file.
-        public T FromFile<T>(string path)
+        public static T FromFile<T>(string path)
         {
             using (var fs = new FileStream(path, FileMode.Open))
             {
@@ -51,7 +51,7 @@ namespace ConsoleEngine
         }
 
         // Returns a string of xml data of the specified instance of T.
-        public string ToXmlString<T>(T instance)
+        public static string ToXmlString<T>(T instance)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             using (StreamReader reader = new StreamReader(memoryStream, Encoding.UTF8))
@@ -64,7 +64,7 @@ namespace ConsoleEngine
         }
 
         // Returns an instance of T from the specified string of xml data.
-        public T FromXmlString<T>(string xml)
+        public static T FromXmlString<T>(string xml)
         {
             using (Stream stream = new MemoryStream())
             {

@@ -63,36 +63,29 @@ namespace ConsoleEngine
         internal void SetUID (UID uid) => UID = uid;
 
         // Moves the GameObject and returns a boolean to indicate whether the object was moved successfully.
-        public virtual bool MoveGameObject(int x, int y)
+        public virtual bool MoveGameObject(int x, int y) // TODO: create a method called when a collision happens. It should pass collision info.
         {
-            // Checks if the whole moved sprite is in world bounds and if it is then moves the sprite.
-            if (Position.X + x < Engine.worldSize.X && 
-                Position.X + x >= 0 &&
-                Position.Y + y < Engine.worldSize.Y &&
-                Position.Y + y >= 0)
+            // Moves the player.
+            Position = new ReadOnlyVec2i(Position.X + x, Position.Y + y);
+
+            // Collision detection.
+            if (Colliders.Count > 0)
             {
-                // Moves the player.
-                Position = new ReadOnlyVec2i(Position.X + x, Position.Y + y);
+                var isColliding = CollisionDetection();
 
-                // Collision detection.
-                if (Colliders.Count > 0)
+                if (isColliding)
                 {
-                    var isColliding = CollisionDetection();
-
-                    if (isColliding)
-                    {
-                        // Unmove the GameObject because such a movement would result in GameObjects overlapping.
-                        Position = new ReadOnlyVec2i(Position.X - x, Position.Y - y);
-                        return false;
-                    }
+                    // Unmove the GameObject because such a movement would result in GameObjects overlapping.
+                    Position = new ReadOnlyVec2i(Position.X - x, Position.Y - y);
+                    return false;
                 }
-
-                Engine.GameObjectManager.AddToMovedGameObjects(this);
-
-                return true;
             }
-            else return false;
+
+            Engine.GameObjectManager.AddToMovedGameObjects(this);
+
+            return true;
         }
+
         // Is called when a chunk was traversed by the GameObject.
         internal virtual void OnChunkTraverse() { }
 
