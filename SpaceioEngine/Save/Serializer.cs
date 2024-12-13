@@ -75,21 +75,5 @@ namespace ConsoleEngine
                 return (T)deserializer.ReadObject(stream);
             }
         }
-        
-        public void SaveKnownTypes(string knownTypesFilePath)
-        {
-            knownTypesStrings_serialize = new List<string>();
-            foreach (var type in knownTypes) knownTypesStrings_serialize.Add(type.ToString());
-            ToFile(knownTypesStrings_serialize, knownTypesFilePath);
-            knownTypesStrings_serialize = null;
-        }
-
-        public void ReadKnownTypes(string knownTypesFilePath)
-        {
-            knownTypes = new List<Type>();
-            knownTypesStrings_serialize = FromFile<List<string>>(knownTypesFilePath);
-            foreach (var str in knownTypesStrings_serialize) knownTypes.Add(Type.GetType(str));
-            knownTypesStrings_serialize = null;
-        }
     }
 }

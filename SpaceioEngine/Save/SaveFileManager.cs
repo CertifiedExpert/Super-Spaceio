@@ -26,8 +26,8 @@ namespace ConsoleEngine
 
         public SaveFileManager(Engine engine)
         {
-            ChunksHeaderPath = $"{engine.pathWorldFolder}\\ChunkHeader";
-            ChunksDataPath = $"{engine.pathWorldFolder}\\ChunkData";
+            ChunksHeaderPath = $"{engine.pathWorldFolder}\\ChunkHeader.txt";
+            ChunksDataPath = $"{engine.pathWorldFolder}\\ChunkData.txt";
         }
         internal void SaveChunkBytes(byte[] bytes, Vec2i index)
         {
