@@ -173,14 +173,5 @@ namespace ConsoleEngine
             Chunk = Engine.chunks[chunkX, chunkY];
             OnChunkTraverse(chunkX, chunkY);
         }
-        
-        public GameObjectSaveData GenerateGameObjectSaveData()
-        {
-            var sd = new GameObjectSaveData();
-
-            throw new NotImplementedException();
-
-            return sd;
-        }
     }
 }

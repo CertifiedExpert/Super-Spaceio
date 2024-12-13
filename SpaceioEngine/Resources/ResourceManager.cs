@@ -20,6 +20,15 @@ namespace ConsoleEngine
             resFolderPath = $"{engine.pathRootFolder}\\Resources";
         }
 
+        internal ResourceManager(Engine engine, ResourceManagerSaveData saveData)
+        {
+            Engine = engine;
+            Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(bitmaps);
+            resFolderPath = $"{engine.pathRootFolder}\\Resources";
+
+            ResIDManager = new ResIDManager(saveData.ResIDManager);
+        }
+
         private Dictionary<string, ResID> namesAndResIDs = new Dictionary<string, ResID>(); 
         private Dictionary<ResID, Bitmap> bitmaps = new Dictionary<ResID, Bitmap>();
         public ReadOnlyDictionary<ResID, Bitmap> Bitmaps { get; }
@@ -70,13 +79,13 @@ namespace ConsoleEngine
             throw new NotImplementedException(); //TODO: write this
         }
 
-
-        /// <summary>
-        /// Replace Bitmap in Sprite class with ResID. Unmodified Bitmaps should be loaded from file. Modified Bitmaps
-        /// sould be able to be added to 'bitmaps' pool. Optionally modified Bitmaps should be able to be saved to file in resources folder.
-        /// </summary>
-
-        /// Upgrade Sprite class (more info there)
+        internal ResourceManagerSaveData GetSaveData()
+        {
+            var sd = new ResourceManagerSaveData();
+            sd.ResIDManager = ResIDManager.GetSaveData();
+            return sd;
+        }
+        
 
 
         public static Bitmap fighter1Up;

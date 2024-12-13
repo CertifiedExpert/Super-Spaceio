@@ -11,6 +11,12 @@ namespace ConsoleEngine
         private List<UID> freeUIDs = new List<UID>();
         private uint totalUIDcount = 50;
 
+        internal UIDManager(UIDManagerSaveData saveData)
+        {
+            freeUIDs = saveData.freeUIDs;
+            totalUIDcount = saveData.totalUIDcount;
+        }
+
         internal UID GenerateUID()
         {
             if (freeUIDs.Count == 0) 
@@ -29,6 +35,14 @@ namespace ConsoleEngine
             {
                 freeUIDs.Add(new UID(i, 0));
             }
+        }
+
+        internal UIDManagerSaveData GetSaveData()
+        {
+            var sd = new UIDManagerSaveData();
+            sd.freeUIDs = freeUIDs;
+            sd.totalUIDcount = totalUIDcount;
+            return sd;
         }
     }
 }

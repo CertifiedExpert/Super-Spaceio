@@ -6,7 +6,6 @@ using System.IO;
 
 namespace ConsoleEngine
 {
-    [DataContract(IsReference = true)]
     public abstract class Engine
     {
         // Systems. TODO: change ObservableCollection to ReadOnlyCollection
@@ -80,9 +79,11 @@ namespace ConsoleEngine
             GameObjectManager = new GameObjectManager(Serializer.FromFile<GameObjectManagerSaveData>($"{pathGameState}\\GameObjectManager.txt"));
             Camera = new Camera(Serializer.FromFile<CameraSaveData>("${pathGameState}\\Camera.txt"));
             ResourceManager = new ResourceManager(Serializer.FromFile<ResourceManagerSaveData>($"{pathGameState}\\ResourceManager.txt"));
-            SaveFileManager = new SaveFileManager(Serializer.FromFile<SaveFileManagerSaveData>($"{pathGameState}\\SaveFileManager.txt"));
+            SaveFileManager = new SaveFileManager(this);
 
             SetUpEngine();
+
+            SaveFileManager.LoadChunkHeader($"{pathWorldFolder}\\ChunkHeader.txt");
         }
 
         // Sequence of creating new subsystems is vital!
@@ -118,10 +119,20 @@ namespace ConsoleEngine
             OnSave();
 
             // Unload all chunks
+            foreach (var chunk in ChunkManager.loadedChunks)
+            {
+                ChunkManager.ForceUnloadChunk(chunk.Index.X, chunk.Index.Y);
+            }
+            SaveFileManager.WriteHeaderToFile($"{pathWorldFolder}\\ChunkHeader.txt");
 
             // Save engine state (if such even exists)
 
             // Save managers
+            Serializer.ToFile(Settings, $"{pathGameState}\\Settings.txt");
+            Serializer.ToFile(ChunkManager.GetSaveData(), $"{pathGameState}\\ChunkManager.txt");
+            Serializer.ToFile(GameObjectManager.GetSaveData(), $"{pathGameState}\\GameObjectManager.txt");
+            Serializer.ToFile(Camera.GetSaveData(), $"{pathGameState}\\Camera.txt");
+            Serializer.ToFile(ResourceManager.GetSaveData(), $"{pathGameState}\\ResourceManager.txt");   
         }
 
         // Called once on engine load. Initializes the engine.
@@ -136,6 +147,8 @@ namespace ConsoleEngine
 
             for (var i = 0; i < debugLines.Length; i++) debugLines[i] = "";
             lastFrame = DateTime.Now;
+
+            GameObjectManager.FinishInit();
         }
 
         // Called once every frame

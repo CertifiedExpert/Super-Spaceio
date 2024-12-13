@@ -31,6 +31,18 @@ namespace ConsoleEngine
             loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
             chunks = new ReadOnlyDictionary<Vec2i, Chunk>(_chunks);
         }
+
+        internal ChunkManager(Engine engine, ChunkManagerSaveData saveData)
+        {
+            Engine = engine;
+            loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
+            chunks = new ReadOnlyDictionary<Vec2i, Chunk>(_chunks);
+
+            foreach (var index in saveData.Indexes)
+            {
+                _chunks.Add(index, null);
+            }
+        }
         internal void Update()
         {
             foreach (var v in chunksToBeUnloaded) UnloadChunk(v);
@@ -125,17 +137,15 @@ namespace ConsoleEngine
         }
         public bool WasChunkCreated(Vec2i v) => WasChunkCreated(v.X, v.Y);
 
-        public void CompleteDataAfterDeserialization(Engine engine)
+        internal ChunkManagerSaveData GetSaveData()
         {
-            Engine = engine;
-
-            _loadedChunks = new List<Chunk>();
-            loadedChunks = new ReadOnlyCollection<Chunk>(_loadedChunks);
-            
-            chunksToBeAddedToLoadedChunks = new List<Vec2i>();
-            chunksToBeRemovedFromLoadedChunks = new List<Vec2i>();
-            chunksToBeUnloaded = new List<Vec2i>();
-            chunksToBeLoaded = new List<Vec2i>();
+            var sd = new ChunkManagerSaveData();
+            sd.Indexes = new List<Vec2i>();
+            foreach (var index in chunks.Keys)
+            {
+                sd.Indexes.Add(index);
+            }
+            return sd;
         }
     }
 }

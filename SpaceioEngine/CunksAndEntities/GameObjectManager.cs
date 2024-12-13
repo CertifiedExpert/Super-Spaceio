@@ -23,6 +23,12 @@ namespace ConsoleEngine
             UIDManager = uIDManager;
         }
         
+        internal GameObjectManager(Engine engine, GameObjectManagerSaveData saveData)
+        {
+            Engine = engine;
+            UIDManager = new UIDManager(saveData.UIDManager);
+        }
+
         internal void Update()
         {
             // The sequence of each foreach loop is vital.
@@ -130,9 +136,11 @@ namespace ConsoleEngine
             }
         }
 
-        public void CompleteDataAfterDeserialization(Engine engine)
+        internal GameObjectManagerSaveData GetSaveData()
         {
-            Engine = engine;
+            var sd = new GameObjectManagerSaveData();
+            sd.UIDManager = UIDManager.GetSaveData();
+            return sd;
         }
     }
 }

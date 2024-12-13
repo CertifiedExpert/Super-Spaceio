@@ -222,7 +222,7 @@ namespace ConsoleEngine
 
             chunkInHeaderIndexes.Add(new Vec2i(headerEntries[headerIndex].ChunkX, headerEntries[headerIndex].ChunkY), headerIndex);
         }
-        internal void LoadChunksHeader(string path)
+        internal void LoadChunkHeader(string path)
         {
             headerEntries.Clear();
             chunkInHeaderIndexes.Clear();
@@ -233,6 +233,11 @@ namespace ConsoleEngine
                 var he = StringToHeaderEntry(lines[i]);
                 headerEntries.Add(he);
                 chunkInHeaderIndexes.Add(new Vec2i(he.ChunkX, he.ChunkY), i);
+
+                for (var j = 0; j < he.Length; j++)
+                {
+                    segmentOccupancy[he.Offset + j] = true;
+                }
             }
         }
         internal void WriteHeaderToFile(string path)
