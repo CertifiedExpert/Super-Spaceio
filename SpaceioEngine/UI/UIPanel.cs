@@ -114,7 +114,8 @@ namespace ConsoleEngine
             var sortedPanels = SortChildrenUIPanelsByPriority(this);
             foreach (var panel in sortedPanels) panel.DrawPanelToBitmap(bitmap);
 
-            return new Sprite(bitmap);
+            //return new Sprite(bitmap);
+            return null;
         }
         protected virtual void AdditionalDrawPanelToBitmapInstructions(Bitmap bitmap) { }
         private static IEnumerable<UIPanel> SortChildrenUIPanelsByPriority(UIPanel uiPanel)

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ConsoleEngine
 {
-    [DataMember]
+    [DataContract]
     public readonly struct UID : IEquatable<UID>
     {
         [DataMember] public readonly uint BaseID;

@@ -65,32 +65,12 @@ namespace Spaceio
             MoveGameObject(finalX, finalY);
         }
 
-        public override void OnCollision(GameObject collidingObject)
+        protected override void OnCollision(GameObject collidingObject)
         {
             base.OnCollision(collidingObject);
 
             Velocity = new Vec2f(0, 0);
             restOfVelocity = new Vec2f(0, 0);
-        }
-
-        public override void PrepareForSerialization()
-        {
-            base.PrepareForSerialization();
-
-            foreach (var sprite in movementSprites)
-            {
-                sprite.PrepareForDeserialization();
-            }
-        }
-
-        public override void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
-        {
-            base.CompleteDataAfterDeserialization(engine, index);
-
-            foreach (var sprite in movementSprites)
-            {
-                sprite.OnDeserialization();
-            }
         }
     }
 }

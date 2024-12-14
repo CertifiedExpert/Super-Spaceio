@@ -7,50 +7,25 @@ namespace Spaceio
         [STAThread]
         static void Main(string[] args)
         {
-            /*
-            var data = new char[30, 30];
-            var bt = new Bitmap(data);
-            
-            for (var x = 0; x < 30; x++)
-            {
-                for (var y = 0; y < 30; y++)
-                {
-                    data[x, y] = '.';
-                }
-            }
+            var game = new Game();
 
-            var pos = new Vec2i(1, 1);
-            var sx = 3;
-            var sy = 5;
-            bt.DrawRectangleOutline(pos, new Vec2i(sx, sy), 'X');
-            Draw(data);
+            var settings = new Settings(10, ' ', "  " , 1000, 196, 99, 1000);
+            var chunkManager = new ChunkManager(game);
+            var uIDManager = new UIDManager();
+            var gameObjectManager = new GameObjectManager(game, uIDManager);
+            var camera = new Camera(new Vec2i(0, 0), new Vec2i(settings.CameraSizeX, settings.CameraSizeY));
+            var resIDManager = new ResIDManager();
+            var resourceManager = new ResourceManager(game, resIDManager);
+            var saveFileManager = new SaveFileManager(game);
+            var renderer = new Renderer(game);
+            var inputManager = new InputManager();
+
+            game.NewSave("test", settings, chunkManager, gameObjectManager, camera, resourceManager,
+                saveFileManager, renderer, inputManager);
+
+            game.Run();
 
             Console.ReadLine();
-            */
-
-            Engine engine = new Game();
         }
-
-        /*
-        private static void Draw(char[,] data)
-        {
-            Console.SetCursorPosition(0, 0);
-
-            var finalString = string.Empty;
-            for (int y = data.GetLength(1) - 1; y >= 0; y--)
-            {
-                var line = "";
-                for (int x = 0; x < data.GetLength(0); x++)
-                {
-                    line += data[x, y].ToString();
-                    line += " ";
-                }
-
-                finalString += line + "\n";
-            }
-
-            Console.WriteLine(finalString);
-        }
-        */
     }
 }

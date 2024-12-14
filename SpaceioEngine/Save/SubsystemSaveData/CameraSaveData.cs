@@ -1,11 +1,12 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace ConsoleEngine
 {
     [DataContract]
     internal class CameraSaveData
     {
-        [DataMember] Vec2i Position;
-        [DataMember] Vec2i Size;
+        [DataMember] public Vec2i Position;
+        [DataMember] public Vec2i Size;
     }
 }

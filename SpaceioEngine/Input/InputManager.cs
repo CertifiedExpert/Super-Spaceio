@@ -100,7 +100,7 @@ namespace ConsoleEngine
         }
 
         // Updates inputs with the currently held buttons + deactivates those released
-        internal void UpdateInput(Engine engine)
+        internal void UpdateInput()
         {
             UpdateButton(Key.D1, D1);
             UpdateButton(Key.D2, D2);

@@ -15,9 +15,12 @@ namespace ConsoleEngine
         public Renderer(Engine engine)
         {
             Engine = engine;
+        }
 
+        internal void Init()
+        {
             // Initialize the screenBuffer.
-            screenBuffer = new char[engine.Camera.Size.X, engine.Camera.Size.Y];
+            screenBuffer = new char[Engine.Camera.Size.X, Engine.Camera.Size.Y];
 
             // Fill screenBuffer with background pixels initializing all pixels.
             ClearBuffer(screenBuffer);
@@ -137,6 +140,7 @@ namespace ConsoleEngine
         // Renders the Sprite of the provided parent UIPanel to the screenBuffer. 
         private void WriteParentPanelToScreenBuffer(UIPanel uiPanel)
         {
+            /*
             var sprite = uiPanel.GetParentPanelSprite();
             for (var x = 0; x < sprite.BitmapID.Size.X; x++)
             {
@@ -145,12 +149,7 @@ namespace ConsoleEngine
                     screenBuffer[uiPanel.Position.X + x, uiPanel.Position.Y + y] = sprite.BitmapID.Data[x, y];
                 }
             }
-        }
-
-        public void CompleteDataAfterDeserialization(Engine engine)
-        {
-            Engine = engine;
-            screenBuffer = new char[engine.Settings.CameraSizeX, engine.Settings.CameraSizeY];
+            */
         }
     }
 }

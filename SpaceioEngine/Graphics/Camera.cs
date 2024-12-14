@@ -17,12 +17,17 @@ namespace ConsoleEngine
         internal Camera(CameraSaveData saveData)
         {
             Position = saveData.Position;
-            Size = saveData.Size;
+            Size = new ReadOnlyVec2i(saveData.Size.X, saveData.Size.Y);
         }
 
+        public void Move(int x, int y) => Move(new Vec2i(x, y));
+        public void Move(Vec2i position)
+        {
+            Position = position;
+        }
         internal CameraSaveData GetSaveData()
         {
-            var sd = new CamerSaveData();
+            var sd = new CameraSaveData();
             sd.Position = Position;
             sd.Size = Size;
             return sd;

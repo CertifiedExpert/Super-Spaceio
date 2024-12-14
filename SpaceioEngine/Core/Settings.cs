@@ -11,7 +11,19 @@ namespace ConsoleEngine
         [DataMember] public int chunkSize { get; private set; } // The size of each chunk (both in X- and Y- axis as the chunk is a square).
         [DataMember] public int CameraSizeX { get; private set; } // The size of the camera in the X-axis.
         [DataMember] public int CameraSizeY { get; private set; } // The size of the camera in the Y-axis.
-        [DataMember] public Vec2i CameraStartPosition { get; private set; } // The start position of the camera.
         [DataMember] public int milisecondsForNextFrame { get; private set; } // Minimum number of milliseconds which needs to pass for the next frame to proceed.
+
+        public Settings(int spriteLevelCount, char backgroundPixel, string pixelSpacingCharacters, int chunkSize, int cameraSizeX,
+            int cameraSizeY, int millisecondsForNextFrame)
+        {
+            this.spriteLevelCount = spriteLevelCount;
+            this.backgroudPixel = backgroundPixel;
+            this.pixelSpacingCharacters = pixelSpacingCharacters;
+            this.chunkSize = chunkSize;
+            this.CameraSizeX = cameraSizeX;
+            this.CameraSizeY = cameraSizeY;
+            this.milisecondsForNextFrame = millisecondsForNextFrame;
+        }
+
     }
 }

@@ -22,8 +22,8 @@ namespace ConsoleEngine
         private List<Vec2i> chunksToBeUnloaded = new List<Vec2i>(); // List of chunks which have been scheduled to be unloaded.
         private List<Vec2i> chunksToBeLoaded = new List<Vec2i>();
 
-        internal delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
-        internal event ChunkLoadedEventHandler ChunkLoaded; 
+        public delegate void ChunkLoadedEventHandler(Vec2i chunkIndex);
+        public event ChunkLoadedEventHandler ChunkLoaded; // Subscribe to this if you want to add changes to chunk after it has been loaded (like ex. growing plants by the amount of time which has passed since Chunks.LastUnloaded.)
         internal event EventHandler ChunkLoadingEnded; 
         public ChunkManager(Engine engine)
         {

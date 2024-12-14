@@ -134,7 +134,7 @@ namespace ConsoleEngine
             return false;
         }
         // Gets called when a collision has been detected. Passes the GameObject which it collided with.
-        internal virtual void OnCollision(GameObject collidingObject) { }
+        protected virtual void OnCollision(GameObject collidingObject) { }
         
         // Is called each frame and updates the GameObject. Updated all Animators of GameObject if it has any (if it doesn't, Animation property is null and is ignored).
         public virtual void Update()
@@ -151,11 +151,13 @@ namespace ConsoleEngine
             sd.UID = UID;
             sd.Position = new Vec2i(Position.X, Position.Y);
             sd.SpriteLevel = SpriteLevel;
+            sd.Sprites = new List<SpriteSaveData>();
             foreach (var sprite in Sprites) 
             {
                 var spriteSD = sprite.GetSaveData();
                 sd.Sprites.Add(spriteSD);
             }
+            sd.Colliders = new List<ColliderSaveData>();
             foreach (var collider in Colliders) 
             {
                 var colliderSD = collider.GetSaveData();
@@ -163,15 +165,6 @@ namespace ConsoleEngine
             }
 
             return sd;
-        }
-
-
-
-        // Is called when a Chunk to which the GameObject started belonging during it being unloaded is finally loaded. Calls OnChunkTraverse and sets GameObject.Chunk because when a GameObject is added to an unloaded Chunk is it automatically treated as if it was unloaded itself, so the OnChunkTraverse() or GameObject.Chunk.set() is not called as that would be calling a method on an unloaded GameObject meaning the GameObject must be processed after the chunk awakens to have all data.
-        public void OnUnloadedChunkAwake(int chunkX, int chunkY) //TODO: update this when you get around to writinng save/load system
-        {
-            Chunk = Engine.chunks[chunkX, chunkY];
-            OnChunkTraverse(chunkX, chunkY);
         }
     }
 }

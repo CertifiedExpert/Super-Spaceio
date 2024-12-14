@@ -14,7 +14,6 @@ namespace ConsoleEngine
         public Animator Animator { get; set; }
         public Shader Shader { get; set; }
 
-        private char[][] jaggedizedBitmapData_serialize;
         public Sprite (ResID bitmap)
         {
             BitmapID = bitmap;
@@ -49,20 +48,5 @@ namespace ConsoleEngine
         }
 
         public static char DefaultShader(int x, int y, Bitmap bitmap, object[] args) => bitmap.Data[x, y];
-
-
-
-        // Prepares the sprite for deserialization (serializer does not allow for 2d-arrays but allows jagged arrays)
-        public void PrepareForDeserialization()
-        {
-            jaggedizedBitmapData_serialize = Util.Jaggedize2dArray(BitmapID.Data);
-        }
-        // Called on deserialization of the sprite. Brings it back to it's pre-jaggedized state.
-        public void OnDeserialization()
-        {
-            var data = Util.UnJaggedize2dArray(jaggedizedBitmapData_serialize);
-            BitmapID = new Bitmap(data);
-            jaggedizedBitmapData_serialize = null;
-        }
     }
 }

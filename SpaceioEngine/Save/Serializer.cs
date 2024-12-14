@@ -10,7 +10,7 @@ namespace ConsoleEngine
     public static class Serializer
     {
         // List of types recognized by the Serializer.
-        private static List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
+        public static List<Type> knownTypes = new List<Type>() {typeof(GameObject) };
         public static void AddKnownType(Type type) => knownTypes.Add(type);
 
         public static byte[] ToXmlBytes<T>(T instance)

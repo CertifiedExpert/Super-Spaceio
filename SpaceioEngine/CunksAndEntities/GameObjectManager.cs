@@ -112,7 +112,7 @@ namespace ConsoleEngine
             }
         }
 
-        internal void FinishInit() // TODO: when the Engine has created instances of all subsystems, call this function to finish init
+        internal void Init() // TODO: when the Engine has created instances of all subsystems, call this function to finish init
         {
             Engine.ChunkManager.ChunkLoaded += ChunkManager_ChunkLoaded;
             Engine.ChunkManager.ChunkLoadingEnded += ChunkManager_ChunkLoadingEnded;

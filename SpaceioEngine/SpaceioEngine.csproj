@@ -75,7 +75,6 @@
     <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Math\EMath.cs" />
     <Compile Include="Physics\Collider.cs" />
-    <Compile Include="Misc\GoBind.cs" />
     <Compile Include="Math\ReadOnlyVec2i.cs" />
     <Compile Include="Resources\ResID.cs" />
     <Compile Include="Resources\ResIDManager.cs" />
@@ -98,6 +97,12 @@
     <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Math\Vec2f.cs" />
+    <Compile Include="Save\SubsystemSaveData\CameraSaveData.cs" />
+    <Compile Include="Save\SubsystemSaveData\ChunkManagerSaveData.cs" />
+    <Compile Include="Save\SubsystemSaveData\GameObjectManagerSaveData.cs" />
+    <Compile Include="Save\SubsystemSaveData\ResIDManagerSaveData.cs" />
+    <Compile Include="Save\SubsystemSaveData\ResourceManagerSaveData.cs" />
+    <Compile Include="Save\SubsystemSaveData\UIDManagerSaveData.cs" />
     <Compile Include="UI\UIComponent.cs" />
     <Compile Include="UI\UIImageBox.cs" />
     <Compile Include="UI\UIManager.cs" />
@@ -127,8 +132,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Save\SubsystemSaveData\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -17,7 +17,6 @@ namespace ConsoleEngine
             Engine = engine;
             ResIDManager = resIDManager;
             Bitmaps = new ReadOnlyDictionary<ResID, Bitmap>(bitmaps);
-            resFolderPath = $"{engine.pathRootFolder}\\Resources";
         }
 
         internal ResourceManager(Engine engine, ResourceManagerSaveData saveData)
@@ -32,6 +31,11 @@ namespace ConsoleEngine
         private Dictionary<string, ResID> namesAndResIDs = new Dictionary<string, ResID>(); 
         private Dictionary<ResID, Bitmap> bitmaps = new Dictionary<ResID, Bitmap>();
         public ReadOnlyDictionary<ResID, Bitmap> Bitmaps { get; }
+
+        internal void Init()
+        {
+            resFolderPath = $"{Engine.pathRootFolder}\\Resources";
+        }
 
         internal void LoadAllBitmapsFromFolder(string path)
         {
@@ -102,7 +106,7 @@ namespace ConsoleEngine
         public static Bitmap enemyDefault2;
 
         public static Bitmap asteroid;
-        public static void Init()
+        public static void Initialize()
         {
             #region FighterSprites
 

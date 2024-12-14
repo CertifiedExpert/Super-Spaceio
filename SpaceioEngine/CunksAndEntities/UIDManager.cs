@@ -9,8 +9,9 @@ namespace ConsoleEngine
     public class UIDManager
     {
         private List<UID> freeUIDs = new List<UID>();
-        private uint totalUIDcount = 50;
+        private uint totalUIDcount = 0;
 
+        public UIDManager() { }
         internal UIDManager(UIDManagerSaveData saveData)
         {
             freeUIDs = saveData.freeUIDs;

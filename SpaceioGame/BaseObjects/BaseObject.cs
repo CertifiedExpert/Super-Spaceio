@@ -13,16 +13,9 @@ namespace Spaceio
             Game = game;
         }
 
-        public override void OnCollision(GameObject collidingObject)
+        protected override void OnCollision(GameObject collidingObject)
         {
 
-        }
-
-        public override void CompleteDataAfterDeserialization(Engine engine, Vec2i index)
-        {
-            base.CompleteDataAfterDeserialization(engine, index);
-
-            Game = (Game)engine;
         }
     }
 }

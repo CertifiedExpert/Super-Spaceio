@@ -76,10 +76,10 @@ namespace ConsoleEngine
             pathGameState = $"{pathSaveFolder}\\GameState";
 
             Settings = Serializer.FromFile<Settings>($"{pathGameState}\\Settings.txt");
-            ChunkManager = new ChunkManager(Serializer.FromFile<ChunkManagerSaveData>($"{pathGameState}\\ChunkManager.txt"));
-            GameObjectManager = new GameObjectManager(Serializer.FromFile<GameObjectManagerSaveData>($"{pathGameState}\\GameObjectManager.txt"));
+            ChunkManager = new ChunkManager(this, Serializer.FromFile<ChunkManagerSaveData>($"{pathGameState}\\ChunkManager.txt"));
+            GameObjectManager = new GameObjectManager(this, Serializer.FromFile<GameObjectManagerSaveData>($"{pathGameState}\\GameObjectManager.txt"));
             Camera = new Camera(Serializer.FromFile<CameraSaveData>("${pathGameState}\\Camera.txt"));
-            ResourceManager = new ResourceManager(Serializer.FromFile<ResourceManagerSaveData>($"{pathGameState}\\ResourceManager.txt"));
+            ResourceManager = new ResourceManager(this, Serializer.FromFile<ResourceManagerSaveData>($"{pathGameState}\\ResourceManager.txt"));
             SaveFileManager = new SaveFileManager(this);
 
             SetUpEngine();
@@ -88,11 +88,11 @@ namespace ConsoleEngine
         }
 
         // Sequence of creating new subsystems is vital!
-        public void NewSave(string name, Settings settings, Renderer renderer, InputManager inputManager, ChunkManager chunkManager,
-            GameObjectManager gameObjectManager, Camera camera, ResourceManager resourceManager, SaveFileManager saveFileManager)
+        public void NewSave(string name, Settings settings, ChunkManager chunkManager, GameObjectManager gameObjectManager, Camera camera,
+            ResourceManager resourceManager, SaveFileManager saveFileManager, Renderer renderer, InputManager inputManager)
         {
             var saveName = name;
-            while (!Directory.Exists($"{pathRootFolder}\\Saves\\{saveName}")) saveName += "(1)";
+            while (Directory.Exists($"{pathRootFolder}\\Saves\\{saveName}")) saveName += "(1)";
 
             // folder Saves\\{saveName}:
             // -World
@@ -102,7 +102,7 @@ namespace ConsoleEngine
             //      - files for all subsystems
 
             pathSaveFolder = $"{pathRootFolder}\\Saves\\{saveName}";
-            Direcotry.CreateDirectory($"{pathSaveFolder}");
+            Directory.CreateDirectory($"{pathSaveFolder}");
             pathWorldFolder = $"{pathSaveFolder}\\World";
             pathGameState = $"{pathSaveFolder}\\GameState";
             Directory.CreateDirectory($"{pathWorldFolder}");
@@ -152,14 +152,17 @@ namespace ConsoleEngine
             for (var i = 0; i < debugLines.Length; i++) debugLines[i] = "";
             lastFrame = DateTime.Now;
 
-            GameObjectManager.FinishInit();
+            GameObjectManager.Init();
+            ResourceManager.Init();
+            SaveFileManager.Init();
+            Renderer.Init();
         }
 
         // Called once every frame
         private void EngineUpdate()
         {
             // Registers input.
-            InputManager.UpdateInput(this);
+            InputManager.UpdateInput();
 
             UIManager.Update();
 

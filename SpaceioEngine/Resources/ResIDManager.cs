@@ -9,8 +9,14 @@ namespace ConsoleEngine
     public class ResIDManager
     {
         private List<ResID> freeResIDs = new List<ResID>();
-        private uint totalResIDcount = 50;
+        private uint totalResIDcount = 0;
 
+        public ResIDManager() { }
+        internal ResIDManager(ResIDManagerSaveData saveData)
+        {
+            freeResIDs = saveData.freeResIDs;
+            totalResIDcount = saveData.totalResIDCount;
+        }
         internal ResID GenerateResID()
         {
             if (freeResIDs.Count == 0)
@@ -32,5 +38,13 @@ namespace ConsoleEngine
         }
 
         internal static ResID InvalidResID => new ResID(uint.MaxValue, uint.MaxValue);
+
+        internal ResIDManagerSaveData GetSaveData()
+        {
+            var sd = new ResIDManagerSaveData();
+            sd.freeResIDs = freeResIDs;
+            sd.totalResIDCount = totalResIDcount;
+            return sd;
+        }
     }
 }

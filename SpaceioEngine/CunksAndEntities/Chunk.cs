@@ -59,7 +59,7 @@ namespace ConsoleEngine
         {
             var sd = new ChunkSaveData();
             sd.lastUnloaded = LastUnloaded;
-
+            sd.gameObjects = new List<GameObjectSaveData>();
             foreach (var go in _gameObjects.Values)
             {
                 var goSd = go.GetSaveData();
